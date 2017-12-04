@@ -1,0 +1,23 @@
+.srb-button {
+  padding: 10px;
+
+  color: white !important;
+  text-decoration: none;
+  background-color: #FFBC00;
+  border-radius: 100px;
+}
+
+.srb-button:hover, .srb-button:active, .srb-button:focus {
+  background-color: #E0A000;
+  text-decoration: none !important;
+  cursor: pointer;
+}
+
+h3 .srb-button {
+  padding: 10px;
+
+  color: white !important;
+  text-decoration: none;
+  background-color: #FFBC00;
+  border-radius: 100px;
+}

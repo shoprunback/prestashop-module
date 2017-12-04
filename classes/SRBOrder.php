@@ -1,50 +1,80 @@
 <?php
 
-include_once 'Synchronizer.php';
+include_once 'SRBObject.php';
+include_once 'SRBCustomer.php';
+include_once 'SRBItem.php';
 
-class SRBOrder extends Synchronizer {
+class SRBOrder extends SRBObject
+{
     public $ordered_at;
     public $customer;
     public $order_number;
     public $items;
 
     public function __construct ($psOrder) {
-        $identifier = 'id';
+        $this->order_number = $this->extractOrderNumber($psOrder);
+        $this->ordered_at = $psOrder['date_add'];
+        $this->customer = SRBCustomer::createFromOrder($psOrder);
+        $this->items = SRBItem::createItemsFromOrder($this->order_number);
+    }
 
-        if (isset($psOrder->id_order)) {
-            $identifier = 'id_order';
+    static public function getSRBApiCallType () {
+        return 'order';
+    }
+
+    static public function getIdentifier () {
+        return 'order_number';
+    }
+
+    static public function getTableName () {
+        return 'o';
+    }
+
+    static public function getIdColumnName () {
+        return 'id_order';
+    }
+
+    public function getProducts () {
+        $products = [];
+        foreach ($this->items as $item) {
+            $products[] = $item->product;
         }
 
-        $this->order_number = $psOrder->{$identifier};
-        $this->ordered_at = $psOrder->date_add;
-        $this->customer = $this->formalizeCustomerForAPI($psOrder);
+        return $products;
+    }
 
+    static public function syncAll () {
+        $orders = self::getAll();
+
+        $responses = [];
+        foreach ($orders as $order) {
+            $responses[] = $order->sync();
+        }
+
+        return $responses;
+    }
+
+    public function sync () {
+        return Synchronizer::sync($this, 'order');
+    }
+
+    // SQL object extractors
+
+    static private function extractOrderNumber ($psOrderArrayName) {
+        return isset($psOrderArrayName['id_order']) ? $psOrderArrayName['id_order'] : $psOrderArrayName['id'];
+    }
+
+    // private (class) methods
+
+    static protected function findAllQuery () {
         $sql = new DbQuery();
-        $sql->select('p.id_product, p.price, p.id_manufacturer, p.weight, p.width, p.height, p.depth, pl.name, cu.iso_code');
+        $sql->select('o.*, c.*, a.*, s.name as stateName, co.*');
         $sql->from('orders', 'o');
-        $sql->innerJoin('currency', 'cu', 'cu.id_currency = o.id_currency');
-        $sql->innerJoin('cart', 'ca', 'o.id_cart = ca.id_cart');
-        $sql->innerJoin('cart_product', 'cp', 'ca.id_cart = cp.id_cart');
-        $sql->innerJoin('product', 'p', 'p.id_product = cp.id_product');
-        $sql->innerJoin('product_lang', 'pl', 'p.id_product = pl.id_product');
-        $sql->where('o.id_order = ' . $psOrder->order_number);
-        $sql->where('p.id_manufacturer > 0');
-        $products = Db::getInstance()->executeS($sql);
+        $sql->innerJoin('customer', 'c', 'o.id_customer = c.id_customer');
+        $sql->innerJoin('address', 'a', 'c.id_customer = a.id_customer');
+        $sql->innerJoin('country', 'co', 'a.id_country = co.id_country');
+        $sql->leftJoin('state', 's', 'a.id_state = s.id_state');
 
-        $items = [];
-        foreach ($products as $product) {
-            $productObject = $this->arrayToObject($product);
-
-            $item = new stdClass();
-            $item->label = 'string';
-            $item->reference = 'string';
-            $item->price_cents = $productObject->price;
-            $item->currency = $productObject->iso_code;
-            $item->product = new Product($productObject);
-
-            $items[] = $item;
-        }
-
-        $this->items = $items;
+        return $sql;
     }
 }

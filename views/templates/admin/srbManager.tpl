@@ -36,13 +36,6 @@
         </ul>
     </div>
 
-    <!-- <h3>
-        <button class="post-all" data-type="products">Send all products to ShopRunBack</button>
-        <button class="post-all" data-type="brands">Send all brands to ShopRunBack</button>
-        <button class="post-all" data-type="orders">Send all orders to ShopRunBack</button>
-    </h3>
-    <p>{$conditionsToSend}</p> -->
-
     <div class="data">
         <div class="banner">
             <h1>

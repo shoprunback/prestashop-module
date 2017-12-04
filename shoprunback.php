@@ -4,17 +4,14 @@ if (! defined('_PS_VERSION_')) {
 }
 
 include_once 'sqlQueries.php';
-include_once 'classes/Formalizer.php';
 include_once 'classes/SRBBrand.php';
 include_once 'classes/SRBOrder.php';
 include_once 'classes/SRBProduct.php';
 
 class ShopRunBack extends Module {
-    const API_CALLS_TABLE_NAME = _DB_PREFIX_ . 'srb_api_calls';
-    const API_CALLS_INDEX_NAME = 'index_type_id_item';
-    const API_CALLS_INDEX_COLUMNS = 'type, id_item';
-
     public $formalizer;
+    public $dirurl;
+    public $url;
 
     public function __construct () {
         // Mandatory parameters
@@ -32,9 +29,12 @@ class ShopRunBack extends Module {
         $this->displayName = $this->trans('ShopRunBack');
         $this->description = $this->trans('ShopRunBack helps you by registering all your products\' updates, additions or deletions');
         $this->confirmUninstall = $this->trans('Are you sure you want to delete ShopRunBack?');
+        $this->bootstrap = true;
 
-        $this->formalizer = new Formalizer();
-
+        // Custom parameters
+        $this->dirurl = 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']);
+        $this->url = 'http://localhost:3000';
+        // $this->url = 'https://dashboard.shoprunback.com';
         $message = '';
         if (Tools::getValue('message') && Tools::getValue('messageType')) {
             $message = $_GET['message'];

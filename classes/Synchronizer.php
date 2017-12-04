@@ -1,28 +1,17 @@
 <?php
 
-include_once 'Formalizer.php';
-
-abstract class Synchronizer {
-    public $dirurl;
-    public $SRBModulePath;
-    public $SRBModuleURL;
-    public $url;
-    public $apiUrl;
-
-    public function __construct () {
-        // Custom parameters
-        $this->url = 'http://localhost:3000';
-        // $this->url = 'https://dashboard.shoprunback.com';
-        $this->apiUrl = $this->url . '/api/v1';
-        $this->dirurl = 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']);
-        $this->SRBModulePath = _PS_MODULE_DIR_ . $this->name;
-        $this->SRBModuleURL = $this->dirurl . '/modules/' . $this->name;
-        $this->bootstrap = true;
-    }
+abstract class Synchronizer
+{
+    const API_CALLS_TABLE_NAME = _DB_PREFIX_ . 'srb_api_calls';
+    const API_CALLS_INDEX_NAME = 'index_type_id_item';
+    const API_CALLS_INDEX_COLUMNS = 'type, id_item';
+    const SRB_BASE_URL = 'http://localhost:3000';
+    // const SRB_BASE_URL = 'https://dashboard.shoprunback.com';
+    const SRB_API_URL = self::SRB_BASE_URL . '/api/v1';
 
     public function APIcall ($path, $type, $json = '') {
         $path = str_replace(' ', '%20', $path);
-        $url = $this->apiUrl . '/' . $path;
+        $url = self::SRB_API_URL . '/' . $path;
 
         $headers = ['accept: application/json'];
         $headers = ['Content-Type: application/json'];
@@ -65,8 +54,26 @@ abstract class Synchronizer {
         return $response;
     }
 
-    protected function insertApiCallLog ($item, $type) {
-        $dbName = str_replace(_DB_PREFIX_, '', ShopRunBack::API_CALLS_TABLE_NAME);
+    static public function sync ($item, $itemType) {
+        $itemType = rtrim($itemType, 's');
+        $path = $itemType . 's';
+        $identifier = $item::getIdentifier();
+
+        $postResult = '';
+        $getResult = self::APIcall($path . '/' . $item->{$identifier}, 'GET');
+        if ($getResult != '' && $path != 'orders') {
+            $postResult = self::APIcall($path . '/' . $item->{$identifier}, 'PUT', json_encode($item));
+        } else {
+            $postResult = self::APIcall($path, 'POST', json_encode($item));
+        }
+
+        self::insertApiCallLog($item, $itemType);
+
+        return $postResult;
+    }
+
+    static private function insertApiCallLog ($item, $type) {
+        $dbName = str_replace(_DB_PREFIX_, '', self::API_CALLS_TABLE_NAME);
         $idItem = 'id_' . $type;
         if (! isset($item->$idItem)) {
             if (isset($item->reference)) {
@@ -82,18 +89,5 @@ abstract class Synchronizer {
             'type' => $type,
             'last_sent' => date('Y-m-d H:i:s')
         ]);
-    }
-
-    protected function getAll () {
-        $manufacturerSql = new DbQuery();
-        $manufacturerSql->select('m.*');
-        $manufacturerSql->from('manufacturer', 'm');
-        $manufacturerSql->where('m.id_manufacturer = ' . $manufacturer);
-        $manufacturerFromDB = Db::getInstance()->executeS($manufacturerSql)[0];
-        $manufacturer = $this->formalizer->arrayToObject($manufacturerFromDB);
-    }
-
-    public function postItem () {
-
     }
 }

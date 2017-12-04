@@ -3,21 +3,6 @@
   font-family: "Montserrat", "Trebuchet MS", sans-serif;
 }
 
-#srb-content .srb-button {
-  padding: 10px;
-
-  color: white !important;
-  text-decoration: none;
-  background-color: #FFBC00;
-  border-radius: 100px;
-}
-
-#srb-content .srb-button:hover, #srb-content .srb-button:active, .srb-button:focus {
-  background-color: #E0A000;
-  text-decoration: none !important;
-  cursor: pointer;
-}
-
 
 
 #srb-content .header {

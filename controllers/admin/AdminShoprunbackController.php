@@ -7,6 +7,7 @@ class AdminShoprunbackController extends ModuleAdminController
         parent::__construct();
         $this->bootstrap = true;
         $this->token = isset($_GET['token']) ? $_GET['token'] : '';
+        $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/srbGlobal.css');
 
         if ($_GET && isset($_GET['action'])) {
             $function = $_GET['action'];
@@ -24,7 +25,7 @@ class AdminShoprunbackController extends ModuleAdminController
 
         $this->context->smarty->assign('token', Configuration::get('token'));
         $this->context->smarty->assign('shoprunbackURL', $this->module->url);
-        $this->context->smarty->assign('shoprunbackAPIURL', $this->module->apiUrl);
+        $this->context->smarty->assign('shoprunbackAPIURL', Synchronizer::SRB_API_URL);
         $this->context->smarty->assign(
             'asyncCall',
             $this->module->dirurl . '/index.php?controller=AdminShoprunback&token=' . $this->token . '&action=asyncCall'
@@ -148,8 +149,14 @@ class AdminShoprunbackController extends ModuleAdminController
     }
 
     public function test () {
-        $product = SRBProduct::getById(1);
-        echo '<pre>';print_r($product);echo '</pre>';
+        // $products = [];
+        // $products[] = SRBOrder::getAll();
+        $product = SRBProduct::getById(2);
+        $result = $product->findWithSRBApiCallQuery();
+        // $result = $product->sync();
+        $result = SRBOrder::syncAll();
+        // echo '<pre>';print_r($products);echo '</pre>';
+        echo '<pre>';print_r($result);echo '</pre>';
         die;
         // $result = $this->module->postProduct($product);
 
