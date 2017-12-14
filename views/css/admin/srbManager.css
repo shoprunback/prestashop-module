@@ -1,0 +1,54 @@
+#srb-manager {
+  margin-top: 40px;
+}
+
+
+
+#srb-manager .banner p {
+  margin-top: 30px;
+}
+
+
+
+#srb-manager table tr {
+  height: 40px;
+}
+
+#srb-manager table td, #srb-manager table th {
+  text-align: center;
+}
+
+#srb-manager table img {
+  max-width: 100px;
+}
+
+
+
+#srb-manager .pagination {
+  padding: 0;
+  width: 100%;
+  text-align: center;
+}
+
+#srb-manager .pagination ul {
+  display: inline-block;
+}
+
+#srb-manager .pagination ul li {
+  float: left;
+  list-style-type: none;
+}
+
+#srb-manager .pagination ul li a {
+  padding: 0;
+  color: #505050;
+}
+
+#srb-manager .pagination ul li button {
+  padding: 5px 2px;
+  font-weight: bold;
+}
+
+#srb-manager .pagination ul .active button {
+  color: #40A0F0;
+}

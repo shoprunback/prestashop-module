@@ -21,6 +21,23 @@ class SRBItem
     // private (class) methods
 
     static public function createItemsFromOrder ($orderId) {
+        $sql = self::findProductsForItems();
+        $sql->where('o.id_order = ' . $orderId);
+        $productsFromDB = Db::getInstance()->executeS($sql);
+
+        return self::generateItemsWithProducts($productsFromDB);
+    }
+
+    static public function createItemsFromOrderDetail ($orderDetailId) {
+        $sql = self::findProductsForItems();
+        $sql->innerJoin('order_detail', 'od', 'od.id_order = o.id_order');
+        $sql->where('od.id_order_detail = ' . $orderDetailId);
+        $productsFromDB = Db::getInstance()->executeS($sql);
+
+        return self::generateItemsWithProducts($productsFromDB);
+    }
+
+    static private function findProductsForItems () {
         $sql = new DbQuery();
         $sql->select('p.*, pl.name, cu.iso_code');
         $sql->from('product', 'p');
@@ -29,12 +46,14 @@ class SRBItem
         $sql->innerJoin('cart', 'ca', 'cp.id_cart = ca.id_cart');
         $sql->innerJoin('orders', 'o', 'ca.id_cart = o.id_cart');
         $sql->innerJoin('currency', 'cu', 'cu.id_currency = o.id_currency');
-        $sql->where('o.id_order = ' . $orderId);
-        $productsFromDB = Db::getInstance()->executeS($sql);
 
+        return $sql;
+    }
+
+    static private function generateItemsWithProducts ($products) {
         $items = [];
-        foreach ($productsFromDB as $productFromDB) {
-            $items[] = new self($productFromDB);
+        foreach ($products as $product) {
+            $items[] = new self($product);
         }
 
         return $items;

@@ -12,6 +12,7 @@ class SRBOrder extends SRBObject
     public $items;
 
     public function __construct ($psOrder) {
+        $this->ps = $psOrder;
         $this->order_number = $this->extractOrderNumber($psOrder);
         $this->ordered_at = $psOrder['date_add'];
         $this->customer = SRBCustomer::createFromOrder($psOrder);
@@ -23,6 +24,10 @@ class SRBOrder extends SRBObject
     }
 
     static public function getIdentifier () {
+        return 'order_number';
+    }
+
+    static public function getDisplayNameAttribute () {
         return 'order_number';
     }
 
@@ -43,8 +48,8 @@ class SRBOrder extends SRBObject
         return $products;
     }
 
-    static public function syncAll () {
-        $orders = self::getAll();
+    static public function syncAll ($newOnly = false) {
+        $orders = $newOnly ? self::getAllNotSync() : self::getAll();
 
         $responses = [];
         foreach ($orders as $order) {
@@ -66,14 +71,24 @@ class SRBOrder extends SRBObject
 
     // private (class) methods
 
-    static protected function findAllQuery () {
-        $sql = new DbQuery();
-        $sql->select('o.*, c.*, a.*, s.name as stateName, co.*');
-        $sql->from('orders', 'o');
-        $sql->innerJoin('customer', 'c', 'o.id_customer = c.id_customer');
+    static public function createFromReturn ($return) {
+        return new self($return);
+    }
+
+    static public function addComponentsToQuery ($sql) {
+        $sql->select(self::getTableName() . '.*, c.*, a.*, s.name as stateName, co.*');
+        $sql->innerJoin('customer', 'c', self::getTableName() . '.id_customer = c.id_customer');
         $sql->innerJoin('address', 'a', 'c.id_customer = a.id_customer');
         $sql->innerJoin('country', 'co', 'a.id_country = co.id_country');
         $sql->leftJoin('state', 's', 'a.id_state = s.id_state');
+
+        return $sql;
+    }
+
+    static protected function findAllQuery () {
+        $sql = new DbQuery();
+        $sql->from('orders', self::getTableName());
+        $sql = self::addComponentsToQuery($sql);
 
         return $sql;
     }

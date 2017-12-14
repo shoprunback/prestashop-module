@@ -2,146 +2,210 @@
 class AdminShoprunbackController extends ModuleAdminController
 {
     public $token;
+    private $actionResult;
 
     public function __construct() {
         parent::__construct();
         $this->bootstrap = true;
         $this->token = isset($_GET['token']) ? $_GET['token'] : '';
         $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/srbGlobal.css');
+        $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin/header.css');
+        $this->actionResult = false;
 
         if ($_GET && isset($_GET['action'])) {
             $function = $_GET['action'];
-            $this->{$function}();
+            $this->actionResult = $this->{$function}();
         }
     }
 
-    public function initContent() {
-        $link = new Link();
-        parent::initContent();
-        $this->context->smarty->assign(
-            'configurationURL',
-            $this->module->dirurl . '/index.php?controller=AdminModules&configure=shoprunback&token=' . $this->token
-        );
+    private function handleConfig () {
+        $srbtoken = isset($_POST['srbtoken']) ? $_POST['srbtoken'] : '';
 
-        $this->context->smarty->assign('token', Configuration::get('token'));
-        $this->context->smarty->assign('shoprunbackURL', $this->module->url);
-        $this->context->smarty->assign('shoprunbackAPIURL', Synchronizer::SRB_API_URL);
-        $this->context->smarty->assign(
-            'asyncCall',
-            $this->module->dirurl . '/index.php?controller=AdminShoprunback&token=' . $this->token . '&action=asyncCall'
-        );
-        $this->context->smarty->assign('link', $link);
-        $this->context->smarty->assign('srbManager', $this->module->dirurl . '/index.php?controller=AdminShoprunback&token=' . $this->token);
-
-        $conditionsToSend = '';
-        $currentPage = (isset($_GET['currentPage'])) ? $_GET['currentPage'] : 1;
-        $pages = 1;
-        $itemType = (isset($_GET['itemType'])) ? $_GET['itemType'] : 'products';
-        $itemsByPage = 20;
-        $itemsToShow = [];
-        switch ($itemType) {
-            case 'returns':
-                break;
-            case 'products':
-                $productSql = new DbQuery();
-                $productSql->select('p.id_product as id_product, p.id_product as reference, pl.name, IF(srb.last_sent IS NULL, "-", srb.last_sent) as last_sent');
-                $productSql->from('product', 'p');
-                $productSql->innerJoin('product_lang', 'pl', 'pl.id_product = p.id_product');
-                $productSql->leftJoin('srb_api_calls', 'srb', 'srb.id_item = p.id_product
-                                                                AND srb.type = "product"
-                                                                AND srb.last_sent IN (
-                                                                    SELECT MAX(srb.last_sent)
-                                                                    FROM ps_srb_api_calls srb
-                                                                    WHERE srb.type = "product"
-                                                                    GROUP BY srb.id_item
-                                                                )');
-                $productSql->where('pl.id_lang = ' . Configuration::get('PS_LANG_DEFAULT'));
-                $productSql->orderBy('srb.last_sent DESC');
-                $products = Db::getInstance()->executeS($productSql);
-
-                $countProducts = count($products);
-                $pages = ceil($countProducts / $itemsByPage);
-                $currentPage = ($currentPage <= $pages) ? $currentPage : 1;
-
-                for ($i = ($currentPage - 1) * $itemsByPage; $i < $currentPage * $itemsByPage; $i++) {
-                    if (isset($products[$i])) {
-                        $products[$i]['id'] = $products[$i]['id_product'];
-                        $itemsToShow[] = $products[$i];
-                    }
-                }
-
-                $conditionsToSend = 'ShopRunBack needs all your products to have a name, a reference, a width, an height, a depth, a weight and a brand';
-                break;
-            case 'orders':
-                $orderSql = new DbQuery();
-                $orderSql->select('o.id_order, o.reference, IF(srb.last_sent IS NULL, "-", srb.last_sent) as last_sent');
-                $orderSql->from('orders', 'o');
-                $orderSql->leftJoin('srb_api_calls', 'srb', 'srb.id_item = o.id_order
-                                            AND srb.type = "order"
-                                            AND srb.last_sent IN (
-                                                SELECT MAX(srb.last_sent)
-                                                FROM ps_srb_api_calls srb
-                                                WHERE srb.type = "order"
-                                                GROUP BY srb.id_item
-                                            )');
-                $orderSql->orderBy('srb.last_sent DESC');
-                $orders = Db::getInstance()->executeS($orderSql);
-
-                $countOrders = count($orders);
-                $pages = ceil($countOrders / $itemsByPage);
-                $currentPage = ($currentPage <= $pages) ? $currentPage : 1;
-
-                for ($i = ($currentPage - 1) * $itemsByPage; $i < $currentPage * $itemsByPage; $i++) {
-                    if (isset($orders[$i])) {
-                        $orders[$i]['id'] = $orders[$i]['id_order'];
-                        $orders[$i]['name'] = $orders[$i]['reference'];
-                        $itemsToShow[] = $orders[$i];
-                    }
-                }
-
-                $conditionsToSend = 'ShopRunBack needs all your orders to have ...';
-                break;
-            case 'brands':
-                $brandSql = new DbQuery();
-                $brandSql->select('m.id_manufacturer as id_manufacturer, m.id_manufacturer as reference, m.name, IF(srb.last_sent IS NULL, "-", srb.last_sent) as last_sent');
-                $brandSql->from('manufacturer', 'm');
-                $brandSql->leftJoin('srb_api_calls', 'srb', 'srb.id_item = m.id_manufacturer
-                                                                AND srb.type = "manufacturer"
-                                                                AND srb.last_sent IN (
-                                                                    SELECT MAX(srb.last_sent)
-                                                                    FROM ps_srb_api_calls srb
-                                                                    WHERE srb.type = "manufacturer"
-                                                                    GROUP BY srb.id_item
-                                                                )');
-                $brandSql->orderBy('srb.last_sent DESC');
-                $brands = Db::getInstance()->executeS($brandSql);
-
-                $countBrands = count($brands);
-                $pages = ceil($countBrands / $itemsByPage);
-
-                for ($i = ($currentPage - 1) * $itemsByPage; $i < $currentPage * $itemsByPage; $i++) {
-                    if (isset($brands[$i])) {
-                        $brands[$i]['id'] = $brands[$i]['id_manufacturer'];
-                        $itemsToShow[] = $brands[$i];
-                    }
-                }
-
-                $conditionsToSend = 'ShopRunBack needs all your brands to have ...';
-                break;
+        if ($srbtoken == '') {
+            return false;
         }
 
-        $this->context->smarty->assign('conditionsToSend', $this->trans($conditionsToSend));
-        $this->context->smarty->assign('currentPage', $currentPage);
-        $this->context->smarty->assign('pages', $pages);
-        $this->context->smarty->assign('itemType', $itemType);
-        $this->context->smarty->assign('items', $itemsToShow);
+        $oldsrbToken = '';
+        if (Configuration::get('srbtoken')) {
+            $oldsrbToken = Configuration::get('srbtoken');
+        }
 
-        $this->addJs(_PS_MODULE_DIR_ . $this->module->name . '/views/js/products.js');
-        $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/override.css');
-        $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/srbManager.css');
+        Configuration::updateValue('srbtoken', $srbtoken);
+
+        $user = json_decode(Synchronizer::APIcall('me', 'GET'));
+
+        if (! $user) {
+            Configuration::updateValue('srbtoken', $oldsrbToken);
+            return $this->module->displayError($this->l('error.no_token'));
+        }
+
+        Synchronizer::APIcall('company', 'PUT', ['webhook_url' => $this->module->webhookUrl]);
+
+        Configuration::updateValue('check', $_POST['check']);
+
+        return $this->module->displayConfirmation($this->l('success.token'));
+    }
+
+    public function initContent () {
+        $link = new Link();
+        parent::initContent();
+        $srbManager = Context::getContext()->link->getAdminLink('AdminShoprunback');
+
+        $this->context->smarty->assign('token', Configuration::get('srbtoken'));
+        $this->context->smarty->assign('shoprunbackURL', $this->module->url);
+        $this->context->smarty->assign('shoprunbackAPIURL', Synchronizer::SRB_API_URL);
+        $this->context->smarty->assign('srbManager', $srbManager);
+        $this->context->smarty->assign('asyncCall', $srbManager . '&action=asyncCall');
+        $this->context->smarty->assign('link', $link);
+
+        $conditionsToSend = '';
+        $pages = 1;
+        $itemType = (isset($_GET['itemType'])) ? $_GET['itemType'] : 'returns';
+        $items = [];
+        $template = 'srbManager';
+        $externalLink = $this->module->url;
+        $message = '';
+        $this->context->smarty->assign('itemType', $itemType);
+
+        if ($itemType == 'config') {
+            if (Tools::isSubmit('submittoken')) {
+                $message = $this->handleConfig();
+            }
+
+            $template = 'config';
+
+            $defaultLang = (int) Configuration::get('PS_LANG_DEFAULT');
+
+            $fieldsForm[0]['form'] = [
+                'legend' => [
+                    'title' => $this->l('config.form.title'),
+                ],
+                'input' => [
+                    [
+                        'type' => 'text',
+                        'label' => $this->l('config.form.token'),
+                        'name' => 'srbtoken',
+                        'size' => 40,
+                        'required' => true
+                    ],
+                    [
+                        'type' => 'radio',
+                        'name' => 'check',
+                        'label' => $this->l('config.form.check'),
+                        'id_bool' => true,
+                        'required' => true,
+                        'values' => [
+                            'id' => [
+                                'id' => 'check-yes',
+                                'value' => true,
+                                'label' => $this->l('config.form.on'),
+                                'checked' => Configuration::get('check')
+                            ],
+                            [
+                                'id' => 'check-no',
+                                'value' => false,
+                                'label' => $this->l('config.form.off'),
+                                'checked' => ! Configuration::get('check')
+                            ]
+                        ],
+                        'required' => true
+                    ]
+                ],
+                'submit' => [
+                    'title' => $this->l('config.form.save'),
+                    'class' => 'btn btn-default pull-right'
+                ]
+            ];
+
+            $helper = new HelperForm();
+
+            // Module, token and currentIndex
+            $helper->module = $this->module;
+            $helper->name_controller = $this->module->name;
+            $helper->token = Tools::getAdminTokenLite('AdminShoprunback');
+            $helper->currentIndex = $srbManager . '&itemType=config';
+
+            // Language
+            $helper->default_form_language = $defaultLang;
+            $helper->allow_employee_form_lang = $defaultLang;
+
+            // Title and toolbar
+            $helper->title = $this->module->displayName;
+            $helper->show_toolbar = true;
+            $helper->toolbar_scroll = true;
+            $helper->submit_action = 'submittoken';
+            $helper->toolbar_btn = array(
+                'save' => array(
+                    'desc' => $this->l('config.form.save'),
+                    'href' => $helper->currentIndex,
+                ),
+                'back' => array(
+                    'href' => $helper->currentIndex,
+                    'desc' => $this->l('config.form.back')
+                )
+            );
+
+            // Load current value
+            $helper->fields_value['srbtoken'] = Configuration::get('srbtoken');
+            $helper->fields_value['check'] = Configuration::get('check');
+
+            $this->context->smarty->assign('form', $helper->generateForm(array($fieldsForm[0])));
+            $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin/config.css');
+        } else {
+            switch ($itemType) {
+                case 'returns':
+                    $items = SRBReturn::getAllByCreateDate();
+                    $conditionsToSend = $this->l('return.description');
+                    $externalLink .= '/shipbacks/';
+                    break;
+                case 'products':
+                    $items = SRBProduct::getAllWithSRBApiCallQuery();
+                    $conditionsToSend = $this->l('product.description');
+                    $externalLink .= '/products/';
+                    break;
+                case 'orders':
+                    $items = SRBOrder::getAllWithSRBApiCallQuery();
+                    $conditionsToSend = $this->l('order.description');
+                    $externalLink .= '/orders/';
+                    break;
+                case 'brands':
+                    $items = SRBBrand::getAllWithSRBApiCallQuery();
+                    $conditionsToSend = $this->l('brand.description');
+                    $externalLink .= '/brands/';
+                    break;
+            }
+
+            $itemsByPage = 20;
+            $currentPage = (isset($_GET['currentPage'])) ? $_GET['currentPage'] : 1;
+
+            $countItems = count($items);
+            $pages = ceil($countItems / $itemsByPage);
+            $currentPage = ($currentPage <= $pages) ? $currentPage : 1;
+
+            $itemMin = ($currentPage - 1) * $itemsByPage;
+            $itemMax = $currentPage * $itemsByPage;
+            $itemsToShow = [];
+            for ($itemMin; $itemMin < $itemMax; $itemMin++) {
+                if (isset($items[$itemMin])) {
+                    $itemsToShow[] = $items[$itemMin];
+                }
+            }
+
+            $this->context->smarty->assign('currentPage', $currentPage);
+            $this->context->smarty->assign('pages', $pages);
+            $this->context->smarty->assign('items', $itemsToShow);
+            $this->context->smarty->assign('conditionsToSend', $conditionsToSend);
+            $this->context->smarty->assign('externalLink', $externalLink);
+            $this->addJs(_PS_MODULE_DIR_ . $this->module->name . '/views/js/admin/srbManager.js');
+            $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin/srbManager.css');
+        }
+
+        $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin/override.css');
         $this->addCSS('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
 
-        $this->setTemplate('../../../../modules/' . $this->module->name . '/views/templates/admin/srbManager.tpl');
+        $this->context->smarty->assign('template', $template);
+        $this->context->smarty->assign('message', $message);
+        $this->setTemplate('../../../../modules/' . $this->module->name . '/views/templates/admin/layout.tpl');
     }
 
     public function asyncCall () {
@@ -151,13 +215,16 @@ class AdminShoprunbackController extends ModuleAdminController
     public function test () {
         // $products = [];
         // $products[] = SRBOrder::getAll();
-        $product = SRBProduct::getById(2);
-        $result = $product->findWithSRBApiCallQuery();
+        $product = SRBProduct::getById(11);
+        $result = $product->sync();
+        // $result = SRBProduct::getAllWithSRBApiCallQuery();
+        // $result = SRBProduct::getAllNotSync();
         // $result = $product->sync();
-        $result = SRBOrder::syncAll();
+        // $product = SRBProduct::getById(14);
+        // $result = $product->sync();
+        // $result = SRBBrand::syncAll();
         // echo '<pre>';print_r($products);echo '</pre>';
-        echo '<pre>';print_r($result);echo '</pre>';
-        die;
+        // die;
         // $result = $this->module->postProduct($product);
 
         // $product = new stdClass();
@@ -173,7 +240,8 @@ class AdminShoprunbackController extends ModuleAdminController
 
         // $result = $this->module->postBrand(2);
 
-        // $_POST['action'] = 'postAllOrders';
+        // $_POST['action'] = 'syncAll';
+        // $_POST['className'] = 'SRBProduct';
         // $_POST['params'] = true;
         // $result = $this->asyncCall();
 

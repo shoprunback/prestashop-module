@@ -15,6 +15,7 @@ class SRBProduct extends SRBObject
     public $brand;
 
     public function __construct ($psProduct) {
+        $this->ps = $psProduct;
         $this->label = $this->extractName($psProduct['name']);
         $this->reference = $this->extractReference($psProduct);
         $this->weight_grams = $psProduct['weight'] * 1000;
@@ -31,6 +32,10 @@ class SRBProduct extends SRBObject
 
     static public function getIdentifier () {
         return 'reference';
+    }
+
+    static public function getDisplayNameAttribute () {
+        return 'label';
     }
 
     static public function getTableName () {
@@ -55,12 +60,26 @@ class SRBProduct extends SRBObject
         return isset($psProductArrayName['id_product']) ? $psProductArrayName['id_product'] : $psProductArrayName['id'];
     }
 
-    static public function syncAll () {
-        $products = self::getAll();
+    static public function syncAll ($newOnly = false) {
+        $products = $newOnly ? self::getAllNotSync() : self::getAll();
 
-        $responses = [];
+        $responses = [
+            'brand' => [],
+            'product' => []
+        ];
+        $brands = [];
         foreach ($products as $product) {
-            $responses[] = $product->sync(true);
+            if (! isset($brands[$product->brand_id])) {
+                $brands[$product->brand_id] = $product->brand;
+            }
+        }
+
+        foreach ($brands as $brand) {
+            $responses['brand'][] = $brand->sync();
+        }
+
+        foreach ($products as $product) {
+            $responses['product'][] = $product->sync(true);
         }
 
         return $responses;
@@ -68,20 +87,28 @@ class SRBProduct extends SRBObject
 
     public function sync ($brandChecked = false) {
         if (! $brandChecked) {
-            $postBrandResult = Synchronizer::sync($this->brand, 'brand');
+            $postBrandResult = $this->brand->sync();
         }
 
-        return Synchronizer::sync($this, 'product');
+        $productCover = Product::getCover($this->ps['id_product']);
+        $image = new Image($productCover['id_image']);
+        $imagePath = _PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->getExistingImgPath() . ".jpg";
+        $fileContent = file_get_contents($imagePath);
+
+        $this->picture_file_url = 'string';
+        $this->picture_file_base64 = 'data:image/png;base64,' . base64_encode($fileContent);
+
+        return Synchronizer::sync($this, self::getSRBApiCallType());
     }
 
     // private (class) methods
 
     static protected function findOrderProductsQuery ($orderId) {
         $sql = new DbQuery();
-        $sql->select('p.*, pl.name, cu.iso_code');
-        $sql->from('product', 'p');
-        $sql->innerJoin('product_lang', 'pl', 'p.id_product = pl.id_product');
-        $sql->innerJoin('cart_product', 'cp', 'p.id_product = cp.id_product');
+        $sql->select(self::getTableName() . '.*, pl.name, cu.iso_code');
+        $sql->from('product', self::getTableName());
+        $sql->innerJoin('product_lang', 'pl', self::getTableName() . '.id_product = pl.id_product');
+        $sql->innerJoin('cart_product', 'cp', self::getTableName() . '.id_product = cp.id_product');
         $sql->innerJoin('cart', 'ca', 'cp.id_cart = ca.id_cart');
         $sql->innerJoin('orders', 'o', 'ca.id_cart = o.id_cart');
         $sql->innerJoin('currency', 'cu', 'cu.id_currency = o.id_currency');
@@ -93,9 +120,9 @@ class SRBProduct extends SRBObject
 
     static protected function findAllQuery () {
         $sql = new DbQuery();
-        $sql->select('p.*, pl.*');
-        $sql->from('product', 'p');
-        $sql->innerJoin('product_lang', 'pl', 'pl.id_product=p.id_product');
+        $sql->select(self::getTableName() . '.*, pl.*');
+        $sql->from('product', self::getTableName());
+        $sql->innerJoin('product_lang', 'pl', self::getTableName() . '.id_product = pl.id_product');
         $sql->where('pl.id_lang = ' . Configuration::get('PS_LANG_DEFAULT'));
 
         return $sql;

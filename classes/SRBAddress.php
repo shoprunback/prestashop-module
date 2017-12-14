@@ -2,7 +2,7 @@
 
 include_once 'SRBObject.php';
 
-class SRBAddress extends SRBObject
+class SRBAddress
 {
     public $line1;
     public $line2;
@@ -27,6 +27,10 @@ class SRBAddress extends SRBObject
 
     static public function getIdColumnName () {
         return 'id_address';
+    }
+
+    static public function getIdentifier () {
+        return 'id';
     }
 
     // SQL object extractors

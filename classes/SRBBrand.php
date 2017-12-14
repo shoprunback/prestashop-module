@@ -8,17 +8,21 @@ class SRBBrand extends SRBObject
     public $reference;
 
     public function __construct ($manufacturer) {
-        $this->identifier = 'reference';
+        $this->ps = $manufacturer;
         $this->name = $manufacturer['name'];
         $this->reference = $this->extractReference($manufacturer);
     }
 
     static public function getSRBApiCallType () {
-        return 'manufacturer';
+        return 'brand';
     }
 
     static public function getIdentifier () {
         return 'reference';
+    }
+
+    static public function getDisplayNameAttribute () {
+        return 'name';
     }
 
     static public function getTableName () {
@@ -29,19 +33,19 @@ class SRBBrand extends SRBObject
         return 'id_manufacturer';
     }
 
-    static public function syncAll () {
-        $products = self::getAll();
+    static public function syncAll ($newOnly = false) {
+        $brands = $newOnly ? self::getAllNotSync() : self::getAll();
 
         $responses = [];
-        foreach ($products as $product) {
-            $responses[] = Synchronizer::sync($product, 'product');
+        foreach ($brands as $brand) {
+            $responses[] = $brand->sync();
         }
 
         return $responses;
     }
 
     public function sync () {
-        return Synchronizer::sync($this, 'brand');
+        return Synchronizer::sync($this, self::getSRBApiCallType());
     }
 
     // SQL object extractors
@@ -62,8 +66,8 @@ class SRBBrand extends SRBObject
 
     static protected function findAllQuery () {
         $sql = new DbQuery();
-        $sql->select('m.*');
-        $sql->from('manufacturer', 'm');
+        $sql->select(self::getTableName() . '.*');
+        $sql->from('manufacturer', self::getTableName());
 
         return $sql;
     }

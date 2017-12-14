@@ -3,16 +3,28 @@ require_once(dirname(__FILE__) . '../../../config/config.inc.php');
 require_once(dirname(__FILE__) . '../../../init.php');
 
 require_once 'shoprunback.php';
+include_once 'classes/Synchronizer.php';
 
-$shoprunback = new ShopRunBack();
+$class = $_POST['className'] ? $_POST['className'] : 'ShopRunBack';
+
 $action = $_POST['action'];
-$parameters = '';
+$result = '';
 
 if (isset($_POST['params'])) {
-    $parameters = $_POST['params'];
-    $result = $shoprunback->{$action}($parameters);
+    switch ($action) {
+        case 'sync':
+            $item = $class::getById($_POST['params']);
+            $result = $item->sync();
+            break;
+        case 'syncAll':
+            $result = $class::syncAll($_POST['params']);
+            break;
+        default:
+            echo false;
+            die;
+    }
 } else {
-    $result = $shoprunback->{$action}();
+    $result = $class->{$action}();
 }
 
 if (! is_string($result)) {

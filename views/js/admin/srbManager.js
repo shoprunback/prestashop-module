@@ -1,4 +1,10 @@
 $(document).ready(function() {
+  function getSRBObjectName (string) {
+    var objectName = string.charAt(0).toUpperCase() + string.slice(1).toLowerCase(); // Capitalize to have for example "Products"
+    objectName = objectName.slice(0, -1); // Removes the "s" to have for example "Product"
+    return 'SRB' + objectName;
+  }
+
   function ajaxAsyncCall(data) {
     $.ajax({
       url: asyncCall,
@@ -6,7 +12,7 @@ $(document).ready(function() {
       data: data,
       dataType: 'json',
       beforeSend: function () {
-        $('#srb-content .data').html('Sending...');
+        $('#srb-manager').html('Sending... You can go on another page while the process goes on.');
       },
       success: function (response) {
         window.location.reload();
@@ -25,7 +31,9 @@ $(document).ready(function() {
     e.preventDefault();
 
     var data = {
-      'action': 'postAll' + $(this).data('type').charAt(0).toUpperCase() + $(this).data('type').slice(1).toLowerCase()
+      'action': 'syncAll',
+      'className': getSRBObjectName($(this).data('type')),
+      'params': false
     };
 
     ajaxAsyncCall(data);
@@ -35,19 +43,20 @@ $(document).ready(function() {
     e.preventDefault();
 
     var data = {
-      'action': 'postAllNew' + $(this).data('type').charAt(0).toUpperCase() + $(this).data('type').slice(1).toLowerCase(),
+      'action': 'syncAll',
+      'className': getSRBObjectName($(this).data('type')),
       'params': true
     };
 
     ajaxAsyncCall(data);
   });
 
-  $('#srb-content .sync-item').on('click', function () {
-    var object = $(this).data('type').charAt(0).toUpperCase() + $(this).data('type').slice(1).toLowerCase(); // Capitalize to have for example "Products"
-    object = object.slice(0, -1); // Removes the "s" to have for example "Product"
+  $('#srb-content .sync-item').on('click', function (e) {
+    e.preventDefault();
 
     var data = {
-      'action': 'post' + object,
+      'action': 'sync',
+      'className': getSRBObjectName($(this).data('type')),
       'params': parseInt($(this).parent().parent().data('id'))
     };
 

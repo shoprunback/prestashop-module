@@ -1,4 +1,4 @@
-.bootstrap h1 {
+.bootstrap h1, .bootstrap h2, .bootstrap h3 {
   font-family: "Montserrat", "Trebuchet MS", sans-serif;
 }
 
