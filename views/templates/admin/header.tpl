@@ -1,10 +1,10 @@
 <div id="srb-header">
     <div class="header row">
-        <div class="pull-left">
+        <div class="col-md-4">
             <a href="{$shoprunbackURL}" target="_blank"><img src="../modules/shoprunback/assets/img/logo.png" /></a>
         </div>
 
-        <div class="pull-right link-to-srb">
+        <div class="col-md-4 col-md-offset-4 link-to-srb">
             <a href="{$shoprunbackURL}" class="srb-button" target="_blank">{l s="header.my_dashboard" mod='shoprunback'}</a>
         </div>
     </div>

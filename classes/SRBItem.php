@@ -20,9 +20,9 @@ class SRBItem
 
     // private (class) methods
 
-    static public function createItemsFromOrder ($orderId) {
+    static public function createItemsFromOrderId ($orderId) {
         $sql = self::findProductsForItems();
-        $sql->where('o.id_order = ' . $orderId);
+        $sql->where('o.' . SRBOrder::getIdColumnName() . ' = "' . $orderId . '"');
         $productsFromDB = Db::getInstance()->executeS($sql);
 
         return self::generateItemsWithProducts($productsFromDB);

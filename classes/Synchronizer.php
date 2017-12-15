@@ -99,11 +99,17 @@ abstract class Synchronizer
     }
 
     static private function insertApiCallLog ($item, $type) {
-        $identifier = $item::getIdentifier();
+        $identifier = $item::getIdColumnName();
+        $itemId = isset($item->$identifier) ? $item->$identifier : $item->ps[$identifier];
+        // var_dump([
+        //     'id_item' => $itemId,
+        //     'type' => $type,
+        //     'last_sent' => date('Y-m-d H:i:s')
+        // ]);die;
 
         $srbSql = Db::getInstance();
         $srbSql->insert(self::API_CALLS_TABLE_NAME_NO_PREFIX, [
-            'id_item' => $item->$identifier,
+            'id_item' => $itemId,
             'type' => $type,
             'last_sent' => date('Y-m-d H:i:s')
         ]);

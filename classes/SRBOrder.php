@@ -16,7 +16,7 @@ class SRBOrder extends SRBObject
         $this->order_number = $this->extractOrderNumber($psOrder);
         $this->ordered_at = $psOrder['date_add'];
         $this->customer = SRBCustomer::createFromOrder($psOrder);
-        $this->items = SRBItem::createItemsFromOrder($this->order_number);
+        $this->items = SRBItem::createItemsFromOrderId($this->ps['id_order']);
     }
 
     static public function getSRBApiCallType () {
@@ -66,7 +66,17 @@ class SRBOrder extends SRBObject
     // SQL object extractors
 
     static private function extractOrderNumber ($psOrderArrayName) {
-        return isset($psOrderArrayName['id_order']) ? $psOrderArrayName['id_order'] : $psOrderArrayName['id'];
+        $return = '';
+
+        if (isset($psOrderArrayName['reference'])) {
+            $return = $psOrderArrayName['reference'];
+        } elseif (isset($psOrderArrayName['id_order'])) {
+            $return = $psOrderArrayName['id_order'];
+        } else {
+            $return = $psOrderArrayName['id'];
+        }
+
+        return $return;
     }
 
     // private (class) methods

@@ -140,6 +140,7 @@ class AdminShoprunbackController extends ModuleAdminController
 
                     $actionUrl = Context::getContext()->link->getAdminLink('AdminShoprunback') . '&itemType=returns';
                     $this->context->smarty->assign('actionUrl', $actionUrl);
+                    $this->context->smarty->assign('searchId', Tools::getValue('orderId'));
                     break;
                 case 'products':
                     $items = SRBProduct::getAllWithSRBApiCallQuery();
@@ -196,66 +197,14 @@ class AdminShoprunbackController extends ModuleAdminController
     }
 
     public function test () {
-        // $products = [];
-        // $products[] = SRBOrder::getAll();
-        $product = SRBProduct::getById(11);
-        $result = $product->sync();
-        // $result = SRBProduct::getAllWithSRBApiCallQuery();
-        // $result = SRBProduct::getAllNotSync();
-        // $result = $product->sync();
-        // $product = SRBProduct::getById(14);
-        // $result = $product->sync();
-        // $result = SRBBrand::syncAll();
-        // echo '<pre>';print_r($products);echo '</pre>';
-        // die;
-        // $result = $this->module->postProduct($product);
-
-        // $product = new stdClass();
-        // $product->id_product = 15;
-        // $product->name = 'New';
-        // $product->reference = 'newew';
-        // $product->id_manufacturer = 1;
-        // $product->height = 1;
-        // $product->width = 1;
-        // $product->depth = 1;
-        // $product->weight = 1;
-        // $result = $this->module->postProduct($product);
-
-        // $result = $this->module->postBrand(2);
-
-        // $_POST['action'] = 'syncAll';
-        // $_POST['className'] = 'SRBProduct';
-        // $_POST['params'] = true;
-        // $result = $this->asyncCall();
-
-        // $sql = new DbQuery();
-        // $sql->select('o.*, c.*, a.*, s.*, co.*, ca.*');
-        // $sql->from('orders', 'o');
-        // $sql->innerJoin('customer', 'c', 'c.id_customer = o.id_customer');
-        // $sql->innerJoin('address', 'a', 'c.id_customer = a.id_customer');
-        // $sql->innerJoin('state', 's', 's.id_state = a.id_state');
-        // $sql->innerJoin('country', 'co', 's.id_country = co.id_country');
-        // $sql->innerJoin('cart', 'ca', 'o.id_cart = ca.id_cart');
-        // $sql->where('o.id_order = 3');
-        // $order = $this->module->formalizer->arrayToObject(Db::getInstance()->executeS($sql)[0]);
-        // $result = $this->module->postOrder($order);
-
-        // $result = $this->module->postAllProducts();
-
-        // $sql = "CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . "srb_api_calls`(
-        //     `id_srb_api_calls` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        //     `id_item` INT(11) NOT NULL,
-        //     `type` VARCHAR(256) NOT NULL,
-        //     `last_sent` DATETIME NOT NULL
-        // )";
-        // $sql = "SHOW COLUMNS FROM `" . _DB_PREFIX_ . "srb_api_calls`";
-        // $sqls[] = "CREATE INDEX IF NOT EXISTS index_type_id_item ON TABLE `" . _DB_PREFIX_ . "srb_api_calls` (type, id_item)";
-        // echo $sql;
-
-        // $result = Db::getInstance()->Execute($sql);
-
-        echo '<pre>';print_r($result);echo '</pre>';
-        // var_dump($result);
+        $_POST['className'] = 'SRBOrder';
+        $_POST['action'] = 'sync';
+        $_POST['params'] = 56;
+        $result = $this->asyncCall();
+        // $item = SRBOrder::getById(58);
+        // $result = $item->sync();
+        echo 'done<br>';
+        var_dump($result);
         die;
     }
 }
