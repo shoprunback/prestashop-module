@@ -32,7 +32,7 @@
 }
 
 #srb-manager .display .banner p.col-sm-12 {
-  margin-top: 20px;
+  margin: 20px 0;
 }
 
 
@@ -47,6 +47,16 @@
 
 #srb-manager table img {
   max-width: 100px;
+}
+
+#srb-manager table thead tr {
+  background-color: #333C49;
+}
+
+#srb-manager table thead tr th {
+  color: white;
+  font-size: 16px;
+  vertical-align: middle;
 }
 
 #srb-manager table tbody tr .badge {
@@ -76,6 +86,11 @@
 
 #srb-manager table thead tr .input-order-id {
   width: 100px;
+  height: 20px;
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+  color: black;
+  font-size: 12px;
 }
 
 

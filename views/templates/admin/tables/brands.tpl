@@ -24,7 +24,7 @@
                 <tr>
                     <th>{l s="brand.brands" mod='shoprunback'}</th>
                     <th>{l s="brand.reference" mod='shoprunback'}</th>
-                    <th>{l s="item.sync_all" mod='shoprunback'}</th>
+                    <th>{l s="item.last_sync" mod='shoprunback'}</th>
                     <th>{l s="item.sync" mod='shoprunback'}</th>
                     <th></th>
                 </tr>
