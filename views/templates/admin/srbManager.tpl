@@ -11,11 +11,11 @@
     <div class="pagination">
         <ul>
             {if $pages > 1}
-                <li><a href="{$srbManager}&itemType={$itemType}&currentPage=1"><button>{l s="pagination.first" mod="shoprunback"}</button></a></li>
+                <li><a href="{$srbManager}&itemType={$itemType}&currentPage=1"><button>{l s="pagination.first" mod='shoprunback'}</button></a></li>
             {/if}
 
             {if $currentPage > 1}
-                <li><a href="{$srbManager}&itemType={$itemType}&currentPage={$currentPage - 1}"><button>{l s="pagination.previous" mod="shoprunback"}</button></a></li>
+                <li><a href="{$srbManager}&itemType={$itemType}&currentPage={$currentPage - 1}"><button>{l s="pagination.previous" mod='shoprunback'}</button></a></li>
             {/if}
 
             {if $currentPage - 2 > 0}
@@ -33,11 +33,11 @@
             {/if}
 
             {if $currentPage < $pages}
-                <li><a href="{$srbManager}&itemType={$itemType}&currentPage={$currentPage + 1}"><button>{l s="pagination.next" mod="shoprunback"}</button></a></li>
+                <li><a href="{$srbManager}&itemType={$itemType}&currentPage={$currentPage + 1}"><button>{l s="pagination.next" mod='shoprunback'}</button></a></li>
             {/if}
 
             {if $pages > 1}
-                <li><a href="{$srbManager}&itemType={$itemType}&currentPage={$pages}"><button>{l s="pagination.last" mod="shoprunback"}</button></a></li>
+                <li><a href="{$srbManager}&itemType={$itemType}&currentPage={$pages}"><button>{l s="pagination.last" mod='shoprunback'}</button></a></li>
             {/if}
         </ul>
     </div>

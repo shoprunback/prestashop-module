@@ -41,9 +41,7 @@ class AdminShoprunbackController extends ModuleAdminController
 
         Synchronizer::APIcall('company', 'PUT', ['webhook_url' => $this->module->webhookUrl]);
 
-        Configuration::updateValue('check', $_POST['check']);
-
-        return $this->module->displayConfirmation($this->l('success.token'));
+        return $this->module->displayConfirmation(sprintf($this->l('success.token'), $user->first_name, $user->last_name));
     }
 
     public function initContent () {
@@ -87,28 +85,6 @@ class AdminShoprunbackController extends ModuleAdminController
                         'name' => 'srbtoken',
                         'size' => 40,
                         'required' => true
-                    ],
-                    [
-                        'type' => 'radio',
-                        'name' => 'check',
-                        'label' => $this->l('config.form.check'),
-                        'id_bool' => true,
-                        'required' => true,
-                        'values' => [
-                            'id' => [
-                                'id' => 'check-yes',
-                                'value' => true,
-                                'label' => $this->l('config.form.on'),
-                                'checked' => Configuration::get('check')
-                            ],
-                            [
-                                'id' => 'check-no',
-                                'value' => false,
-                                'label' => $this->l('config.form.off'),
-                                'checked' => ! Configuration::get('check')
-                            ]
-                        ],
-                        'required' => true
                     ]
                 ],
                 'submit' => [
@@ -147,16 +123,23 @@ class AdminShoprunbackController extends ModuleAdminController
 
             // Load current value
             $helper->fields_value['srbtoken'] = Configuration::get('srbtoken');
-            $helper->fields_value['check'] = Configuration::get('check');
 
             $this->context->smarty->assign('form', $helper->generateForm(array($fieldsForm[0])));
             $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin/config.css');
         } else {
             switch ($itemType) {
                 case 'returns':
-                    $items = SRBReturn::getAllByCreateDate();
+                    if (Tools::getValue('orderId')) {
+                        $items = SRBReturn::getLikeOrderIdByCreateDate(Tools::getValue('orderId'));
+                    } else {
+                        $items = SRBReturn::getAllByCreateDate();
+                    }
+
                     $conditionsToSend = $this->l('return.description');
                     $externalLink .= '/shipbacks/';
+
+                    $actionUrl = Context::getContext()->link->getAdminLink('AdminShoprunback') . '&itemType=returns';
+                    $this->context->smarty->assign('actionUrl', $actionUrl);
                     break;
                 case 'products':
                     $items = SRBProduct::getAllWithSRBApiCallQuery();

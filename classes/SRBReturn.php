@@ -136,10 +136,30 @@ class SRBReturn extends SRBObject
 
     // private (class) methods
 
-    static public function getAllByCreateDate () {
+    private function findAllByCreateDateQuery () {
         $sql = self::findAllQuery();
         $sql = SRBOrder::addComponentsToQuery($sql);
         $sql->orderBy('created_at DESC');
+
+        return $sql;
+    }
+
+    static public function getAllByCreateDate () {
+        $sql = self::findAllByCreateDateQuery();
+        $returnsFromDB = Db::getInstance()->executeS($sql);
+
+        $returns = [];
+        foreach ($returnsFromDB as $key => $return) {
+            $return['order'] = SRBOrder::createFromReturn($return);
+            $returns[] = new self($return);
+        }
+
+        return $returns;
+    }
+
+    static public function getLikeOrderIdByCreateDate ($orderId) {
+        $sql = self::findAllByCreateDateQuery();
+        $sql->where(self::getTableName() . '.id_order LIKE "%' . $orderId . '%"');
         $returnsFromDB = Db::getInstance()->executeS($sql);
 
         $returns = [];

@@ -4,8 +4,35 @@
 
 
 
-#srb-manager .banner p {
-  margin-top: 30px;
+#srb-manager .display .banner .top {
+  vertical-align: middle;
+}
+
+#srb-manager .display .banner .title {
+  vertical-align: middle;
+}
+
+#srb-manager .display .banner .title h1 {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0;
+}
+
+#srb-manager .display .banner .srb-button {
+  padding: 8px;
+  font-size: 14px;
+  margin-left: 10px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+#srb-manager .display .banner .external-link {
+  text-align: center;
+  vertical-align: middle;
+}
+
+#srb-manager .display .banner p.col-sm-12 {
+  margin-top: 20px;
 }
 
 
@@ -20,6 +47,35 @@
 
 #srb-manager table img {
   max-width: 100px;
+}
+
+#srb-manager table tbody tr .badge {
+  padding: 5px;
+  border-radius: 4px;
+}
+
+#srb-manager table tbody tr .badge.created {
+  background-color: #0A8CFF;
+}
+
+#srb-manager table tbody tr .badge.started {
+  background-color: #FCDC12;
+}
+
+#srb-manager table tbody tr .badge.paid {
+  background-color: #8FBEAC;
+}
+
+#srb-manager table tbody tr .badge.transiting {
+  background-color: #FFBC00;
+}
+
+#srb-manager table tbody tr .badge.relocated {
+  background-color: #47DB30;
+}
+
+#srb-manager table thead tr .input-order-id {
+  width: 100px;
 }
 
 
