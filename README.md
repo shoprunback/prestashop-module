@@ -4,12 +4,9 @@ To install Prestashop:
 https://www.prestashop.com/fr/telecharger
 
 You need a local server to launch Prestashop
-
-Linux : https://www.digitalocean.com/community/tutorials/how-to-install-linux-apache-mysql-php-lamp-stack-on-ubuntu
-
-Mac : https://www.mamp.info/en/
-
-Windows : http://www.wampserver.com/
+- Linux : https://www.digitalocean.com/community/tutorials/how-to-install-linux-apache-mysql-php-lamp-stack-on-ubuntu
+- Mac : https://www.mamp.info/en/
+- Windows : http://www.wampserver.com/
 
 
 ## Install the module on Prestashop
