@@ -17,7 +17,7 @@ class SRBProduct extends SRBObject
     public function __construct ($psProduct) {
         $this->ps = $psProduct;
         $this->label = $this->extractName($psProduct['name']);
-        $this->reference = $this->extractReference($psProduct);
+        $this->reference = $psProduct['reference'];
         $this->weight_grams = $psProduct['weight'] * 1000;
         $this->width_mm = $psProduct['width'];
         $this->height_mm = $psProduct['height'];
@@ -26,7 +26,7 @@ class SRBProduct extends SRBObject
         $this->brand_id = $this->brand->reference;
     }
 
-    static public function getSRBApiCallType () {
+    static public function getMapType () {
         return 'product';
     }
 
@@ -56,10 +56,6 @@ class SRBProduct extends SRBObject
         return is_array($psProductArrayName) ? $psProductArrayName[1] : $psProductArrayName;
     }
 
-    static private function extractReference ($psProductArrayName) {
-        return isset($psProductArrayName['id_product']) ? $psProductArrayName['id_product'] : $psProductArrayName['id'];
-    }
-
     static public function syncAll ($newOnly = false) {
         $products = $newOnly ? self::getAllNotSync() : self::getAll();
 
@@ -87,18 +83,22 @@ class SRBProduct extends SRBObject
 
     public function sync ($brandChecked = false) {
         if (! $brandChecked) {
+            Logger::addLog('[ShopRunBack] prebrand', 0, null, 'brand', 1, true);
             $postBrandResult = $this->brand->sync();
         }
 
         $productCover = Product::getCover($this->ps['id_product']);
         $image = new Image($productCover['id_image']);
         $imagePath = _PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->getExistingImgPath() . ".jpg";
-        $fileContent = file_get_contents($imagePath);
 
-        $this->picture_file_url = 'string';
-        $this->picture_file_base64 = 'data:image/png;base64,' . base64_encode($fileContent);
+        if (file_exists($imagePath)) {
+            $fileContent = file_get_contents($imagePath);
 
-        return Synchronizer::sync($this, self::getSRBApiCallType());
+            $this->picture_file_url = 'string';
+            $this->picture_file_base64 = 'data:image/png;base64,' . base64_encode($fileContent);
+        }
+
+        return Synchronizer::sync($this, self::getMapType());
     }
 
     // private (class) methods
@@ -113,7 +113,7 @@ class SRBProduct extends SRBObject
         $sql->innerJoin('orders', 'o', 'ca.id_cart = o.id_cart');
         $sql->innerJoin('currency', 'cu', 'cu.id_currency = o.id_currency');
         $sql->where('pl.id_lang = ' . Configuration::get('PS_LANG_DEFAULT'));
-        $sql->where('o.id_order = ' . $orderId);
+        $sql->where('o.id_order = ' . pSQL($orderId));
 
         return $sql;
     }

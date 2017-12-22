@@ -12,7 +12,7 @@
                 <div class="external-link col-sm-2">
                     <a href="{$shoprunbackURL}/orders" target="_blank" class="srb-button external-link">{l s="title.link_to_orders" mod='shoprunback'}</a>
                 </div>
-          </div>
+            </div>
 
             <div class="row">
                 <p class="col-sm-12">{$conditionsToSend}</p>
@@ -24,7 +24,9 @@
                 <thead>
                     <tr>
                         <th>{l s="order.orders" mod='shoprunback'}</th>
-                        <th>{l s="order.reference" mod='shoprunback'}</th>
+                        <th>{l s="order.customer" mod='shoprunback'}</th>
+                        <th>{l s="order.command_date" mod='shoprunback'}</th>
+                        <th>{l s="order.returned" mod='shoprunback'}</th>
                         <th>{l s="item.last_sync" mod='shoprunback'}</th>
                         <th>{l s="item.sync" mod='shoprunback'}</th>
                         <th></th>
@@ -32,11 +34,27 @@
                 </thead>
                 <tbody>
                     {foreach from=$items key=id item=item}
-                        <tr data-id="{$item->ps[{$item->getIdColumnName()}]}">
-                            <td><a href="{$link->getProductLink($item->ps)}"><b>{$item->getName()}</b></a></td>
-                            <td><b>{$item->getReference()}</b></td>
+                        <tr data-id="{$item->getDBId()}">
+                            <td><a href="{$externalLink}{$item->getReference()}" target="_blank"><b>{$item->getName()}</b></a></td>
+                            <td>{$item->customer->first_name} {$item->customer->last_name}</td>
+                            <td>{$item->ordered_at}</td>
+                            <td>
+                                {if $item->id_srb_return}
+                                    <a href="{$shoprunbackURL}/shipbacks/{$item->id_srb_return}" target="blank">
+                                        <span class="badge badge-default {$item->state}">{$item->state|capitalize}</span>
+                                    </a>
+                                {/if}
+                            </td>
                             <td>{$item->last_sent}</td>
-                            <td><a class="sync-item srb-button" data-type="{$itemType}">{l s="item.sync" mod='shoprunback'}</a></td>
+                            <td>
+                                {if $item->delivery != 1}
+                                    <a class="sync-item srb-button" data-type="{$itemType}">
+                                        {l s="item.sync" mod='shoprunback'}
+                                    </a>
+                                {else}
+                                    {l s="item.delivered" mod='shoprunback'}
+                                {/if}
+                            </td>
                             <td><a href="{$externalLink}{$item->getReference()}" target="_blank"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a></td>
                         </tr>
                     {/foreach}

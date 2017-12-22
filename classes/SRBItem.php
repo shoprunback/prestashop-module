@@ -22,7 +22,7 @@ class SRBItem
 
     static public function createItemsFromOrderId ($orderId) {
         $sql = self::findProductsForItems();
-        $sql->where('o.' . SRBOrder::getIdColumnName() . ' = "' . $orderId . '"');
+        $sql->where('o.' . SRBOrder::getIdColumnName() . ' = "' . pSQL($orderId) . '"');
         $productsFromDB = Db::getInstance()->executeS($sql);
 
         return self::generateItemsWithProducts($productsFromDB);
@@ -31,7 +31,7 @@ class SRBItem
     static public function createItemsFromOrderDetail ($orderDetailId) {
         $sql = self::findProductsForItems();
         $sql->innerJoin('order_detail', 'od', 'od.id_order = o.id_order');
-        $sql->where('od.id_order_detail = ' . $orderDetailId);
+        $sql->where('od.id_order_detail = ' . pSQL($orderDetailId));
         $productsFromDB = Db::getInstance()->executeS($sql);
 
         return self::generateItemsWithProducts($productsFromDB);

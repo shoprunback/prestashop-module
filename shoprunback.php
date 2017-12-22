@@ -2,6 +2,7 @@
 if (! defined('_PS_VERSION_')) {
     exit;
 }
+define ('SANDBOX_MODE', Configuration::get('sandbox'));
 
 include_once 'classes/Synchronizer.php';
 include_once 'classes/SRBReturn.php';
@@ -36,14 +37,14 @@ class ShopRunBack extends Module
         $this->dirurl = 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']);
         $this->SRBModulePath = _PS_MODULE_DIR_ . $this->name;
         $this->webhookUrl = $this->context->link->getModuleLink('shoprunback', 'webhook', []);
-        $this->url = 'http://localhost:3000';
-        // $this->url = 'https://dashboard.shoprunback.com';
+        $this->url = _PS_MODE_DEV_ ? 'http://localhost:3000' : 'https://dashboard.shoprunback.com';
         $message = '';
         if (Tools::getValue('message') && Tools::getValue('messageType')) {
             $message = $_GET['message'];
             $type = Tools::getValue('messageType');
             $this->context->controller->{$type}[] = $this->l($message);
         }
+        $this->context->smarty->assign('devmode', _PS_MODE_DEV_);
     }
 
     private function installTab ($controllerClassName, $tabName, $tabParentControllerName = false) {
@@ -92,6 +93,9 @@ class ShopRunBack extends Module
             return false;
         }
 
+        Configuration::updateValue('sandbox', true);
+
+        Logger::addLog('[' . $this->name . '] Module installed', 0);
         return true;
     }
 
@@ -116,6 +120,7 @@ class ShopRunBack extends Module
             return false;
         }
 
+        Logger::addLog('[' . $this->name . '] Module uninstalled');
         return true;
     }
 
@@ -166,12 +171,6 @@ class ShopRunBack extends Module
         $order->sync();
     }
 
-    // public function hookActionOrderEdited ($params) {
-    //     Configuration::updateValue('params', json_encode($params));
-    //     // $order = SRBOrder::getById($params['id_order']);
-    //     // $order->sync();
-    // }
-
     public function hookActionProductUpdate ($params) {
         $product = SRBProduct::getById($params['product']->id);
         $product->sync();
@@ -183,9 +182,13 @@ class ShopRunBack extends Module
     }
 
     public function hookDisplayOrderDetail ($params) {
+        $order = SRBOrder::getById($_GET['id_order']);
         $srbfcLink = $this->context->link->getModuleLink('shoprunback', 'return', []);
         $this->context->smarty->assign('createReturnLink', $srbfcLink);
-        $this->context->smarty->assign('orderId', $_GET['id_order']);
+        $this->context->smarty->assign('order', $order);
+
+        $return = SRBReturn::getByOrderId($_GET['id_order']);
+        $this->context->smarty->assign('return', $return);
 
         $srbwebhookLink = $this->webhookUrl;
         $this->context->smarty->assign('webhookLink', $srbwebhookLink);

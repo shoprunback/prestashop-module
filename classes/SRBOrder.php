@@ -19,7 +19,7 @@ class SRBOrder extends SRBObject
         $this->items = SRBItem::createItemsFromOrderId($this->ps['id_order']);
     }
 
-    static public function getSRBApiCallType () {
+    static public function getMapType () {
         return 'order';
     }
 
@@ -37,6 +37,29 @@ class SRBOrder extends SRBObject
 
     static public function getIdColumnName () {
         return 'id_order';
+    }
+
+    public function isDelivered () {
+        $sql = new DbQuery();
+        $sql->select('os.delivery');
+        $sql->from('orders', self::getTableName());
+        $sql->leftJoin(
+            'order_history',
+            'oh',
+            'oh.id_order = ' . self::getTableName() . '.' . self::getIdColumnName() . ' AND oh.id_order_history IN (
+                SELECT MAX(oh.id_order_history)
+                FROM ps_order_history oh
+                GROUP BY id_order
+            )'
+        );
+        $sql->leftJoin(
+            'order_state',
+            'os',
+            'os.id_order_state = oh.id_order_state'
+        );
+        $sql->where('oh.id_order = ' . $this->ps['id_order']);
+
+        return Db::getInstance()->executeS($sql)[0]['delivery'];
     }
 
     public function getProducts () {
@@ -60,7 +83,7 @@ class SRBOrder extends SRBObject
     }
 
     public function sync () {
-        return Synchronizer::sync($this, 'order');
+        return Synchronizer::sync($this, self::getMapType());
     }
 
     // SQL object extractors
@@ -81,6 +104,40 @@ class SRBOrder extends SRBObject
 
     // private (class) methods
 
+    static public function getAllWithSRBApiCallQuery ($onlySyncItems = false) {
+        $sql = self::findWithMapQuery($onlySyncItems);
+        $sql->select('srbr.id_srb_return, srbr.state, os.delivery');
+        $sql->leftJoin(
+            SRBReturn::RETURN_TABLE_NAME_NO_PREFIX,
+            'srbr',
+            'srbr.id_order = ' . self::getTableName() . '.' . self::getIdColumnName()
+        );
+        $sql->leftJoin(
+            'order_history',
+            'oh',
+            'oh.id_order = ' . self::getTableName() . '.' . self::getIdColumnName() . ' AND oh.id_order_history IN (
+                SELECT MAX(oh.id_order_history)
+                FROM ps_order_history oh
+                GROUP BY id_order
+            )'
+        );
+        $sql->leftJoin(
+            'order_state',
+            'os',
+            'os.id_order_state = oh.id_order_state'
+        );
+        $items = self::convertPSArrayToSRBObjects(Db::getInstance()->executeS($sql));
+
+        foreach ($items as $key => $item) {
+            $items[$key]->last_sent = $item->ps['last_sent'];
+            $items[$key]->id_srb_return = $item->ps['id_srb_return'];
+            $items[$key]->state = $item->ps['state'];
+            $items[$key]->delivery = $item->ps['delivery'];
+        }
+
+        return $items;
+    }
+
     static public function createFromReturn ($return) {
         return new self($return);
     }
@@ -99,6 +156,31 @@ class SRBOrder extends SRBObject
         $sql = new DbQuery();
         $sql->from('orders', self::getTableName());
         $sql = self::addComponentsToQuery($sql);
+
+        return $sql;
+    }
+
+    protected function findWithMapQuery ($onlySyncItems = false) {
+        $identifier = static::getIdColumnName();
+        $type = static::getMapType();
+        $joinType = $onlySyncItems ? 'innerJoin' : 'leftJoin';
+
+        $sql = static::findAllQuery();
+        $sql->select('srb.*');
+        $sql->{$joinType}(
+            SRBMap::MAPPER_TABLE_NAME_NO_PREFIX,
+            'srb',
+            'srb.id_item = ' . static::getTableName() . '.' . $identifier . '
+                AND srb.type = "' . $type . '"
+                AND srb.last_sent IN (
+                    SELECT MAX(srb.last_sent)
+                    FROM ' . SRBMap::MAPPER_TABLE_NAME . ' srb
+                    WHERE srb.type = "' . $type . '"
+                    GROUP BY srb.id_item
+            )'
+        );
+        $sql->groupBy(static::getTableName() . '.' . $identifier);
+        $sql->orderBy('srb.last_sent DESC');
 
         return $sql;
     }

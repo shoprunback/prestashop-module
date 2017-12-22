@@ -16,13 +16,9 @@ $(document).ready(function() {
       },
       success: function (response) {
         window.location.reload();
-        // console.log('success');
-        // console.log(response);
       },
       error: function (response) {
         window.location.reload();
-        // console.log('error');
-        // console.log(response);
       }
     });
   }
@@ -33,7 +29,7 @@ $(document).ready(function() {
     var data = {
       'action': 'syncAll',
       'className': getSRBObjectName($(this).data('type')),
-      'params': false
+      'params': ''
     };
 
     ajaxAsyncCall(data);

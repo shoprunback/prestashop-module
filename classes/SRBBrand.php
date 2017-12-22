@@ -10,10 +10,10 @@ class SRBBrand extends SRBObject
     public function __construct ($manufacturer) {
         $this->ps = $manufacturer;
         $this->name = $manufacturer['name'];
-        $this->reference = $this->extractReference($manufacturer);
+        $this->reference = $manufacturer['name'];
     }
 
-    static public function getSRBApiCallType () {
+    static public function getMapType () {
         return 'brand';
     }
 
@@ -45,21 +45,7 @@ class SRBBrand extends SRBObject
     }
 
     public function sync () {
-        return Synchronizer::sync($this, self::getSRBApiCallType());
-    }
-
-    // SQL object extractors
-
-    static private function extractReference ($psManufacturerArrayName) {
-        $identifier = 'id';
-
-        if (isset($psManufacturerArrayName['id_manufacturer'])) {
-            $identifier = 'id_manufacturer';
-        } elseif (isset($psManufacturerArrayName['reference'])) {
-            $identifier = 'reference';
-        }
-
-        return $psManufacturerArrayName[$identifier];
+        return Synchronizer::sync($this, self::getMapType());
     }
 
     // private (class) methods

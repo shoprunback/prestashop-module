@@ -4,8 +4,8 @@
             <a href="{$shoprunbackURL}" target="_blank"><img src="../modules/shoprunback/assets/img/logo.png" /></a>
         </div>
 
-        <div class="col-md-4 col-md-offset-4 link-to-srb">
-            <a href="{$shoprunbackURL}" class="srb-button" target="_blank">{l s="header.my_dashboard" mod='shoprunback'}</a>
+        <div class="col-md-5 col-md-offset-2 link-to-srb text-right">
+            {l s="header.go_to" mod='shoprunback'} <a href="{$shoprunbackURL}" class="srb-button" target="_blank">{l s="header.my_dashboard" mod='shoprunback'}</a>
         </div>
     </div>
 

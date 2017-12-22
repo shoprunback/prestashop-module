@@ -1,6 +1,7 @@
 <?php
 
 include_once 'Synchronizer.php';
+include_once 'SRBMap.php';
 
 abstract class SRBObject
 {
@@ -16,7 +17,7 @@ abstract class SRBObject
 
     abstract static public function getDisplayNameAttribute();
 
-    abstract static public function getSRBApiCallType();
+    abstract static public function getMapType();
 
     abstract static public function syncAll();
 
@@ -31,17 +32,22 @@ abstract class SRBObject
 
     static public function getAllNotSync () {
         $class = get_called_class();
+        var_dump(Db::getInstance()->executeS($class::findNotSyncQuery()));die;
         return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS($class::findNotSyncQuery()));
     }
 
     static public function getAllWithSRBApiCallQuery ($onlySyncItems = false) {
         $class = get_called_class();
-        $items = self::convertPSArrayToSRBObjects(Db::getInstance()->executeS($class::findWithSRBApiCallQuery($onlySyncItems)));
+        $items = self::convertPSArrayToSRBObjects(Db::getInstance()->executeS($class::findWithMapQuery($onlySyncItems)));
         foreach ($items as $key => $item) {
             $items[$key]->last_sent = $item->ps['last_sent'];
         }
 
         return $items;
+    }
+
+    public function getDBId () {
+        return isset($this->ps[static::getIdColumnName()]) ? $this->ps[static::getIdColumnName()] : false;
     }
 
     public function getName() {
@@ -53,6 +59,7 @@ abstract class SRBObject
         $reference = static::getIdentifier();
         return $this->{$reference};
     }
+
     protected function convertPSArrayToSRBObjects($PSArray) {
         $class = get_called_class();
         $SRBObjects = [];
@@ -69,34 +76,27 @@ abstract class SRBObject
 
     protected function findNotSyncQuery () {
         $identifier = static::getIdColumnName();
-        $type = static::getSRBApiCallType();
-        return static::findAllQuery()
-                        ->where(static::getTableName() . '.' . static::getIdColumnName() . ' NOT IN (
-                                                                                                SELECT srb.id_item
-                                                                                                FROM ' . Synchronizer::API_CALLS_TABLE_NAME . ' srb
-                                                                                                WHERE srb.type = "' . $type . '"
-                                                                                                GROUP BY srb.id_item
-                                                                                            )'
-                        );
+        $type = static::getMapType();
+        $mapQuery = SRBMap::findOnlyIdItemByTypeQuery($type);
+        Logger::addLog('[ShopRunBack] OBJECT: ' . static::findAllQuery()->where(static::getTableName() . '.' . static::getIdColumnName() . ' NOT IN (' . $mapQuery . ')'), 0, null, 'brand', 1, true);
+
+        return static::findAllQuery()->where(static::getTableName() . '.' . static::getIdColumnName() . ' NOT IN (' . $mapQuery . ')');
     }
 
-    protected function findWithSRBApiCallQuery ($onlySyncItems = false) {
+    protected function findWithMapQuery ($onlySyncItems = false) {
         $identifier = static::getIdColumnName();
-        $type = static::getSRBApiCallType();
+        $type = static::getMapType();
         $joinType = $onlySyncItems ? 'innerJoin' : 'leftJoin';
+        $mapQuery = SRBMap::findOnlyLastSentByTypeQuery($type);
+
         return static::findAllQuery()
                         ->select('srb.*')
                         ->{$joinType}(
-                            Synchronizer::API_CALLS_TABLE_NAME_NO_PREFIX,
+                            SRBMap::MAPPER_TABLE_NAME_NO_PREFIX,
                             'srb',
                             'srb.id_item = ' . static::getTableName() . '.' . $identifier . '
                                 AND srb.type = "' . $type . '"
-                                AND srb.last_sent IN (
-                                    SELECT MAX(srb.last_sent)
-                                    FROM ' . Synchronizer::API_CALLS_TABLE_NAME . ' srb
-                                    WHERE srb.type = "' . $type . '"
-                                    GROUP BY srb.id_item
-                            )'
+                                AND srb.last_sent IN (' . $mapQuery . ')'
                         )
                         ->groupBy(static::getTableName() . '.' . $identifier)
                         ->orderBy('srb.last_sent DESC');
@@ -105,7 +105,7 @@ abstract class SRBObject
     // private (class) method
 
     static protected function findOneQuery ($id) {
-        return static::findAllQuery()->where(self::getTableIdentifier() . ' = "' . $id . '"');
+        return static::findAllQuery()->where(self::getTableIdentifier() . ' = "' . pSQL($id) . '"');
     }
 
     static public function getById ($id) {

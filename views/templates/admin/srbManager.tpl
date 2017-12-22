@@ -41,10 +41,4 @@
             {/if}
         </ul>
     </div>
-
-    <h2>
-        <a href="http://localhost/prestashop/admin939kmvcyx/index.php?controller=AdminShoprunback&token=23c28709c9abfa423fa123ad2363b2e8&action=test">
-            <button>TEST</button>
-        </a>
-    </h2>
 </div>

@@ -5,6 +5,11 @@ include_once 'SRBOrder.php';
 
 class SRBReturn extends SRBObject
 {
+    const RETURN_TABLE_NAME_NO_PREFIX = 'shoprunback_returns';
+    const RETURN_TABLE_NAME = _DB_PREFIX_ . self::RETURN_TABLE_NAME_NO_PREFIX;
+    const RETURN_INDEX_NAME = 'index_srb_return_id';
+    const RETURN_INDEX_COLUMNS = 'srb_return_id';
+
     public $id_srb_return;
     public $mode;
     public $order_id;
@@ -13,7 +18,8 @@ class SRBReturn extends SRBObject
     public $created_at;
 
     public function __construct ($psReturn) {
-        $this->id_srb_return = $psReturn['id_srb_return'];
+        $this->ps = $psReturn;
+        $this->id_srb_return = isset($psReturn['id_srb_return']) ? $psReturn['id_srb_return'] : '';
         $this->order_id = $psReturn['id_order'];
         $this->order = isset($psReturn['order']) ? $psReturn['order'] : SRBOrder::getById($this->order_id);
         $this->mode = $psReturn['mode'];
@@ -21,8 +27,8 @@ class SRBReturn extends SRBObject
         $this->created_at = $psReturn['created_at'];
     }
 
-    static public function getSRBApiCallType () {
-        return 'shipback';
+    static public function getMapType () {
+        return 'shipbacks';
     }
 
     static public function getIdentifier () {
@@ -48,7 +54,7 @@ class SRBReturn extends SRBObject
     public function getReturnDetails () {
         $sql = self::findAllQuery();
         $sql->innerJoin('order_detail', 'od', 'ord.id_order_detail = od.id_order_detail');
-        $sql->where(self::getTableName() . '.' . self::getIdColumnName() . ' = ' . $this->id);
+        $sql->where(self::getTableName() . '.' . self::getIdColumnName() . ' = ' . pSQL($this->id));
         $sql->groupBy('ord.id_order_detail');
 
         return Db::getInstance()->executeS($sql);
@@ -56,7 +62,7 @@ class SRBReturn extends SRBObject
 
     public function sync () {
         $this->order->sync();
-        return Synchronizer::sync($this, 'shipbacks');
+        return Synchronizer::sync($this, self::getMapType());
     }
 
     public function save () {
@@ -67,7 +73,7 @@ class SRBReturn extends SRBObject
         ];
 
         $sql = Db::getInstance();
-        $result = $sql->update(Synchronizer::RETURN_TABLE_NAME_NO_PREFIX, $returnToUpdate, 'id_srb_return = "' . $this->id_srb_return . '"');
+        $result = $sql->update(SRBReturn::RETURN_TABLE_NAME_NO_PREFIX, $returnToUpdate, 'id_srb_return = "' . pSQL($this->id_srb_return) . '"');
 
         $this->sync();
 
@@ -92,8 +98,12 @@ class SRBReturn extends SRBObject
             return false;
         }
 
+        if (self::getByOrderId($orderId)) {
+            return false;
+        }
+
         $psReturn = [
-            'id_srb_return' => '1',
+            'id_srb_return' => 0,
             'id_order' => $orderId,
             'state' => '0',
             'mode' => 'postal',
@@ -131,7 +141,7 @@ class SRBReturn extends SRBObject
         ];
 
         $sql = Db::getInstance();
-        return $sql->insert(Synchronizer::RETURN_TABLE_NAME_NO_PREFIX, $returnToInsert);
+        return $sql->insert(SRBReturn::RETURN_TABLE_NAME_NO_PREFIX, $returnToInsert);
     }
 
     // private (class) methods
@@ -148,44 +158,60 @@ class SRBReturn extends SRBObject
         $sql = self::findAllByCreateDateQuery();
         $returnsFromDB = Db::getInstance()->executeS($sql);
 
-        $returns = [];
-        foreach ($returnsFromDB as $key => $return) {
-            $return['order'] = SRBOrder::createFromReturn($return);
-            $returns[] = new self($return);
-        }
-
-        return $returns;
+        return self::generateReturnsFromDBResult($returnsFromDB);
     }
 
     static public function getLikeOrderIdByCreateDate ($orderId) {
         $sql = self::findAllByCreateDateQuery();
-        $sql->where(self::getTableName() . '.id_order LIKE "%' . $orderId . '%"');
+        $sql->where(self::getTableName() . '.id_order LIKE "%' . pSQL($orderId) . '%"');
         $returnsFromDB = Db::getInstance()->executeS($sql);
 
-        $returns = [];
-        foreach ($returnsFromDB as $key => $return) {
-            $return['order'] = SRBOrder::createFromReturn($return);
-            $returns[] = new self($return);
-        }
+        return self::generateReturnsFromDBResult($returnsFromDB);
+    }
 
-        return $returns;
+    static public function getLikeCustomerByCreateDate ($customer) {
+        $sql = self::findAllByCreateDateQuery();
+        $sql->where('
+            c.firstname LIKE "%' . pSQL($customer) . '%" OR
+            c.lastname LIKE "%' . pSQL($customer) . '%" OR
+            CONCAT(c.firstname, " ", c.lastname) LIKE "%' . pSQL($customer) . '%"'
+        );
+        $returnsFromDB = Db::getInstance()->executeS($sql);
+
+        return self::generateReturnsFromDBResult($returnsFromDB);
     }
 
     static public function getByOrderId ($orderId) {
         $sql = self::findAllQuery();
         $sql = SRBOrder::addComponentsToQuery($sql);
-        $sql->where(self::getTableName() . '.id_order = ' . $orderId);
+        $sql->where(self::getTableName() . '.id_order = ' . pSQL($orderId));
         $sql->orderBy('created_at', 'DESC');
-        $returnFromDB = Db::getInstance()->executeS($sql)[0];
+        $result = Db::getInstance()->executeS($sql);
+
+        if (! $result) {
+            return false;
+        }
+
+        $returnFromDB = $result[0];
         $returnFromDB['order'] = SRBOrder::createFromReturn($returnFromDB);
 
         return new self($returnFromDB);
     }
 
+    static private function generateReturnsFromDBResult ($returnsFromDB) {
+        $returns = [];
+        foreach ($returnsFromDB as $key => $return) {
+            $return['order'] = SRBOrder::createFromReturn($return);
+            $returns[] = new self($return);
+        }
+
+        return $returns;
+    }
+
     static protected function findAllQuery () {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*, o.*');
-        $sql->from(Synchronizer::RETURN_TABLE_NAME_NO_PREFIX, self::getTableName());
+        $sql->from(SRBReturn::RETURN_TABLE_NAME_NO_PREFIX, self::getTableName());
         $sql->innerJoin('orders', 'o', self::getTableName() . '.id_order = o.id_order');
 
         return $sql;

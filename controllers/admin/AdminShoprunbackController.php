@@ -19,7 +19,7 @@ class AdminShoprunbackController extends ModuleAdminController
     }
 
     private function handleConfig () {
-        $srbtoken = isset($_POST['srbtoken']) ? $_POST['srbtoken'] : '';
+        $srbtoken = Tools::getValue('srbtoken');
 
         if ($srbtoken == '') {
             return false;
@@ -40,6 +40,8 @@ class AdminShoprunbackController extends ModuleAdminController
         }
 
         Synchronizer::APIcall('company', 'PUT', ['webhook_url' => $this->module->webhookUrl]);
+
+        Configuration::updateValue('sandbox', Tools::getValue('sandbox'));
 
         return $this->module->displayConfirmation(sprintf($this->l('success.token'), $user->first_name, $user->last_name));
     }
@@ -85,6 +87,25 @@ class AdminShoprunbackController extends ModuleAdminController
                         'name' => 'srbtoken',
                         'size' => 40,
                         'required' => true
+                    ],
+                    [
+                        'type' => 'radio',
+                        'label' => $this->l('config.form.sandbox'),
+                        'name' => 'sandbox',
+                        'required' => true,
+                        'values' => [
+                            [
+                                'id' => 'yes',
+                                'value' => 1,
+                                'label' => $this->l('config.form.yes')
+                            ],
+                            [
+                                'id' => 'no',
+                                'value' => 0,
+                                'label' => $this->l('config.form.no')
+                            ]
+                        ],
+                        'is_bool' => true,
                     ]
                 ],
                 'submit' => [
@@ -123,14 +144,17 @@ class AdminShoprunbackController extends ModuleAdminController
 
             // Load current value
             $helper->fields_value['srbtoken'] = Configuration::get('srbtoken');
+            $helper->fields_value['sandbox'] = Configuration::get('sandbox');
 
             $this->context->smarty->assign('form', $helper->generateForm(array($fieldsForm[0])));
             $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin/config.css');
         } else {
             switch ($itemType) {
                 case 'returns':
-                    if (Tools::getValue('orderId')) {
+                    if (Tools::getValue('orderId') !== false) {
                         $items = SRBReturn::getLikeOrderIdByCreateDate(Tools::getValue('orderId'));
+                    } elseif (Tools::getValue('customer') !== false) {
+                        $items = SRBReturn::getLikeCustomerByCreateDate(Tools::getValue('customer'));
                     } else {
                         $items = SRBReturn::getAllByCreateDate();
                     }
@@ -140,7 +164,8 @@ class AdminShoprunbackController extends ModuleAdminController
 
                     $actionUrl = Context::getContext()->link->getAdminLink('AdminShoprunback') . '&itemType=returns';
                     $this->context->smarty->assign('actionUrl', $actionUrl);
-                    $this->context->smarty->assign('searchId', Tools::getValue('orderId'));
+                    $this->context->smarty->assign('searchOrderId', Tools::getValue('orderId'));
+                    $this->context->smarty->assign('searchCustomer', Tools::getValue('customer'));
                     break;
                 case 'products':
                     $items = SRBProduct::getAllWithSRBApiCallQuery();
@@ -194,17 +219,5 @@ class AdminShoprunbackController extends ModuleAdminController
 
     public function asyncCall () {
         require_once($this->module->SRBModulePath . '/asyncCall.php');
-    }
-
-    public function test () {
-        $_POST['className'] = 'SRBOrder';
-        $_POST['action'] = 'sync';
-        $_POST['params'] = 56;
-        $result = $this->asyncCall();
-        // $item = SRBOrder::getById(58);
-        // $result = $item->sync();
-        echo 'done<br>';
-        var_dump($result);
-        die;
     }
 }

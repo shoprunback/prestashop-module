@@ -4,6 +4,7 @@ include_once 'SRBObject.php';
 
 class SRBAddress
 {
+    public $id;
     public $line1;
     public $line2;
     public $zipcode;

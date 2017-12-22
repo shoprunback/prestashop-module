@@ -2,19 +2,9 @@
 
 abstract class Synchronizer
 {
-    const SRB_BASE_URL = 'http://localhost:3000';
-    // const SRB_BASE_URL = 'https://dashboard.shoprunback.com';
-    const SRB_WEB_URL = 'http://localhost:3002';
-    // const SRB_BASE_URL = 'https://web.shoprunback.com';
-    const SRB_API_URL = self::SRB_BASE_URL . '/api/v1';
-    const API_CALLS_TABLE_NAME_NO_PREFIX = 'srb_api_calls';
-    const API_CALLS_TABLE_NAME = _DB_PREFIX_ . self::API_CALLS_TABLE_NAME_NO_PREFIX;
-    const API_CALLS_INDEX_NAME = 'index_type_id_item';
-    const API_CALLS_INDEX_COLUMNS = 'type, id_item';
-    const RETURN_TABLE_NAME_NO_PREFIX = 'srb_return';
-    const RETURN_TABLE_NAME = _DB_PREFIX_ . self::RETURN_TABLE_NAME_NO_PREFIX;
-    const RETURN_INDEX_NAME = 'index_srb_return_id';
-    const RETURN_INDEX_COLUMNS = 'srb_return_id';
+    const SRB_DASHBOARD_URL = _PS_MODE_DEV_ ? 'http://localhost:3000' : (SANDBOX_MODE ? 'https://sandbox.dashboard.shoprunback.com' : 'https://dashboard.shoprunback.com');
+    const SRB_WEB_URL = _PS_MODE_DEV_ ? 'http://localhost:3002': (SANDBOX_MODE ? 'https://sandbox.web.shoprunback.com' : 'https://web.shoprunback.com');
+    const SRB_API_URL = self::SRB_DASHBOARD_URL . '/api/v1';
 
     static public function APIcall ($path, $type, $json = '') {
         $path = str_replace(' ', '%20', $path);
@@ -69,49 +59,55 @@ abstract class Synchronizer
         $itemType = rtrim($itemType, 's'); // Without an "s" at the end (Product)
         $path = $itemType . 's'; // With an "s" (Products)
         $identifier = $item::getIdentifier();
+        $reference = $item->{$identifier};
+
+        $map = SRBMap::getByIdItemAndIdType($item->getDBId(), $itemType);
+        if ($map) {
+            $reference = $map->id_item_srb;
+        }
 
         $postResult = '';
-        $getResult = self::APIcall($path . '/' . $item->{$identifier}, 'GET');
+        $getResult = self::APIcall($path . '/' . $reference, 'GET');
 
         if ($getResult == '') {
             $postResult = self::APIcall($path, 'POST', $item);
         } else {
             if ($path != 'orders') {
-                $postResult = self::APIcall($path . '/' . $item->{$identifier}, 'PUT', $item);
+                $postResult = self::APIcall($path . '/' . $reference, 'PUT', $item);
+            } else {
+                $item->id_item_srb = json_decode($getResult)->id;
+                self::logApiCall($item, $itemType);
             }
         }
 
-        self::insertApiCallLog($item, $itemType);
+        if ($postResult) {
+            $postResultDecoded = json_decode($postResult);
+
+            if (isset($postResultDecoded->{$itemType}->errors)) {
+                Logger::addLog('[ShopRunBack] ' . ucfirst($itemType) . ' ' . $item->{$identifier} . ' couldn\'t be synchronized! ' . $postResultDecoded->{$itemType}->errors[0], 1, null, $itemType, $item->{$identifier}, true);
+            } else {
+                Logger::addLog('[ShopRunBack] ' . ucfirst($itemType) . ' ' . $item->{$identifier} . ' synchronized', 0, null, $itemType, $item->{$identifier}, true);
+                $item->id_item_srb = $postResultDecoded->id;
+                self::logApiCall($item, $itemType);
+            }
+        }
 
         return $postResult;
     }
 
-    static public function delete ($item, $itemType) {
-        $itemType = rtrim($itemType, 's'); // Without an "s" at the end (Product)
-        $path = $itemType . 's'; // With an "s" (Products)
-        $identifier = $item::getIdentifier();
-
-        $deleteResult = self::APIcall($path . '/' . $item->{$identifier}, 'DELETE');
-
-        self::insertApiCallLog($item, $itemType);
-
-        return $deleteResult;
-    }
-
-    static private function insertApiCallLog ($item, $type) {
+    static private function logApiCall ($item, $itemType) {
         $identifier = $item::getIdColumnName();
         $itemId = isset($item->$identifier) ? $item->$identifier : $item->ps[$identifier];
-        // var_dump([
-        //     'id_item' => $itemId,
-        //     'type' => $type,
-        //     'last_sent' => date('Y-m-d H:i:s')
-        // ]);die;
 
         $srbSql = Db::getInstance();
-        $srbSql->insert(self::API_CALLS_TABLE_NAME_NO_PREFIX, [
+
+        $data = [
             'id_item' => $itemId,
-            'type' => $type,
-            'last_sent' => date('Y-m-d H:i:s')
-        ]);
+            'id_item_srb' => $item->id_item_srb,
+            'type' => $itemType,
+            'last_sent' => date('Y-m-d H:i:s'),
+        ];
+        $map = new SRBMap($data);
+        $map->save();
     }
 }

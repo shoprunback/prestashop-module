@@ -21,12 +21,18 @@
                 <thead>
                     <tr>
                         <th>{l s="return.returns" mod='shoprunback'}</th>
-                        <th>{l s="return.customer" mod='shoprunback'}</th>
+                        <th>
+                            {l s="return.customer" mod='shoprunback'}
+                            <form action="{$actionUrl}" method="POST">
+                                <input type="text" name="customer" placeholder="{l s='form.placeholder' mod='shoprunback'}" value="{$searchCustomer}" />
+                                <a href="{$srbManager}&itemType={$itemType}" class="btn btn-default">{l s='form.clear' mod='shoprunback'}</a>
+                            </form>
+                        </th>
                         <th>
                             {l s='order.id' mod='shoprunback'}
                             <form action="{$actionUrl}" method="POST">
-                                <input type="number" name="orderId" placeholder="Search..." class="input-order-id" value="{$searchId}" />
-                                <a class="" href="{$srbManager}&itemType={$itemType}">{l s='form.clear' mod='shoprunback'}</a>
+                                <input type="number" min="0" name="orderId" placeholder="{l s='form.placeholder' mod='shoprunback'}" value="{$searchOrderId}" />
+                                <a href="{$srbManager}&itemType={$itemType}" class="btn btn-default">{l s='form.clear' mod='shoprunback'}</a>
                             </form>
                         </th>
                         <th>{l s='return.state' mod='shoprunback'}</th>
@@ -37,12 +43,16 @@
                 <tbody>
                     {foreach from=$items key=id item=item}
                         <tr data-id="{$item->getReference()}">
-                            <td><a href=""><b>{$item->getName()}</b></a></td>
+                            <td><a href="{$externalLink}{$item->getReference()}" target="_blank"><b>{$item->getName()}</b></a></td>
                             <td>{$item->order->customer->first_name} {$item->order->customer->last_name}</td>
                             <td>{$item->order_id}</td>
-                            <td><span class="badge badge-default {$item->state}">{$item->state|capitalize}</span></td>
+                            <td>
+                                <a href="{$externalLink}{$item->getReference()}" target="blank">
+                                    <span class="badge badge-default {$item->state}">{$item->state|capitalize}</span>
+                                </a>
+                            </td>
                             <td>{$item->created_at}</td>
-                            <td><a href="{$item->getPublicUrl()}" target="_blank"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a></td>
+                            <td><a href="{$externalLink}{$item->getReference()}" target="_blank"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a></td>
                         </tr>
                     {/foreach}
                 </tbody>
