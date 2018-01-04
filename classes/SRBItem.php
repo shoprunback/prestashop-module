@@ -18,8 +18,6 @@ class SRBItem
         $this->product = new SRBProduct($psProduct);
     }
 
-    // private (class) methods
-
     static public function createItemsFromOrderId ($orderId) {
         $sql = self::findProductsForItems();
         $sql->where('o.' . SRBOrder::getIdColumnName() . ' = "' . pSQL($orderId) . '"');

@@ -1,7 +1,5 @@
 <?php
 
-include_once 'SRBObject.php';
-
 class SRBAddress
 {
     public $id;
@@ -34,8 +32,6 @@ class SRBAddress
         return 'id';
     }
 
-    // SQL object extractors
-
     static public function getByCustomerId ($customerId) {
         return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS(self::findByCustomerIdQuery($customerId)));
     }
@@ -51,8 +47,6 @@ class SRBAddress
     static public function createFromOrder ($psOrder) {
         return new self($psOrder);
     }
-
-    // private (class) methods
 
     static protected function findAllQuery () {
         $sql = new DbQuery();

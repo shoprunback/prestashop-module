@@ -1,6 +1,5 @@
 <?php
 
-include_once 'SRBObject.php';
 include_once 'SRBAddress.php';
 
 class SRBCustomer
@@ -30,13 +29,9 @@ class SRBCustomer
         return 'id';
     }
 
-    // SQL object extractors
-
     static private function extractId ($psCustomerArrayName) {
         return isset($psCustomerArrayName['id_customer']) ? $psCustomerArrayName['id_customer'] : $psCustomerArrayName['id'];
     }
-
-    // private (class) methods
 
     static protected function findAllQuery () {
         $sql = new DbQuery();

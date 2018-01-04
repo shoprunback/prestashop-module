@@ -47,12 +47,12 @@
                             </td>
                             <td>{$item->last_sent}</td>
                             <td>
-                                {if $item->delivery != 1}
+                                {if $item->delivery}
+                                    {l s="item.delivered" mod='shoprunback'}
+                                {elseif ! $item->last_sent}
                                     <a class="sync-item srb-button" data-type="{$itemType}">
                                         {l s="item.sync" mod='shoprunback'}
                                     </a>
-                                {else}
-                                    {l s="item.delivered" mod='shoprunback'}
                                 {/if}
                             </td>
                             <td><a href="{$externalLink}{$item->getReference()}" target="_blank"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a></td>

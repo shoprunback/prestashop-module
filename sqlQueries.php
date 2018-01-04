@@ -10,7 +10,8 @@ function createTableQuery () {
         `id_item` INT(11) NOT NULL,
         `id_item_srb` VARCHAR(255) NOT NULL,
         `type` VARCHAR(255) NOT NULL,
-        `last_sent` DATETIME NOT NULL
+        `last_sent` DATETIME NOT NULL,
+        `test` INT(11)
     )';
 }
 

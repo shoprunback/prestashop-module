@@ -48,7 +48,7 @@ class SRBMap
         $sql = Db::getInstance();
         if (isset($this->id_srb_map) && $this->id_srb_map != 0) {
             $result = $sql->update(SRBMap::MAPPER_TABLE_NAME_NO_PREFIX, $mapArray, 'id_item_srb = "' . pSQL($this->id_item_srb) . '"');
-            Logger::addLog('[ShopRunBack] ' . ucfirst($this->type) . ' ' . $this->id_item . ' map updated', 0, null, $this->type, $this->id_item, true);
+            Logger::addLog('[ShopRunBack] Map of ' . ucfirst($this->type) . ' ' . $this->id_item . ' updated', 0, null, $this->type, $this->id_item, true);
         } else {
             $result = $sql->insert(SRBMap::MAPPER_TABLE_NAME_NO_PREFIX, $mapArray);
             Logger::addLog('[ShopRunBack] ' . ucfirst($this->type) . ' ' . $this->id_item . ' mapped', 0, null, $this->type, $this->id_item, true);

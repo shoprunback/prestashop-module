@@ -2,8 +2,8 @@
 
 global $_MODULE;
 $_MODULE = array();
-$_MODULE['<{shoprunback}prestashop>shoprunback_bb4768ee80af89876784e903eebc5f40'] = 'ShopRunBack vous aide !!! :D';
-$_MODULE['<{shoprunback}prestashop>shoprunback_8ff63b277c7cd76096e7e03431f51c3f'] = 'Désinstallation';
+$_MODULE['<{shoprunback}prestashop>shoprunback_bb4768ee80af89876784e903eebc5f40'] = 'ShopRunBack vous aide à enregistrer vos modifications, ajouts et suppressions de produits ';
+$_MODULE['<{shoprunback}prestashop>shoprunback_8ff63b277c7cd76096e7e03431f51c3f'] = 'Voulez-vous vraiment désinstaller ShopRunBack ?';
 $_MODULE['<{shoprunback}prestashop>adminshoprunbackcontroller_536e5c02c641b33bcc42cf255e7d41bf'] = 'Token inconnu';
 $_MODULE['<{shoprunback}prestashop>adminshoprunbackcontroller_cd7f50bf12c9b35fca7dab3331340ff4'] = 'Token enregistré ! Bienvenu %s %s !';
 $_MODULE['<{shoprunback}prestashop>adminshoprunbackcontroller_fa152001a93f98c22968c049e24e27da'] = 'Configuration';
@@ -46,7 +46,7 @@ $_MODULE['<{shoprunback}prestashop>orders_2e41893e6b1f228b57f5fd3aa71fe524'] = '
 $_MODULE['<{shoprunback}prestashop>orders_366940cdf0f882254dc908bbc5ad7377'] = 'Statut du retour';
 $_MODULE['<{shoprunback}prestashop>orders_6fb114bdbf5a985dba47380bb375150c'] = 'Dernière Synchronisation';
 $_MODULE['<{shoprunback}prestashop>orders_fd9a2af570b15663268a5b561fd57a67'] = 'Synchroniser';
-$_MODULE['<{shoprunback}prestashop>orders_300960f72528c4156ec21de9390300ef'] = 'Livré';
+$_MODULE['<{shoprunback}prestashop>orders_300960f72528c4156ec21de9390300ef'] = 'Livrée';
 $_MODULE['<{shoprunback}prestashop>products_01ac876f7b0793b511cfdf88a03b89b8'] = 'Mes produits';
 $_MODULE['<{shoprunback}prestashop>products_ca69e7227610e37cf051265a9e0415ba'] = 'Synchroniser Tous';
 $_MODULE['<{shoprunback}prestashop>products_e966757a696b5c1c158821c6ffd5e036'] = 'Synchroniser Nouveaux';

@@ -55,16 +55,21 @@ abstract class Synchronizer
         return $response;
     }
 
+    static private function referenceMapping ($itemId, $itemType) {
+        $map = SRBMap::getByIdItemAndIdType($itemId, $itemType);
+
+        if ($map) {
+            return $map->id_item_srb;
+        }
+
+        return false;
+    }
+
     static public function sync ($item, $itemType) {
         $itemType = rtrim($itemType, 's'); // Without an "s" at the end (Product)
         $path = $itemType . 's'; // With an "s" (Products)
         $identifier = $item::getIdentifier();
-        $reference = $item->{$identifier};
-
-        $map = SRBMap::getByIdItemAndIdType($item->getDBId(), $itemType);
-        if ($map) {
-            $reference = $map->id_item_srb;
-        }
+        $reference = self::referenceMapping($item->getDBId(), $itemType) ? self::referenceMapping($item->getDBId(), $itemType) : $item->{$identifier};
 
         $postResult = '';
         $getResult = self::APIcall($path . '/' . $reference, 'GET');
@@ -76,26 +81,47 @@ abstract class Synchronizer
                 $postResult = self::APIcall($path . '/' . $reference, 'PUT', $item);
             } else {
                 $item->id_item_srb = json_decode($getResult)->id;
-                self::logApiCall($item, $itemType);
+                self::mapApiCall($item, $itemType);
             }
         }
 
         if ($postResult) {
             $postResultDecoded = json_decode($postResult);
+            $class = get_class($item);
 
             if (isset($postResultDecoded->{$itemType}->errors)) {
-                Logger::addLog('[ShopRunBack] ' . ucfirst($itemType) . ' ' . $item->{$identifier} . ' couldn\'t be synchronized! ' . $postResultDecoded->{$itemType}->errors[0], 1, null, $itemType, $item->{$identifier}, true);
+                Logger::addLog('[ShopRunBack] ' . ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be synchronized! ' . $postResultDecoded->{$itemType}->errors[0], 1, null, $itemType, $item->ps[$class::getIdColumnName()], true);
             } else {
-                Logger::addLog('[ShopRunBack] ' . ucfirst($itemType) . ' ' . $item->{$identifier} . ' synchronized', 0, null, $itemType, $item->{$identifier}, true);
+                Logger::addLog('[ShopRunBack] ' . ucfirst($itemType) . ' "' . $item->{$identifier} . '" synchronized', 0, null, $itemType, $item->ps[$class::getIdColumnName()], true);
                 $item->id_item_srb = $postResultDecoded->id;
-                self::logApiCall($item, $itemType);
+                self::mapApiCall($item, $itemType);
             }
         }
 
         return $postResult;
     }
 
-    static private function logApiCall ($item, $itemType) {
+    static public function delete ($item, $itemType) {
+        $itemType = rtrim($itemType, 's'); // Without an "s" at the end (Product)
+        $path = $itemType . 's'; // With an "s" (Products)
+        $identifier = $item::getIdentifier();
+        $reference = self::referenceMapping($item->getDBId(), $itemType) ? self::referenceMapping($item->getDBId(), $itemType) : $item->{$identifier};
+
+        $deleteResult = self::APIcall($path . '/' . $reference, 'DELETE');
+
+        $class = get_class($item);
+        $deleteResultDecoded = json_decode($deleteResult);
+        if (isset($deleteResultDecoded->errors)) {
+            Logger::addLog('[ShopRunBack] ' . ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be deleted! ' . $deleteResultDecoded->errors[0], 3, null, $itemType, $item->ps[$class::getIdColumnName()], true);
+            return false;
+        }
+
+        Logger::addLog('[ShopRunBack] ' . ucfirst($itemType) . ' "' . $item->{$identifier} . '" has been deleted. ' . $deleteResult, 0, null, $itemType, $item->ps[$class::getIdColumnName()], true);
+
+        return $deleteResult;
+    }
+
+    static private function mapApiCall ($item, $itemType) {
         $identifier = $item::getIdColumnName();
         $itemId = isset($item->$identifier) ? $item->$identifier : $item->ps[$identifier];
 

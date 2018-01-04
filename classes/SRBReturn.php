@@ -62,7 +62,19 @@ class SRBReturn extends SRBObject
 
     public function sync () {
         $this->order->sync();
+        Logger::addLog('[ShopRunBack] SYNCHRONIZING ' . self::getMapType() . ' "' . $this->{self::getIdentifier()} . '"', 0, null, self::getMapType(), $this->ps[self::getIdColumnName()], true);
         return Synchronizer::sync($this, self::getMapType());
+    }
+
+    static public function syncAll ($newOnly = false) {
+        $returns = $newOnly ? self::getAllNotSync() : self::getAll();
+
+        $responses = [];
+        foreach ($returns as $return) {
+            $responses[] = $return->sync();
+        }
+
+        return $responses;
     }
 
     public function save () {
@@ -75,22 +87,11 @@ class SRBReturn extends SRBObject
         $sql = Db::getInstance();
         $result = $sql->update(SRBReturn::RETURN_TABLE_NAME_NO_PREFIX, $returnToUpdate, 'id_srb_return = "' . pSQL($this->id_srb_return) . '"');
 
+        Logger::addLog('[ShopRunBack] ' . self::getMapType() . ' "' . $this->{self::getIdentifier()} . '" updated', 0, null, self::getMapType(), $this->ps[self::getIdColumnName()], true);
+
         $this->sync();
 
         return $result;
-    }
-
-    // SQL object extractors
-
-    static public function syncAll ($newOnly = false) {
-        $returns = $newOnly ? self::getAllNotSync() : self::getAll();
-
-        $responses = [];
-        foreach ($returns as $return) {
-            $responses[] = $return->sync();
-        }
-
-        return $responses;
     }
 
     static public function createReturnFromOrderId ($orderId) {
@@ -140,11 +141,10 @@ class SRBReturn extends SRBObject
             'created_at' => $result->created_at
         ];
 
+        Logger::addLog('[ShopRunBack] ' . self::getMapType() . ' "' . $this->{self::getIdentifier()} . '" inserted', 0, null, self::getMapType(), $this->ps[self::getIdColumnName()], true);
         $sql = Db::getInstance();
         return $sql->insert(SRBReturn::RETURN_TABLE_NAME_NO_PREFIX, $returnToInsert);
     }
-
-    // private (class) methods
 
     private function findAllByCreateDateQuery () {
         $sql = self::findAllQuery();
@@ -213,6 +213,7 @@ class SRBReturn extends SRBObject
         $sql->select(self::getTableName() . '.*, o.*');
         $sql->from(SRBReturn::RETURN_TABLE_NAME_NO_PREFIX, self::getTableName());
         $sql->innerJoin('orders', 'o', self::getTableName() . '.id_order = o.id_order');
+        $sql->groupBy(self::getTableName() . '.' . self::getIdColumnName());
 
         return $sql;
     }

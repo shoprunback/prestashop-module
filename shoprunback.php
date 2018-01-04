@@ -19,7 +19,7 @@ class ShopRunBack extends Module
         // Mandatory parameters
         $this->name = 'shoprunback';
         $this->author = 'ShopRunBack';
-        $this->version = '1.0.0';
+        $this->version = '1.0.3';
         $this->ps_versions_compliancy = array('min' => '1.7.2', 'max' => _PS_VERSION_);
         $this->tab = 'administration';
         $this->tabs = [
@@ -160,10 +160,18 @@ class ShopRunBack extends Module
     }
 
     public function hookActionProductDelete ($params) {
-        // TODO check if product has NEVER been ordered
+        $productParam = $params['product'];
 
-        // $product = $params['product'];
-        // $result = Synchronizer::APIcall('products/' . $product->reference, 'DELETE');
+        $productArray = ['id_product' => $params['id_product']];
+        foreach ($productParam as $key => $value) {
+            $productArray[$key] = $value;
+        }
+
+        $product = new SRBProduct($productArray);
+
+        if ($product) {
+            $product->deleteWithCheck();
+        }
     }
 
     public function hookNewOrder ($params) {

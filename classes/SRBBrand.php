@@ -45,10 +45,9 @@ class SRBBrand extends SRBObject
     }
 
     public function sync () {
+        Logger::addLog('[ShopRunBack] SYNCHRONIZING ' . self::getMapType() . ' "' . $this->{self::getIdentifier()} . '"', 0, null, self::getMapType(), $this->ps[self::getIdColumnName()], true);
         return Synchronizer::sync($this, self::getMapType());
     }
-
-    // private (class) methods
 
     static protected function findAllQuery () {
         $sql = new DbQuery();

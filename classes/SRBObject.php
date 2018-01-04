@@ -32,7 +32,6 @@ abstract class SRBObject
 
     static public function getAllNotSync () {
         $class = get_called_class();
-        var_dump(Db::getInstance()->executeS($class::findNotSyncQuery()));die;
         return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS($class::findNotSyncQuery()));
     }
 
@@ -78,7 +77,7 @@ abstract class SRBObject
         $identifier = static::getIdColumnName();
         $type = static::getMapType();
         $mapQuery = SRBMap::findOnlyIdItemByTypeQuery($type);
-        Logger::addLog('[ShopRunBack] OBJECT: ' . static::findAllQuery()->where(static::getTableName() . '.' . static::getIdColumnName() . ' NOT IN (' . $mapQuery . ')'), 0, null, 'brand', 1, true);
+        Logger::addLog('[ShopRunBack] OBJECT: ' . static::findAllQuery()->where(static::getTableName() . '.' . static::getIdColumnName() . ' NOT IN (' . $mapQuery . ')'), 0, null, $type, 0, true);
 
         return static::findAllQuery()->where(static::getTableName() . '.' . static::getIdColumnName() . ' NOT IN (' . $mapQuery . ')');
     }
@@ -101,8 +100,6 @@ abstract class SRBObject
                         ->groupBy(static::getTableName() . '.' . $identifier)
                         ->orderBy('srb.last_sent DESC');
     }
-
-    // private (class) method
 
     static protected function findOneQuery ($id) {
         return static::findAllQuery()->where(self::getTableIdentifier() . ' = "' . pSQL($id) . '"');

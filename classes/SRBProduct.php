@@ -50,8 +50,6 @@ class SRBProduct extends SRBObject
         return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS(self::findOrderProductsQuery($orderId)));
     }
 
-    // SQL object extractors
-
     static private function extractName ($psProductArrayName) {
         return is_array($psProductArrayName) ? $psProductArrayName[1] : $psProductArrayName;
     }
@@ -98,10 +96,44 @@ class SRBProduct extends SRBObject
             $this->picture_file_base64 = 'data:image/png;base64,' . base64_encode($fileContent);
         }
 
+        Logger::addLog('[ShopRunBack] SYNCHRONIZING ' . self::getMapType() . ' "' . $this->{self::getIdentifier()} . '"', 0, null, self::getMapType(), $this->ps[self::getIdColumnName()], true);
         return Synchronizer::sync($this, self::getMapType());
     }
 
-    // private (class) methods
+    public function deleteWithCheck () {
+        if ($this->canBeDeleted()) {
+            if ($this->syncDelete()) {
+                Logger::addLog('[ShopRunBack] Product "' . $this->{self::getIdentifier()} . '" deleted', 0, null, self::getMapType(), $this->ps[self::getIdColumnName()], true);
+                return true;
+            } else {
+                Logger::addLog('[ShopRunBack] An error occured, product "' . $this->{self::getIdentifier()} . '" couldn\'t be deleted', 3, null, self::getMapType(), $this->ps[self::getIdColumnName()], true);
+                return false;
+            }
+        }
+
+        Logger::addLog('[ShopRunBack] Product "' . $this->{self::getIdentifier()} . '" couldn\'t be deleted because it has already been ordered', 1, null, self::getMapType(), $this->ps[self::getIdColumnName()], true);
+        return false;
+    }
+
+    // Check if product has NEVER been ordered
+    public function canBeDeleted () {
+        $sql = new DbQuery();
+        $sql->select('COUNT(o.id_order)');
+        $sql->from('product', self::getTableName());
+        $sql->innerJoin('cart_product', 'cp', self::getTableName() . '.id_product = cp.id_product');
+        $sql->innerJoin('cart', 'ca', 'cp.id_cart = ca.id_cart');
+        $sql->innerJoin('orders', 'o', 'ca.id_cart = o.id_cart');
+        $sql->where(self::getTableName() . '.' . self::getIdColumnName() . ' = ' . $this->ps[self::getIdColumnName()]);
+
+        $result = Db::getInstance()->getValue($sql);
+
+        return ($result == 0);
+    }
+
+    public function syncDelete () {
+        Logger::addLog('[ShopRunBack] DELETING ' . self::getMapType() . ' "' . $this->{self::getIdentifier()} . '"', 0, null, self::getMapType(), $this->ps[self::getIdColumnName()], true);
+        return Synchronizer::delete($this, self::getMapType());
+    }
 
     static protected function findOrderProductsQuery ($orderId) {
         $sql = new DbQuery();

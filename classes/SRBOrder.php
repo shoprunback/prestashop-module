@@ -83,10 +83,9 @@ class SRBOrder extends SRBObject
     }
 
     public function sync () {
+        Logger::addLog('[ShopRunBack] SYNCHRONIZING ' . self::getMapType() . ' "' . $this->{self::getIdentifier()} . '"', 0, null, self::getMapType(), $this->ps[self::getIdColumnName()], true);
         return Synchronizer::sync($this, self::getMapType());
     }
-
-    // SQL object extractors
 
     static private function extractOrderNumber ($psOrderArrayName) {
         $return = '';
@@ -101,8 +100,6 @@ class SRBOrder extends SRBObject
 
         return $return;
     }
-
-    // private (class) methods
 
     static public function getAllWithSRBApiCallQuery ($onlySyncItems = false) {
         $sql = self::findWithMapQuery($onlySyncItems);
