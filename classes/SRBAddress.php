@@ -59,10 +59,10 @@ class SRBAddress
     }
 
     static protected function findByCustomerIdQuery ($customerId) {
-        return self::findAllQuery()->where('id_customer = ' . $customerId);
+        return self::findAllQuery()->where('id_customer = ' . pSQL($customerId));
     }
 
     static protected function findByOrderIdQuery ($orderId) {
-        return self::findAllQuery()->innerJoin('orders', 'o', 'o.id_address_delivery = ' . self::getTableName() . '.id_address')->where('o.id_order = ' . $orderId);
+        return self::findAllQuery()->innerJoin('orders', 'o', 'o.id_address_delivery = ' . self::getTableName() . '.id_address')->where('o.id_order = ' . pSQL($orderId));
     }
 }

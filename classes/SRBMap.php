@@ -78,7 +78,7 @@ class SRBMap
 
     static public function getByIdItemAndIdType ($idItem, $type) {
         $sql = self::findAllQuery();
-        $sql->where(self::getTableName() . '.id_item = ' . pSQL($idItem) . ' AND ' . pSQL(self::getTableName()) . '.type = "' . $type . '"');
+        $sql->where(self::getTableName() . '.id_item = ' . pSQL($idItem) . ' AND ' . pSQL(self::getTableName()) . '.type = "' . pSQL($type) . '"');
         $result = Db::getInstance()->executeS($sql);
 
         return (is_array($result) && isset($result[0])) ? new self($result[0]) : false;

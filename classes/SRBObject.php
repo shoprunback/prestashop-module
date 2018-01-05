@@ -77,7 +77,6 @@ abstract class SRBObject
         $identifier = static::getIdColumnName();
         $type = static::getMapType();
         $mapQuery = SRBMap::findOnlyIdItemByTypeQuery($type);
-        Logger::addLog('[ShopRunBack] OBJECT: ' . static::findAllQuery()->where(static::getTableName() . '.' . static::getIdColumnName() . ' NOT IN (' . $mapQuery . ')'), 0, null, $type, 0, true);
 
         return static::findAllQuery()->where(static::getTableName() . '.' . static::getIdColumnName() . ' NOT IN (' . $mapQuery . ')');
     }
