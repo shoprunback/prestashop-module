@@ -35,8 +35,8 @@ class SRBCustomer
 
     static protected function findAllQuery () {
         $sql = new DbQuery();
-        $sql->select('c.*');
-        $sql->from('customer', 'c');
+        $sql->select(self::getTableName() . '.*');
+        $sql->from('customer', self::getTableName());
 
         return $sql;
     }

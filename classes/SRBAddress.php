@@ -50,10 +50,10 @@ class SRBAddress
 
     static protected function findAllQuery () {
         $sql = new DbQuery();
-        $sql->select('a.*, co.*, s.name as stateName');
-        $sql->from('address', 'a');
-        $sql->innerJoin('country', 'co', 'a.id_country = co.id_country');
-        $sql->leftJoin('state', 's', 'a.id_state = s.id_state');
+        $sql->select(self::getTableName() . '.*, co.*, s.name as stateName');
+        $sql->from('address', self::getTableName());
+        $sql->innerJoin('country', 'co', self::getTableName() . '.id_country = co.id_country');
+        $sql->leftJoin('state', 's', self::getTableName() . '.id_state = s.id_state');
 
         return $sql;
     }
@@ -63,6 +63,6 @@ class SRBAddress
     }
 
     static protected function findByOrderIdQuery ($orderId) {
-        return self::findAllQuery()->innerJoin('orders', 'o', 'o.id_address_delivery = a.id_address')->where('id_order = ' . $orderId);
+        return self::findAllQuery()->innerJoin('orders', 'o', 'o.id_address_delivery = ' . self::getTableName() . '.id_address')->where('o.id_order = ' . $orderId);
     }
 }
