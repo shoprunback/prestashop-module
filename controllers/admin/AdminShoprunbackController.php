@@ -11,6 +11,7 @@ class AdminShoprunbackController extends ModuleAdminController
         $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/srbGlobal.css');
         $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin/header.css');
         $this->actionResult = false;
+        $this->tabUrl = Context::getContext()->link->getAdminLink('AdminShoprunback');
 
         if ($_GET && isset($_GET['action'])) {
             $function = $_GET['action'];
@@ -53,13 +54,12 @@ class AdminShoprunbackController extends ModuleAdminController
     public function initContent () {
         $link = new Link();
         parent::initContent();
-        $srbManager = Context::getContext()->link->getAdminLink('AdminShoprunback');
 
         $this->context->smarty->assign('token', Configuration::get('srbtoken'));
         $this->context->smarty->assign('shoprunbackURL', $this->module->url);
         $this->context->smarty->assign('shoprunbackAPIURL', Synchronizer::SRB_API_URL);
-        $this->context->smarty->assign('srbManager', $srbManager);
-        $this->context->smarty->assign('asyncCall', $srbManager . '&action=asyncCall');
+        $this->context->smarty->assign('srbManager', $this->tabUrl);
+        $this->context->smarty->assign('asyncCall', $this->tabUrl . '&action=asyncCall');
         $this->context->smarty->assign('link', $link);
 
         $conditionsToSend = '';
@@ -78,79 +78,8 @@ class AdminShoprunbackController extends ModuleAdminController
 
             $template = 'config';
 
-            $defaultLang = (int) Configuration::get('PS_LANG_DEFAULT');
+            $this->getConfigForm();
 
-            $fieldsForm[0]['form'] = [
-                'legend' => [
-                    'title' => $this->l('config.form.title'),
-                ],
-                'input' => [
-                    [
-                        'type' => 'text',
-                        'label' => $this->l('config.form.token'),
-                        'name' => 'srbtoken',
-                        'size' => 40,
-                        'required' => true
-                    ],
-                    [
-                        'type' => 'radio',
-                        'label' => $this->l('config.form.sandbox'),
-                        'name' => 'sandbox',
-                        'required' => true,
-                        'values' => [
-                            [
-                                'id' => 'yes',
-                                'value' => 1,
-                                'label' => $this->l('config.form.yes')
-                            ],
-                            [
-                                'id' => 'no',
-                                'value' => 0,
-                                'label' => $this->l('config.form.no')
-                            ]
-                        ],
-                        'is_bool' => true,
-                    ]
-                ],
-                'submit' => [
-                    'title' => $this->l('config.form.save'),
-                    'class' => 'btn btn-default pull-right'
-                ]
-            ];
-
-            $helper = new HelperForm();
-
-            // Module, token and currentIndex
-            $helper->module = $this->module;
-            $helper->name_controller = $this->module->name;
-            $helper->token = Tools::getAdminTokenLite('AdminShoprunback');
-            $helper->currentIndex = $srbManager . '&itemType=config';
-
-            // Language
-            $helper->default_form_language = $defaultLang;
-            $helper->allow_employee_form_lang = $defaultLang;
-
-            // Title and toolbar
-            $helper->title = $this->module->displayName;
-            $helper->show_toolbar = true;
-            $helper->toolbar_scroll = true;
-            $helper->submit_action = 'submittoken';
-            $helper->toolbar_btn = array(
-                'save' => array(
-                    'desc' => $this->l('config.form.save'),
-                    'href' => $helper->currentIndex,
-                ),
-                'back' => array(
-                    'href' => $helper->currentIndex,
-                    'desc' => $this->l('config.form.back')
-                )
-            );
-
-            // Load current value
-            $helper->fields_value['srbtoken'] = Configuration::get('srbtoken');
-            $helper->fields_value['sandbox'] = Configuration::get('sandbox');
-
-            $this->context->smarty->assign('form', $helper->generateForm(array($fieldsForm[0])));
             $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin/config.css');
         } else {
             switch ($itemType) {
@@ -219,6 +148,82 @@ class AdminShoprunbackController extends ModuleAdminController
         $this->context->smarty->assign('template', $template);
         $this->context->smarty->assign('message', $message);
         $this->setTemplate('../../../../modules/' . $this->module->name . '/views/templates/admin/layout.tpl');
+    }
+
+    private function getConfigForm () {
+        $defaultLang = (int) Configuration::get('PS_LANG_DEFAULT');
+
+        $fieldsForm[0]['form'] = [
+            'legend' => [
+                'title' => $this->l('config.form.title'),
+            ],
+            'input' => [
+                [
+                    'type' => 'text',
+                    'label' => $this->l('config.form.token'),
+                    'name' => 'srbtoken',
+                    'size' => 40,
+                    'required' => true
+                ],
+                [
+                    'type' => 'radio',
+                    'label' => $this->l('config.form.sandbox'),
+                    'name' => 'sandbox',
+                    'required' => true,
+                    'values' => [
+                        [
+                            'id' => 'yes',
+                            'value' => 1,
+                            'label' => $this->l('config.form.yes')
+                        ],
+                        [
+                            'id' => 'no',
+                            'value' => 0,
+                            'label' => $this->l('config.form.no')
+                        ]
+                    ],
+                    'is_bool' => true,
+                ]
+            ],
+            'submit' => [
+                'title' => $this->l('config.form.save'),
+                'class' => 'btn btn-default pull-right'
+            ]
+        ];
+
+        $helper = new HelperForm();
+
+        // Module, token and currentIndex
+        $helper->module = $this->module;
+        $helper->name_controller = $this->module->name;
+        $helper->token = Tools::getAdminTokenLite('AdminShoprunback');
+        $helper->currentIndex = $this->tabUrl . '&itemType=config';
+
+        // Language
+        $helper->default_form_language = $defaultLang;
+        $helper->allow_employee_form_lang = $defaultLang;
+
+        // Title and toolbar
+        $helper->title = $this->module->displayName;
+        $helper->show_toolbar = true;
+        $helper->toolbar_scroll = true;
+        $helper->submit_action = 'submittoken';
+        $helper->toolbar_btn = array(
+            'save' => array(
+                'desc' => $this->l('config.form.save'),
+                'href' => $helper->currentIndex,
+            ),
+            'back' => array(
+                'href' => $helper->currentIndex,
+                'desc' => $this->l('config.form.back')
+            )
+        );
+
+        // Load current value
+        $helper->fields_value['srbtoken'] = Configuration::get('srbtoken');
+        $helper->fields_value['sandbox'] = Configuration::get('sandbox');
+
+        $this->context->smarty->assign('form', $helper->generateForm(array($fieldsForm[0])));
     }
 
     public function asyncCall () {
