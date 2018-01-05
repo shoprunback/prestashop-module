@@ -41,7 +41,7 @@ class AdminShoprunbackController extends ModuleAdminController
             return $this->module->displayError($this->l('error.no_token'));
         }
 
-        Logger::addLog('[ShopRunBack] API token saved: ' . $srbtoken, 0, null, 'apitoken', 0, true);
+        Logger::addLog('[ShopRunBack] API token saved: ' . substr($srbtoken, 0, 3) . '...' . substr($srbtoken, -3), 0, null, 'apitoken', 0, true);
 
         Synchronizer::APIcall('company', 'PUT', ['webhook_url' => $this->module->webhookUrl]);
 
@@ -92,7 +92,6 @@ class AdminShoprunbackController extends ModuleAdminController
                         $items = SRBReturn::getAllByCreateDate();
                     }
 
-                    $conditionsToSend = $this->l('return.description');
                     $externalLink .= '/shipbacks/';
 
                     $actionUrl = Context::getContext()->link->getAdminLink('AdminShoprunback') . '&itemType=returns';
@@ -102,17 +101,14 @@ class AdminShoprunbackController extends ModuleAdminController
                     break;
                 case 'products':
                     $items = SRBProduct::getAllWithSRBApiCallQuery();
-                    $conditionsToSend = $this->l('product.description');
                     $externalLink .= '/products/';
                     break;
                 case 'orders':
                     $items = SRBOrder::getAllWithSRBApiCallQuery();
-                    $conditionsToSend = $this->l('order.description');
                     $externalLink .= '/orders/';
                     break;
                 case 'brands':
                     $items = SRBBrand::getAllWithSRBApiCallQuery();
-                    $conditionsToSend = $this->l('brand.description');
                     $externalLink .= '/brands/';
                     break;
             }
@@ -210,12 +206,8 @@ class AdminShoprunbackController extends ModuleAdminController
         $helper->submit_action = 'submittoken';
         $helper->toolbar_btn = array(
             'save' => array(
-                'desc' => $this->l('config.form.save'),
+                'desc' => $this->module->l('config.form.save'),
                 'href' => $helper->currentIndex,
-            ),
-            'back' => array(
-                'href' => $helper->currentIndex,
-                'desc' => $this->l('config.form.back')
             )
         );
 

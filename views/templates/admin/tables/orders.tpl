@@ -15,7 +15,7 @@
             </div>
 
             <div class="row">
-                <p class="col-sm-12">{$conditionsToSend}</p>
+                <p class="col-sm-12">{l s="order.description" mod='shoprunback'}</p>
             </div>
         </div>
 
