@@ -81,7 +81,6 @@ class SRBProduct extends SRBObject
 
     public function sync ($brandChecked = false) {
         if (! $brandChecked) {
-            Logger::addLog('[ShopRunBack] prebrand', 0, null, 'brand', 1, true);
             $postBrandResult = $this->brand->sync();
         }
 
