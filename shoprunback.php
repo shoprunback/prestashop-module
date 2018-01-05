@@ -19,7 +19,7 @@ class ShopRunBack extends Module
         // Mandatory parameters
         $this->name = 'shoprunback';
         $this->author = 'ShopRunBack';
-        $this->version = '1.0.12';
+        $this->version = '1.0.0';
         $this->ps_versions_compliancy = array('min' => '1.7.2', 'max' => _PS_VERSION_);
         $this->tab = 'administration';
         $this->tabs = [
