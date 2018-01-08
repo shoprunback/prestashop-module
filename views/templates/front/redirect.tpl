@@ -7,7 +7,6 @@
     }
 
     (function() {
-        url = 'http://localhost/prestashop/index.php?controller=order-detail&id_order=61';
         window.location.href = url;
     })();
 </script>

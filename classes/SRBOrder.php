@@ -91,7 +91,7 @@ class SRBOrder extends SRBObject
         $sql = self::findAllWithMappingQuery($onlySyncItems);
         $sql->select('srbr.id_srb_shipback, srbr.state, os.delivery');
         $sql->leftJoin( // We use leftJoin because orders may not have a return associated
-            SRBShipback::RETURN_TABLE_NAME_NO_PREFIX,
+            SRBShipback::SHIPBACK_TABLE_NAME_NO_PREFIX,
             'srbr',
             'srbr.id_order = ' . self::getTableName() . '.' . self::getIdColumnName()
         );

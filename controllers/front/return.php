@@ -16,7 +16,7 @@ class ShopRunBackReturnModuleFrontController extends ModuleFrontController
         $url = $this->context->link->getPageLink('index') . '?controller=order-detail&id_order=' . $_GET['orderId'];
         $shipback = SRBShipback::createShipbackFromOrderId($_GET['orderId']);
 
-        if (! $shipback) {
+        if (! $shipback || isset($shipback->shipback)) {
             Tools::redirect($url);
         }
 

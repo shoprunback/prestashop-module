@@ -7,8 +7,6 @@ class SRBShipback extends SRBObject
 {
     const SHIPBACK_TABLE_NAME_NO_PREFIX = 'shoprunback_shipbacks';
     const SHIPBACK_TABLE_NAME = _DB_PREFIX_ . self::SHIPBACK_TABLE_NAME_NO_PREFIX;
-    const SHIPBACK_INDEX_NAME = 'index_srb_shipback_id';
-    const SHIPBACK_INDEX_COLUMNS = 'srb_shipback_id';
 
     public $id_srb_shipback;
     public $mode;
@@ -20,8 +18,8 @@ class SRBShipback extends SRBObject
     public function __construct ($psReturn) {
         $this->ps = $psReturn;
         $this->id_srb_shipback = isset($psReturn['id_srb_shipback']) ? $psReturn['id_srb_shipback'] : '';
-        $this->order_id = $psReturn['id_order'];
-        $this->order = isset($psReturn['order']) ? $psReturn['order'] : SRBOrder::getById($this->order_id);
+        $this->order = isset($psReturn['order']) ? $psReturn['order'] : SRBOrder::getById($this->ps['id_order']);
+        $this->order_id = $this->order->order_number;
         $this->mode = $psReturn['mode'];
         $this->state = $psReturn['state'];
         $this->created_at = $psReturn['created_at'];
@@ -74,7 +72,7 @@ class SRBShipback extends SRBObject
         ];
 
         $sql = Db::getInstance();
-        $result = $sql->update(self::RETURN_TABLE_NAME_NO_PREFIX, $shipbackToUpdate, 'id_srb_shipback = "' . pSQL($this->id_srb_shipback) . '"');
+        $result = $sql->update(self::SHIPBACK_TABLE_NAME_NO_PREFIX, $shipbackToUpdate, 'id_srb_shipback = "' . pSQL($this->id_srb_shipback) . '"');
 
         SRBLogger::addLog(self::getMapType() . ' "' . $this->{self::getIdentifier()} . '" updated', 0, null, self::getMapType(), $this->ps[self::getIdColumnName()]);
 
@@ -105,8 +103,13 @@ class SRBShipback extends SRBObject
         if (isset($result->shipback) && isset($result->shipback->errors)) {
             $id = explode('(', $result->shipback->errors[0])[1];
             $id = str_replace(')', '', $id);
+
             try {
                 $shipbackById = self::getById($id);
+
+                if (isset($shipbackById->shipback) && isset($shipbackById->shipback->errors)) {
+                    return $shipbackById;
+                }
 
                 if (! $shipbackById && strpos($result->shipback->errors[0], 'Order already\'s got return associated') !== false) {
                     $shipbackGet = json_decode(Synchronizer::APICall('shipbacks/' . $id, 'GET'));
@@ -123,24 +126,26 @@ class SRBShipback extends SRBObject
                 SRBLogger::addLog($e, 3, null, 'order', $orderId);
             }
         } else {
-            self::insertReturnFromSyncResult($result, $orderId);
+            $result = self::insertReturnFromSyncResult($result, $orderId);
         }
 
         return $result;
     }
 
-    static private function insertReturnFromSyncResult ($result, $orderId) {
+    static private function insertReturnFromSyncResult ($item, $orderId) {
         $shipbackToInsert = [
-            'id_srb_shipback' => $result->id,
+            'id_srb_shipback' => $item->id,
             'id_order' => $orderId,
-            'state' => $result->state,
-            'mode' => $result->mode,
-            'created_at' => $result->created_at
+            'state' => $item->state,
+            'mode' => $item->mode,
+            'created_at' => $item->created_at
         ];
 
-        SRBLogger::addLog(self::getMapType() . ' "' . $this->{self::getIdentifier()} . '" inserted', 0, null, self::getMapType(), $this->ps[self::getIdColumnName()]);
         $sql = Db::getInstance();
-        return $sql->insert(self::RETURN_TABLE_NAME_NO_PREFIX, $shipbackToInsert);
+        $result = $sql->insert(self::SHIPBACK_TABLE_NAME_NO_PREFIX, $shipbackToInsert);
+        SRBLogger::addLog(self::getMapType() . ' "' . $item->id . '" inserted', 0, null, self::getMapType(), $item->id);
+
+        return self::getById($item->id);
     }
 
     private function findAllByCreateDateQuery () {
@@ -208,7 +213,7 @@ class SRBShipback extends SRBObject
     static protected function findAllQuery () {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*, o.*');
-        $sql->from(self::RETURN_TABLE_NAME_NO_PREFIX, self::getTableName());
+        $sql->from(self::SHIPBACK_TABLE_NAME_NO_PREFIX, self::getTableName());
         $sql->innerJoin('orders', 'o', self::getTableName() . '.id_order = o.id_order');
         $sql->groupBy(self::getTableName() . '.' . self::getIdColumnName());
 

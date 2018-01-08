@@ -15,7 +15,7 @@ function createTableQuery () {
 }
 
 function createReturnTableQuery () {
-    return 'CREATE TABLE IF NOT EXISTS ' . SRBShipback::RETURN_TABLE_NAME . '(
+    return 'CREATE TABLE IF NOT EXISTS ' . SRBShipback::SHIPBACK_TABLE_NAME . '(
         `id_srb_shipback` VARCHAR(255) NOT NULL PRIMARY KEY,
         `id_order` INT(11) UNIQUE NOT NULL,
         `state` VARCHAR(255) NOT NULL,
@@ -29,7 +29,7 @@ function dropTableQuery () {
 }
 
 function dropReturnTableQuery () {
-    return 'DROP TABLE ' . SRBShipback::RETURN_TABLE_NAME;
+    return 'DROP TABLE ' . SRBShipback::SHIPBACK_TABLE_NAME;
 }
 
 function enableReturns () {

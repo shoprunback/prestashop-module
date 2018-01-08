@@ -69,11 +69,19 @@ abstract class Synchronizer
         $itemType = rtrim($itemType, 's'); // Without an "s" at the end (Product)
         $path = $itemType . 's'; // With an "s" (Products)
         $identifier = $item::getIdentifier();
-        $reference = self::referenceMapping($item->getDBId(), $itemType) ? self::referenceMapping($item->getDBId(), $itemType) : $item->{$identifier};
+        $reference = $item->{$identifier};
+
+        if ($item->getDBId() && ! ($item->{$identifier} == 0 && $itemType == 'shipback')) {
+            $mapId = self::referenceMapping($item->getDBId(), $itemType);
+            $reference = $mapId ? $mapId : $item->{$identifier};
+        }
+
+        $getResult = '';
+        if ($reference) {
+            $getResult = self::APIcall($path . '/' . $reference, 'GET');
+        }
 
         $postResult = '';
-        $getResult = self::APIcall($path . '/' . $reference, 'GET');
-
         if ($getResult == '') {
             $postResult = self::APIcall($path, 'POST', $item);
         } else {
@@ -127,6 +135,7 @@ abstract class Synchronizer
 
         $srbSql = Db::getInstance();
 
+        SRBLogger::addLog($itemType . ': ' . $itemId . ' was the id', 0, null, $itemType);
         $data = [
             'id_item' => $itemId,
             'id_item_srb' => $item->id_item_srb,
