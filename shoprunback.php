@@ -6,6 +6,7 @@ define ('SANDBOX_MODE', Configuration::get('sandbox'));
 
 include_once 'classes/Synchronizer.php';
 include_once 'classes/SRBReturn.php';
+include_once 'classes/SRBLogger.php';
 include_once 'sqlQueries.php';
 
 class ShopRunBack extends Module
@@ -95,7 +96,7 @@ class ShopRunBack extends Module
 
         Configuration::updateValue('sandbox', true);
 
-        Logger::addLog('[' . $this->name . '] Module installed', 0);
+        SRBLogger::addLog('Module installed');
         return true;
     }
 
@@ -120,7 +121,7 @@ class ShopRunBack extends Module
             return false;
         }
 
-        Logger::addLog('[' . $this->name . '] Module uninstalled');
+        SRBLogger::addLog('Module uninstalled');
         return true;
     }
 

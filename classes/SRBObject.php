@@ -39,7 +39,7 @@ abstract class SRBObject
         $class = get_called_class();
         $items = self::convertPSArrayToSRBObjects(Db::getInstance()->executeS($class::findWithMapQuery($onlySyncItems)));
         foreach ($items as $key => $item) {
-            $items[$key]->last_sent = $item->ps['last_sent'];
+            $items[$key]->last_sent_at = $item->ps['last_sent_at'];
         }
 
         return $items;
@@ -94,10 +94,10 @@ abstract class SRBObject
                             'srb',
                             'srb.id_item = ' . static::getTableName() . '.' . $identifier . '
                                 AND srb.type = "' . $type . '"
-                                AND srb.last_sent IN (' . $mapQuery . ')'
+                                AND srb.last_sent_at IN (' . $mapQuery . ')'
                         )
                         ->groupBy(static::getTableName() . '.' . $identifier)
-                        ->orderBy('srb.last_sent DESC');
+                        ->orderBy('srb.last_sent_at DESC');
     }
 
     static protected function findOneQuery ($id) {

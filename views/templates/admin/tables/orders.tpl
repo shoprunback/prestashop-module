@@ -45,11 +45,11 @@
                                     </a>
                                 {/if}
                             </td>
-                            <td>{$item->last_sent}</td>
+                            <td>{$item->last_sent_at}</td>
                             <td>
                                 {if $item->delivery}
                                     {l s="item.delivered" mod='shoprunback'}
-                                {elseif ! $item->last_sent}
+                                {elseif ! $item->last_sent_at}
                                     <a class="sync-item srb-button" data-type="{$itemType}">
                                         {l s="item.sync" mod='shoprunback'}
                                     </a>

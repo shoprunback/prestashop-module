@@ -1,9 +1,11 @@
 <?php
-require_once(dirname(__FILE__) . '../../../config/config.inc.php');
-require_once(dirname(__FILE__) . '../../../init.php');
+// This file must be called by an AJAX function to be asynchrous
+require_once(_PS_MODULE_DIR_ . '../config/config.inc.php');
+require_once(_PS_MODULE_DIR_ . '../init.php');
 
 require_once 'shoprunback.php';
 include_once 'classes/Synchronizer.php';
+include_once 'classes/SRBLogger.php';
 
 $class = $_POST['className'] ? $_POST['className'] : 'ShopRunBack';
 
@@ -13,12 +15,12 @@ $result = '';
 if (isset($_POST['params'])) {
     switch ($action) {
         case 'sync':
-            Logger::addLog('[ShopRunBack] asynccall sync', 0, null, $class, 0, true);
+            SRBLogger::addLog('AsyncCall sync', 0, null, $class);
             $item = $class::getById($_POST['params']);
             $result = $item->sync();
             break;
         case 'syncAll':
-            Logger::addLog('[ShopRunBack] asynccall syncAll', 0, null, $class, 0, true);
+            SRBLogger::addLog('AsyncCall syncAll', 0, null, $class);
             $result = $class::syncAll($_POST['params']);
             break;
         default:
@@ -26,7 +28,7 @@ if (isset($_POST['params'])) {
             die;
     }
 } else {
-    Logger::addLog('[ShopRunBack] asynccallnoparam', 0, null, $class, 0, true);
+    SRBLogger::addLog('AsyncCall No param', 0, null, $class);
     $result = $class->{$action}();
 }
 

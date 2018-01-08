@@ -40,10 +40,6 @@ class SRBAddress
         return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS(self::findByOrderIdQuery($orderId))[0]);
     }
 
-    static public function getCustomerPhoneFromOrder ($orderId) {
-        return Db::getInstance()->executeS(self::findByOrderIdQuery($customerId))[0]['phone'];
-    }
-
     static public function createFromOrder ($psOrder) {
         return new self($psOrder);
     }

@@ -35,7 +35,7 @@
                         <tr data-id="{$item->getDBId()}">
                             <td class="left"><a href="{$externalLink}{$item->getReference()}" target="_blank"><b>{$item->getName()}</b></a></td>
                             <td><b>{$item->getReference()}</b></td>
-                            <td>{$item->last_sent}</td>
+                            <td>{$item->last_sent_at}</td>
                             <td><a class="sync-item srb-button" data-type="{$itemType}">{l s="item.sync" mod='shoprunback'}</a></td>
                             <td><a href="{$externalLink}{$item->getReference()}" target="_blank"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a></td>
                         </tr>

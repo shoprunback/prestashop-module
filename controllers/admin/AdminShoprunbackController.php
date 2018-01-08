@@ -36,17 +36,17 @@ class AdminShoprunbackController extends ModuleAdminController
         $user = json_decode(Synchronizer::APIcall('me', 'GET'));
 
         if (! $user) {
-            Logger::addLog('[ShopRunBack] Invalid API token: ' . $srbtoken, 1, null, 'apitoken', 0, true);
+            SRBLogger::addLog('Invalid API token: ' . $srbtoken, 1, null, 'apitoken');
             Configuration::updateValue('srbtoken', $oldsrbToken);
             return $this->module->displayError($this->l('error.no_token'));
         }
 
-        Logger::addLog('[ShopRunBack] API token saved: ' . substr($srbtoken, 0, 3) . '...' . substr($srbtoken, -3), 0, null, 'apitoken', 0, true);
+        SRBLogger::addLog('API token saved: ' . substr($srbtoken, 0, 3) . '...' . substr($srbtoken, -3), 0, null, 'apitoken');
 
         Synchronizer::APIcall('company', 'PUT', ['webhook_url' => $this->module->webhookUrl]);
 
         Configuration::updateValue('sandbox', Tools::getValue('sandbox'));
-        Logger::addLog('[ShopRunBack] Sandbox mode: ' . Tools::getValue('sandbox'), 0, null, 'sandbox', 0, true);
+        SRBLogger::addLog('Sandbox mode: ' . Tools::getValue('sandbox'), 0, null, 'sandbox');
 
         return $this->module->displayConfirmation(sprintf($this->l('success.token'), $user->first_name, $user->last_name));
     }
@@ -186,6 +186,9 @@ class AdminShoprunbackController extends ModuleAdminController
                 'class' => 'btn btn-default pull-right'
             ]
         ];
+        // $translator = $this->module->getTranslator();
+        // var_dump($this->l('config.form.title'));
+        // die;
 
         $helper = new HelperForm();
 

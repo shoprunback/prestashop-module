@@ -83,7 +83,7 @@ class SRBOrder extends SRBObject
     }
 
     public function sync () {
-        Logger::addLog('[ShopRunBack] SYNCHRONIZING ' . self::getMapType() . ' "' . $this->{self::getIdentifier()} . '"', 0, null, self::getMapType(), $this->ps[self::getIdColumnName()], true);
+        SRBLogger::addLog('SYNCHRONIZING ' . self::getMapType() . ' "' . $this->{self::getIdentifier()} . '"', 0, null, self::getMapType(), $this->ps[self::getIdColumnName()]);
         return Synchronizer::sync($this, self::getMapType());
     }
 
@@ -126,7 +126,7 @@ class SRBOrder extends SRBObject
         $items = self::convertPSArrayToSRBObjects(Db::getInstance()->executeS($sql));
 
         foreach ($items as $key => $item) {
-            $items[$key]->last_sent = $item->ps['last_sent'];
+            $items[$key]->last_sent_at = $item->ps['last_sent_at'];
             $items[$key]->id_srb_return = $item->ps['id_srb_return'];
             $items[$key]->state = $item->ps['state'];
             $items[$key]->delivery = $item->ps['delivery'];
@@ -169,15 +169,15 @@ class SRBOrder extends SRBObject
             'srb',
             'srb.id_item = ' . static::getTableName() . '.' . $identifier . '
                 AND srb.type = "' . $type . '"
-                AND srb.last_sent IN (
-                    SELECT MAX(srb.last_sent)
+                AND srb.last_sent_at IN (
+                    SELECT MAX(srb.last_sent_at)
                     FROM ' . SRBMap::MAPPER_TABLE_NAME . ' srb
                     WHERE srb.type = "' . $type . '"
                     GROUP BY srb.id_item
             )'
         );
         $sql->groupBy(static::getTableName() . '.' . $identifier);
-        $sql->orderBy('srb.last_sent DESC');
+        $sql->orderBy('srb.last_sent_at DESC');
 
         return $sql;
     }

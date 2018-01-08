@@ -90,9 +90,9 @@ abstract class Synchronizer
             $class = get_class($item);
 
             if (isset($postResultDecoded->{$itemType}->errors)) {
-                Logger::addLog('[ShopRunBack] ' . ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be synchronized! ' . $postResultDecoded->{$itemType}->errors[0], 1, null, $itemType, $item->ps[$class::getIdColumnName()], true);
+                SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be synchronized! ' . $postResultDecoded->{$itemType}->errors[0], 1, null, $itemType, $item->ps[$class::getIdColumnName()]);
             } else {
-                Logger::addLog('[ShopRunBack] ' . ucfirst($itemType) . ' "' . $item->{$identifier} . '" synchronized', 0, null, $itemType, $item->ps[$class::getIdColumnName()], true);
+                SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" synchronized', 0, null, $itemType, $item->ps[$class::getIdColumnName()]);
                 $item->id_item_srb = $postResultDecoded->id;
                 self::mapApiCall($item, $itemType);
             }
@@ -112,11 +112,11 @@ abstract class Synchronizer
         $class = get_class($item);
         $deleteResultDecoded = json_decode($deleteResult);
         if (isset($deleteResultDecoded->errors)) {
-            Logger::addLog('[ShopRunBack] ' . ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be deleted! ' . $deleteResultDecoded->errors[0], 3, null, $itemType, $item->ps[$class::getIdColumnName()], true);
+            SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be deleted! ' . $deleteResultDecoded->errors[0], 3, null, $itemType, $item->ps[$class::getIdColumnName()]);
             return false;
         }
 
-        Logger::addLog('[ShopRunBack] ' . ucfirst($itemType) . ' "' . $item->{$identifier} . '" has been deleted. ' . $deleteResult, 0, null, $itemType, $item->ps[$class::getIdColumnName()], true);
+        SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" has been deleted. ' . $deleteResult, 0, null, $itemType, $item->ps[$class::getIdColumnName()]);
 
         return $deleteResult;
     }
@@ -131,7 +131,7 @@ abstract class Synchronizer
             'id_item' => $itemId,
             'id_item_srb' => $item->id_item_srb,
             'type' => $itemType,
-            'last_sent' => date('Y-m-d H:i:s'),
+            'last_sent_at' => date('Y-m-d H:i:s'),
         ];
         $map = new SRBMap($data);
         $map->save();

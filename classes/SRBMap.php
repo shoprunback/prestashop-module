@@ -10,14 +10,14 @@ class SRBMap
     public $id_item;
     public $id_item_srb;
     public $type;
-    public $last_sent;
+    public $last_sent_at;
 
     public function __construct ($psMap) {
         $this->id_srb_map = isset($psMap[self::getIdColumnName()]) ? $psMap[self::getIdColumnName()] : 0;
         $this->id_item = $psMap['id_item'];
         $this->id_item_srb = $psMap['id_item_srb'];
         $this->type = $psMap['type'];
-        $this->last_sent = $psMap['last_sent'];
+        $this->last_sent_at = $psMap['last_sent_at'];
     }
 
     static public function getTableName () {
@@ -33,7 +33,7 @@ class SRBMap
             'id_item' => $this->id_item,
             'id_item_srb' => $this->id_item_srb,
             'type' => $this->type,
-            'last_sent' => $this->last_sent,
+            'last_sent_at' => $this->last_sent_at,
         ];
 
         if (! isset($this->id_srb_map) || $this->id_srb_map == 0) {
@@ -48,10 +48,10 @@ class SRBMap
         $sql = Db::getInstance();
         if (isset($this->id_srb_map) && $this->id_srb_map != 0) {
             $result = $sql->update(SRBMap::MAPPER_TABLE_NAME_NO_PREFIX, $mapArray, 'id_item_srb = "' . pSQL($this->id_item_srb) . '"');
-            Logger::addLog('[ShopRunBack] Map of ' . ucfirst($this->type) . ' ' . $this->id_item . ' updated', 0, null, $this->type, $this->id_item, true);
+            SRBLogger::addLog('Map of ' . ucfirst($this->type) . ' ' . $this->id_item . ' updated', 0, null, $this->type, $this->id_item);
         } else {
             $result = $sql->insert(SRBMap::MAPPER_TABLE_NAME_NO_PREFIX, $mapArray);
-            Logger::addLog('[ShopRunBack] ' . ucfirst($this->type) . ' ' . $this->id_item . ' mapped', 0, null, $this->type, $this->id_item, true);
+            SRBLogger::addLog(ucfirst($this->type) . ' ' . $this->id_item . ' mapped', 0, null, $this->type, $this->id_item);
         }
 
         return $result;
@@ -121,7 +121,7 @@ class SRBMap
 
     static public function findOnlyLastSentByTypeQuery ($type) {
         $sql = new DbQuery();
-        $sql->select(self::getTableName() . '.last_sent');
+        $sql->select(self::getTableName() . '.last_sent_at');
         $sql->from(self::MAPPER_TABLE_NAME_NO_PREFIX, self::getTableName());
         $sql->where(self::getTableName() . '.type = "' . $type . '"');
 
