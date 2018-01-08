@@ -29,12 +29,13 @@ class SRBMap
     }
 
     public function save () {
-        $mapArray = [
-            'id_item' => $this->id_item,
-            'id_item_srb' => $this->id_item_srb,
-            'type' => $this->type,
-            'last_sent_at' => $this->last_sent_at,
-        ];
+        $mapArray = [];
+
+        foreach ($this as $key => $value) {
+            $mapArray[$key] = $value;
+        }
+
+        unset($mapArray['id_srb_map']);
 
         if (! isset($this->id_srb_map) || $this->id_srb_map == 0) {
             $mapFromDB = SRBMap::getByIdItemAndIdType($this->id_item, $this->type);
@@ -57,12 +58,16 @@ class SRBMap
         return $result;
     }
 
+    static private function returnResult ($result) {
+        return (is_array($result) && isset($result[0])) ? new self($result[0]) : false;
+    }
+
     static public function getById ($id) {
         $sql = self::findAllQuery();
         $sql->where(self::getTableName() . '.' . self::getIdColumnName() . ' = ' . pSQL($id));
         $result = Db::getInstance()->executeS($sql);
 
-        return (is_array($result) && isset($result[0])) ? new self($result[0]) : false;
+        return self::returnResult($result);
     }
 
     static public function getByType ($type) {
@@ -81,7 +86,7 @@ class SRBMap
         $sql->where(self::getTableName() . '.id_item = ' . pSQL($idItem) . ' AND ' . pSQL(self::getTableName()) . '.type = "' . pSQL($type) . '"');
         $result = Db::getInstance()->executeS($sql);
 
-        return (is_array($result) && isset($result[0])) ? new self($result[0]) : false;
+        return self::returnResult($result);
     }
 
     static public function getAll () {
