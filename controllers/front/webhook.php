@@ -31,7 +31,7 @@ class ShopRunBackWebhookModuleFrontController extends ModuleFrontController
             case 'shipback':
                 SRBLogger::addLog('WEBHOOK IS SHIPBACK', 0, null, $type, $id);
                 try {
-                    $item = SRBReturn::getById($id);
+                    $item = SRBShipback::getById($id);
                     $state = isset($webhook->data->state) ? $webhook->data->state : '';
                     $mode = isset($webhook->data->mode) ? $webhook->data->mode : '';
 

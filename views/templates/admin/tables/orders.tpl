@@ -39,8 +39,8 @@
                             <td>{$item->customer->first_name} {$item->customer->last_name}</td>
                             <td>{$item->ordered_at}</td>
                             <td>
-                                {if $item->id_srb_return}
-                                    <a href="{$shoprunbackURL}/shipbacks/{$item->id_srb_return}" target="blank">
+                                {if $item->id_srb_shipback}
+                                    <a href="{$shoprunbackURL}/shipbacks/{$item->id_srb_shipback}" target="blank">
                                         <span class="badge badge-default {$item->state}">{$item->state|capitalize}</span>
                                     </a>
                                 {/if}

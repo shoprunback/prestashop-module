@@ -71,14 +71,14 @@ class SRBMap
     }
 
     static public function getByType ($type) {
-        $returnsFromDB = Db::getInstance()->executeS(self::findByTypeQuery($type));
+        $shipbacksFromDB = Db::getInstance()->executeS(self::findByTypeQuery($type));
 
-        $returns = [];
-        foreach ($returnsFromDB as $return) {
-            $returns[] = new self($return);
+        $shipbacks = [];
+        foreach ($shipbacksFromDB as $shipback) {
+            $shipbacks[] = new self($shipback);
         }
 
-        return $returns;
+        return $shipbacks;
     }
 
     static public function getByIdItemAndIdType ($idItem, $type) {
@@ -90,14 +90,14 @@ class SRBMap
     }
 
     static public function getAll () {
-        $returnsFromDB = Db::getInstance()->executeS(self::findAllQuery());
+        $shipbacksFromDB = Db::getInstance()->executeS(self::findAllQuery());
 
-        $returns = [];
-        foreach ($returnsFromDB as $return) {
-            $returns[] = new self($return);
+        $shipbacks = [];
+        foreach ($shipbacksFromDB as $shipback) {
+            $shipbacks[] = new self($shipback);
         }
 
-        return $returns;
+        return $shipbacks;
     }
 
     static protected function findAllQuery () {

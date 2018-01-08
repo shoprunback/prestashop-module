@@ -85,11 +85,11 @@ class AdminShoprunbackController extends ModuleAdminController
             switch ($itemType) {
                 case 'returns':
                     if (Tools::getValue('orderId') !== false) {
-                        $items = SRBReturn::getLikeOrderIdByCreateDate(Tools::getValue('orderId'));
+                        $items = SRBShipback::getLikeOrderIdByCreateDate(Tools::getValue('orderId'));
                     } elseif (Tools::getValue('customer') !== false) {
-                        $items = SRBReturn::getLikeCustomerByCreateDate(Tools::getValue('customer'));
+                        $items = SRBShipback::getLikeCustomerByCreateDate(Tools::getValue('customer'));
                     } else {
-                        $items = SRBReturn::getAllByCreateDate();
+                        $items = SRBShipback::getAllByCreateDate();
                     }
 
                     $externalLink .= '/shipbacks/';

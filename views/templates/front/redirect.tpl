@@ -1,9 +1,9 @@
 <script type="text/javascript">
-    var returnURL = '{$returnURL nofilter}';
+    var redirectURL = '{$redirectURL nofilter}';
     var url = '{$url nofilter}';
 
-    if (returnURL) {
-        window.open(returnURL, '_blank');
+    if (redirectURL) {
+        window.open(redirectURL, '_blank');
     }
 
     (function() {

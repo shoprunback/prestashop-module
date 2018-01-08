@@ -5,7 +5,7 @@ if (! defined('_PS_VERSION_')) {
 define ('SANDBOX_MODE', Configuration::get('sandbox'));
 
 include_once 'classes/Synchronizer.php';
-include_once 'classes/SRBReturn.php';
+include_once 'classes/SRBShipback.php';
 include_once 'classes/SRBLogger.php';
 include_once 'sqlQueries.php';
 
@@ -209,8 +209,8 @@ class ShopRunBack extends Module
             $this->context->smarty->assign('createReturnLink', $srbfcLink);
             $this->context->smarty->assign('order', $order);
 
-            $return = SRBReturn::getByOrderId($_GET['id_order']);
-            $this->context->smarty->assign('return', $return);
+            $shipback = SRBShipback::getByOrderId($_GET['id_order']);
+            $this->context->smarty->assign('shipback', $shipback);
 
             $srbwebhookLink = $this->webhookUrl;
             $this->context->smarty->assign('webhookLink', $srbwebhookLink);

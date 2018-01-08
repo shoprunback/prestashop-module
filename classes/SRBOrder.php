@@ -89,9 +89,9 @@ class SRBOrder extends SRBObject
 
     static public function getAllWithMapping ($onlySyncItems = false) {
         $sql = self::findAllWithMappingQuery($onlySyncItems);
-        $sql->select('srbr.id_srb_return, srbr.state, os.delivery');
+        $sql->select('srbr.id_srb_shipback, srbr.state, os.delivery');
         $sql->leftJoin( // We use leftJoin because orders may not have a return associated
-            SRBReturn::RETURN_TABLE_NAME_NO_PREFIX,
+            SRBShipback::RETURN_TABLE_NAME_NO_PREFIX,
             'srbr',
             'srbr.id_order = ' . self::getTableName() . '.' . self::getIdColumnName()
         );
@@ -113,7 +113,7 @@ class SRBOrder extends SRBObject
 
         foreach ($items as $key => $item) {
             $items[$key]->last_sent_at = $item->ps['last_sent_at'];
-            $items[$key]->id_srb_return = $item->ps['id_srb_return'];
+            $items[$key]->id_srb_shipback = $item->ps['id_srb_shipback'];
             $items[$key]->state = $item->ps['state'];
             $items[$key]->delivery = $item->ps['delivery'];
         }
@@ -121,8 +121,8 @@ class SRBOrder extends SRBObject
         return $items;
     }
 
-    static public function createFromReturn ($return) {
-        return new self($return);
+    static public function createFromShipback ($shipback) {
+        return new self($shipback);
     }
 
     static public function addComponentsToQuery ($sql) {
