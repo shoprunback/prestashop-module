@@ -90,12 +90,12 @@ class SRBOrder extends SRBObject
     static public function getAllWithMapping ($onlySyncItems = false) {
         $sql = self::findAllWithMappingQuery($onlySyncItems);
         $sql->select('srbr.id_srb_return, srbr.state, os.delivery');
-        $sql->leftJoin(
+        $sql->leftJoin( // We use leftJoin because orders may not have a return associated
             SRBReturn::RETURN_TABLE_NAME_NO_PREFIX,
             'srbr',
             'srbr.id_order = ' . self::getTableName() . '.' . self::getIdColumnName()
         );
-        $sql->leftJoin(
+        $sql->leftJoin( // We use leftJoin because orders may not have an history associated
             'order_history',
             'oh',
             'oh.id_order = ' . self::getTableName() . '.' . self::getIdColumnName() . ' AND oh.id_order_history IN (
@@ -104,7 +104,7 @@ class SRBOrder extends SRBObject
                 GROUP BY id_order
             )'
         );
-        $sql->leftJoin(
+        $sql->leftJoin( // Follows order_history
             'order_state',
             'os',
             'os.id_order_state = oh.id_order_state'
