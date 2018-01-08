@@ -78,17 +78,13 @@ class SRBOrder extends SRBObject
     }
 
     static private function extractOrderNumber ($psOrderArrayName) {
-        $return = '';
-
         if (isset($psOrderArrayName['reference'])) {
-            $return = $psOrderArrayName['reference'];
+            return $psOrderArrayName['reference'];
         } elseif (isset($psOrderArrayName['id_order'])) {
-            $return = $psOrderArrayName['id_order'];
+            return $psOrderArrayName['id_order'];
         } else {
-            $return = $psOrderArrayName['id'];
+            return $psOrderArrayName['id'];
         }
-
-        return $return;
     }
 
     static public function getAllWithMapping ($onlySyncItems = false) {
