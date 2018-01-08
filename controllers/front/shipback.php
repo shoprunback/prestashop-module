@@ -1,5 +1,5 @@
 <?php
-class ShopRunBackReturnModuleFrontController extends ModuleFrontController
+class ShopRunBackShipbackModuleFrontController extends ModuleFrontController
 {
     public function __construct() {
         parent::__construct();

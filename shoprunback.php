@@ -205,7 +205,7 @@ class ShopRunBack extends Module
     public function hookDisplayOrderDetail ($params) {
         try {
             $order = SRBOrder::getById($_GET['id_order']);
-            $srbfcLink = $this->context->link->getModuleLink('shoprunback', 'return', []);
+            $srbfcLink = $this->context->link->getModuleLink('shoprunback', 'shipback', []);
             $this->context->smarty->assign('createReturnLink', $srbfcLink);
             $this->context->smarty->assign('order', $order);
 
