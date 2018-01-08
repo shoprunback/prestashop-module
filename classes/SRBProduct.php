@@ -79,21 +79,35 @@ class SRBProduct extends SRBObject
         return $responses;
     }
 
+    public function getCover () {
+        $productCover = Product::getCover($this->ps['id_product']);
+        $image = new Image($productCover['id_image']);
+        $imagePath = $_SERVER['DOCUMENT_ROOT'] . _THEME_PROD_DIR_ . $image->getExistingImgPath() . '.jpg';
+
+        if (file_exists($imagePath)) {
+            return file_get_contents($imagePath);
+        }
+
+        return false;
+    }
+
+    private function addCoverToSync () {
+        $thumbnail = $this->getCover();
+
+        if ($thumbnail) {
+            $this->picture_file_url = 'ps-' . $this->label;
+            $this->picture_file_base64 = 'data:image/png;base64,' . base64_encode($thumbnail);
+        }
+
+        return $thumbnail;
+    }
+
     public function sync ($brandChecked = false) {
         if (! $brandChecked) {
             $postBrandResult = $this->brand->sync();
         }
 
-        $productCover = Product::getCover($this->ps['id_product']);
-        $image = new Image($productCover['id_image']);
-        $imagePath = _PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->getExistingImgPath() . ".jpg";
-
-        if (file_exists($imagePath)) {
-            $fileContent = file_get_contents($imagePath);
-
-            $this->picture_file_url = 'string';
-            $this->picture_file_base64 = 'data:image/png;base64,' . base64_encode($fileContent);
-        }
+        $this->addCoverToSync();
 
         SRBLogger::addLog('SYNCHRONIZING ' . self::getMapType() . ' "' . $this->{self::getIdentifier()} . '"', 0, null, self::getMapType(), $this->ps[self::getIdColumnName()]);
         return Synchronizer::sync($this, self::getMapType());
