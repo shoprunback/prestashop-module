@@ -12,8 +12,9 @@
   padding: 10px !important;
 }
 
-#config h2 {
+#config .no-account {
   margin-top: 0px !important;
-  text-align: center;
   font-size: 20px;
+  text-align: center;
+  width: 100%;
 }
