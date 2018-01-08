@@ -116,15 +116,23 @@ class SRBReturn extends SRBObject
         if (isset($result->shipback) && isset($result->shipback->errors)) {
             $id = explode('(', $result->shipback->errors[0])[1];
             $id = str_replace(')', '', $id);
-            $returnById = self::getById($id);
-
-            if (! $returnById && strpos($result->shipback->errors[0], 'Order already\'s got return associated') !== false) {
-                $returnGet = json_decode(Synchronizer::APICall('shipbacks/' . $id, 'GET'));
-                self::insertReturnFromSyncResult($returnGet, $orderId);
+            try {
                 $returnById = self::getById($id);
-            }
 
-            $result = $returnById;
+                if (! $returnById && strpos($result->shipback->errors[0], 'Order already\'s got return associated') !== false) {
+                    $returnGet = json_decode(Synchronizer::APICall('shipbacks/' . $id, 'GET'));
+                    self::insertReturnFromSyncResult($returnGet, $orderId);
+                    try {
+                        $returnById = self::getById($id);
+                    } catch (Exception $e) {
+                        SRBLogger::addLog($e, 3, null, 'order', $orderId);
+                    }
+                }
+
+                $result = $returnById;
+            } catch (Exception $e) {
+                SRBLogger::addLog($e, 3, null, 'order', $orderId);
+            }
         } else {
             self::insertReturnFromSyncResult($result, $orderId);
         }

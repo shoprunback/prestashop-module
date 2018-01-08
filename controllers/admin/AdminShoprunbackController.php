@@ -100,15 +100,15 @@ class AdminShoprunbackController extends ModuleAdminController
                     $this->context->smarty->assign('searchCustomer', Tools::getValue('customer'));
                     break;
                 case 'products':
-                    $items = SRBProduct::getAllWithSRBApiCallQuery();
+                    $items = SRBProduct::getAllWithMapping();
                     $externalLink .= '/products/';
                     break;
                 case 'orders':
-                    $items = SRBOrder::getAllWithSRBApiCallQuery();
+                    $items = SRBOrder::getAllWithMapping();
                     $externalLink .= '/orders/';
                     break;
                 case 'brands':
-                    $items = SRBBrand::getAllWithSRBApiCallQuery();
+                    $items = SRBBrand::getAllWithMapping();
                     $externalLink .= '/brands/';
                     break;
             }

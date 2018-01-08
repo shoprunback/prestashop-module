@@ -101,8 +101,8 @@ class SRBOrder extends SRBObject
         return $return;
     }
 
-    static public function getAllWithSRBApiCallQuery ($onlySyncItems = false) {
-        $sql = self::findWithMapQuery($onlySyncItems);
+    static public function getAllWithMapping ($onlySyncItems = false) {
+        $sql = self::findAllWithMappingQuery($onlySyncItems);
         $sql->select('srbr.id_srb_return, srbr.state, os.delivery');
         $sql->leftJoin(
             SRBReturn::RETURN_TABLE_NAME_NO_PREFIX,
@@ -157,7 +157,7 @@ class SRBOrder extends SRBObject
         return $sql;
     }
 
-    protected function findWithMapQuery ($onlySyncItems = false) {
+    protected function findAllWithMappingQuery ($onlySyncItems = false) {
         $identifier = static::getIdColumnName();
         $type = static::getMapType();
         $joinType = $onlySyncItems ? 'innerJoin' : 'leftJoin';

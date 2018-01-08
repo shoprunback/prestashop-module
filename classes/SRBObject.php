@@ -35,9 +35,9 @@ abstract class SRBObject
         return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS($class::findNotSyncQuery()));
     }
 
-    static public function getAllWithSRBApiCallQuery ($onlySyncItems = false) {
+    static public function getAllWithMapping ($onlySyncItems = false) {
         $class = get_called_class();
-        $items = self::convertPSArrayToSRBObjects(Db::getInstance()->executeS($class::findWithMapQuery($onlySyncItems)));
+        $items = self::convertPSArrayToSRBObjects(Db::getInstance()->executeS($class::findAllWithMappingQuery($onlySyncItems)));
         foreach ($items as $key => $item) {
             $items[$key]->last_sent_at = $item->ps['last_sent_at'];
         }
@@ -46,7 +46,7 @@ abstract class SRBObject
     }
 
     public function getDBId () {
-        return isset($this->ps[static::getIdColumnName()]) ? $this->ps[static::getIdColumnName()] : false;
+        return $this->ps[static::getIdColumnName()];
     }
 
     public function getName() {
@@ -81,7 +81,7 @@ abstract class SRBObject
         return static::findAllQuery()->where(static::getTableName() . '.' . static::getIdColumnName() . ' NOT IN (' . $mapQuery . ')');
     }
 
-    protected function findWithMapQuery ($onlySyncItems = false) {
+    protected function findAllWithMappingQuery ($onlySyncItems = false) {
         $identifier = static::getIdColumnName();
         $type = static::getMapType();
         $joinType = $onlySyncItems ? 'innerJoin' : 'leftJoin';
@@ -109,7 +109,7 @@ abstract class SRBObject
         $result = Db::getInstance()->executeS(static::findOneQuery($id));
 
         if (! $result) {
-            return false;
+            throw new Exception('No ' . $class::getMapType() . ' found with id ' . $id);
         }
 
         return new $class($result[0]);

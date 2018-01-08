@@ -176,37 +176,53 @@ class ShopRunBack extends Module
     }
 
     public function hookNewOrder ($params) {
-        $order = SRBOrder::getById($params['order']->id);
-        $order->sync();
+        try {
+            $order = SRBOrder::getById($params['order']->id);
+            $order->sync();
+        } catch (Exception $e) {
+            return $e;
+        }
     }
 
     public function hookActionProductUpdate ($params) {
-        $product = SRBProduct::getById($params['product']->id);
-        $product->sync();
+        try {
+            $product = SRBProduct::getById($params['product']->id);
+            $product->sync();
+        } catch (Exception $e) {
+            return $e;
+        }
     }
 
     public function hookActionOrderStatusPostUpdate ($params) {
-        $order = SRBOrder::getById($params['id_order']);
-        $order->sync();
+        try {
+            $order = SRBOrder::getById($params['id_order']);
+            $order->sync();
+        } catch (Exception $e) {
+            return $e;
+        }
     }
 
     public function hookDisplayOrderDetail ($params) {
-        $order = SRBOrder::getById($_GET['id_order']);
-        $srbfcLink = $this->context->link->getModuleLink('shoprunback', 'return', []);
-        $this->context->smarty->assign('createReturnLink', $srbfcLink);
-        $this->context->smarty->assign('order', $order);
+        try {
+            $order = SRBOrder::getById($_GET['id_order']);
+            $srbfcLink = $this->context->link->getModuleLink('shoprunback', 'return', []);
+            $this->context->smarty->assign('createReturnLink', $srbfcLink);
+            $this->context->smarty->assign('order', $order);
 
-        $return = SRBReturn::getByOrderId($_GET['id_order']);
-        $this->context->smarty->assign('return', $return);
+            $return = SRBReturn::getByOrderId($_GET['id_order']);
+            $this->context->smarty->assign('return', $return);
 
-        $srbwebhookLink = $this->webhookUrl;
-        $this->context->smarty->assign('webhookLink', $srbwebhookLink);
+            $srbwebhookLink = $this->webhookUrl;
+            $this->context->smarty->assign('webhookLink', $srbwebhookLink);
 
-        $this->context->controller->addJs(_PS_MODULE_DIR_ . $this->name . '/views/js/front/orderDetail.js');
-        $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/srbGlobal.css');
-        $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/front/orderDetail.css');
+            $this->context->controller->addJs(_PS_MODULE_DIR_ . $this->name . '/views/js/front/orderDetail.js');
+            $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/srbGlobal.css');
+            $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/front/orderDetail.css');
 
-        $display = $this->display(__FILE__, 'orderDetail.tpl');
-        return $display;
+            $display = $this->display(__FILE__, 'orderDetail.tpl');
+            return $display;
+        } catch (Exception $e) {
+            return $e;
+        }
     }
 }
