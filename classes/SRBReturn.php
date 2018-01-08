@@ -66,17 +66,6 @@ class SRBReturn extends SRBObject
         return Synchronizer::sync($this, self::getMapType());
     }
 
-    static public function syncAll ($newOnly = false) {
-        $returns = $newOnly ? self::getAllNotSync() : self::getAll();
-
-        $responses = [];
-        foreach ($returns as $return) {
-            $responses[] = $return->sync();
-        }
-
-        return $responses;
-    }
-
     public function save () {
         $returnToUpdate = [
             'state' => $this->state,

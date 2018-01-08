@@ -39,6 +39,7 @@ class SRBOrder extends SRBObject
         return 'id_order';
     }
 
+    // Returns the attribute "delivered" of an order, which is in the order_state, available by passing through the order_history
     public function isDelivered () {
         $sql = new DbQuery();
         $sql->select('os.delivery');
@@ -69,17 +70,6 @@ class SRBOrder extends SRBObject
         }
 
         return $products;
-    }
-
-    static public function syncAll ($newOnly = false) {
-        $orders = $newOnly ? self::getAllNotSync() : self::getAll();
-
-        $responses = [];
-        foreach ($orders as $order) {
-            $responses[] = $order->sync();
-        }
-
-        return $responses;
     }
 
     public function sync () {

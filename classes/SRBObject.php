@@ -19,7 +19,16 @@ abstract class SRBObject
 
     abstract static public function getMapType();
 
-    abstract static public function syncAll();
+    static public function syncAll ($newOnly = false) {
+        $brands = $newOnly ? self::getAllNotSync() : self::getAll();
+
+        $responses = [];
+        foreach ($brands as $brand) {
+            $responses[] = $brand->sync();
+        }
+
+        return $responses;
+    }
 
     abstract public function sync();
 

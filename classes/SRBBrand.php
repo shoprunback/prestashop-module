@@ -33,17 +33,6 @@ class SRBBrand extends SRBObject
         return 'id_manufacturer';
     }
 
-    static public function syncAll ($newOnly = false) {
-        $brands = $newOnly ? self::getAllNotSync() : self::getAll();
-
-        $responses = [];
-        foreach ($brands as $brand) {
-            $responses[] = $brand->sync();
-        }
-
-        return $responses;
-    }
-
     public function sync () {
         SRBLogger::addLog('SYNCHRONIZING ' . self::getMapType() . ' "' . $this->{self::getIdentifier()} . '"', 0, null, self::getMapType(), $this->ps[self::getIdColumnName()]);
         return Synchronizer::sync($this, self::getMapType());
