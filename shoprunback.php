@@ -2,7 +2,7 @@
 if (! defined('_PS_VERSION_')) {
     exit;
 }
-define ('SANDBOX_MODE', Configuration::get('sandbox'));
+define ('PRODUCTION_MODE', Configuration::get('production'));
 
 include_once 'classes/Synchronizer.php';
 include_once 'classes/SRBShipback.php';
@@ -94,7 +94,7 @@ class ShopRunBack extends Module
             return false;
         }
 
-        Configuration::updateValue('sandbox', true);
+        Configuration::updateValue('production', false);
 
         SRBLogger::addLog('Module installed');
         return true;

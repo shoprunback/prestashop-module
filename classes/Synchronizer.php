@@ -2,8 +2,8 @@
 
 abstract class Synchronizer
 {
-    const SRB_DASHBOARD_URL = _PS_MODE_DEV_ ? 'http://localhost:3000' : (SANDBOX_MODE ? 'https://sandbox.dashboard.shoprunback.com' : 'https://dashboard.shoprunback.com');
-    const SRB_WEB_URL = _PS_MODE_DEV_ ? 'http://localhost:3002': (SANDBOX_MODE ? 'https://sandbox.web.shoprunback.com' : 'https://web.shoprunback.com');
+    const SRB_DASHBOARD_URL = _PS_MODE_DEV_ ? 'http://localhost:3000' : (PRODUCTION_MODE ? 'https://sandbox.dashboard.shoprunback.com' : 'https://dashboard.shoprunback.com');
+    const SRB_WEB_URL = _PS_MODE_DEV_ ? 'http://localhost:3002': (PRODUCTION_MODE ? 'https://sandbox.web.shoprunback.com' : 'https://web.shoprunback.com');
     const SRB_API_URL = self::SRB_DASHBOARD_URL . '/api/v1';
 
     static public function APIcall ($path, $type, $json = '') {
