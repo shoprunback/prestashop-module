@@ -23,6 +23,7 @@ class SRBShipback extends SRBObject
         $this->mode = $psReturn['mode'];
         $this->state = $psReturn['state'];
         $this->created_at = $psReturn['created_at'];
+        $this->public_url = $psReturn['public_url'];
     }
 
     static public function getMapType () {
@@ -45,10 +46,6 @@ class SRBShipback extends SRBObject
         return 'id_srb_shipback';
     }
 
-    public function getPublicUrl () {
-        return Synchronizer::SRB_WEB_URL . '/shipbacks/' . $this->id_srb_shipback;
-    }
-
     public function getShipbackDetails () {
         $sql = self::findAllQuery();
         $sql->innerJoin('order_detail', 'od', 'ord.id_order_detail = od.id_order_detail');
@@ -69,6 +66,7 @@ class SRBShipback extends SRBObject
             'state' => $this->state,
             'mode' => $this->mode,
             'created_at' => $this->created_at,
+            'public_url' => $this->public_url,
         ];
 
         $sql = Db::getInstance();
@@ -95,7 +93,8 @@ class SRBShipback extends SRBObject
             'id_order' => $orderId,
             'state' => '0',
             'mode' => 'postal',
-            'created_at' => date('Y-m-d H:i:s')
+            'created_at' => date('Y-m-d H:i:s'),
+            'public_url' => ''
         ];
         $srbShipback = new self($psReturn);
         $result = json_decode($srbShipback->sync());
@@ -138,7 +137,8 @@ class SRBShipback extends SRBObject
             'id_order' => $orderId,
             'state' => $item->state,
             'mode' => $item->mode,
-            'created_at' => $item->created_at
+            'created_at' => $item->created_at,
+            'public_url' => $item->public_url
         ];
 
         $sql = Db::getInstance();

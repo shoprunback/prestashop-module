@@ -58,6 +58,7 @@ class AdminShoprunbackController extends ModuleAdminController
 
         $this->context->smarty->assign('token', Configuration::get('srbtoken'));
         $this->context->smarty->assign('shoprunbackURL', $this->module->url);
+        $this->context->smarty->assign('shoprunbackURLProd', $this->module->urlProd);
         $this->context->smarty->assign('shoprunbackAPIURL', Synchronizer::SRB_API_URL);
         $this->context->smarty->assign('srbManager', $this->tabUrl);
         $this->context->smarty->assign('asyncCall', $this->tabUrl . '&action=asyncCall');

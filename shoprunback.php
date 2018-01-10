@@ -2,7 +2,10 @@
 if (! defined('_PS_VERSION_')) {
     exit;
 }
+
 define ('PRODUCTION_MODE', Configuration::get('production'));
+define ('DASHBOARD_URL', getenv('DASHBOARD_URL') ? getenv('DASHBOARD_URL') : (PRODUCTION_MODE ? 'https://dashboard.shoprunback.com' : 'https://sandbox.dashboard.shoprunback.com'));
+define ('DASHBOARD_PROD_URL', 'https://dashboard.shoprunback.com');
 
 include_once 'classes/Synchronizer.php';
 include_once 'classes/SRBShipback.php';
@@ -38,14 +41,14 @@ class ShopRunBack extends Module
         $this->dirurl = 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']);
         $this->SRBModulePath = _PS_MODULE_DIR_ . $this->name;
         $this->webhookUrl = $this->context->link->getModuleLink('shoprunback', 'webhook', []);
-        $this->url = _PS_MODE_DEV_ ? 'http://localhost:3000' : 'https://dashboard.shoprunback.com';
+        $this->url = DASHBOARD_URL;
+        $this->urlProd = DASHBOARD_PROD_URL;
         $message = '';
         if (Tools::getValue('message') && Tools::getValue('messageType')) {
             $message = $_GET['message'];
             $type = Tools::getValue('messageType');
             $this->context->controller->{$type}[] = $this->l($message);
         }
-        $this->context->smarty->assign('devmode', _PS_MODE_DEV_);
     }
 
     private function installTab ($controllerClassName, $tabName, $tabParentControllerName = false) {
@@ -205,26 +208,28 @@ class ShopRunBack extends Module
     }
 
     public function hookDisplayOrderDetail ($params) {
-        try {
-            $order = SRBOrder::getById($_GET['id_order']);
-            $srbfcLink = $this->context->link->getModuleLink('shoprunback', 'shipback', []);
-            $this->context->smarty->assign('createReturnLink', $srbfcLink);
-            $this->context->smarty->assign('order', $order);
+        if (Configuration::get('srbtoken')) {
+            try {
+                $order = SRBOrder::getById($_GET['id_order']);
+                $srbfcLink = $this->context->link->getModuleLink('shoprunback', 'shipback', []);
+                $this->context->smarty->assign('createReturnLink', $srbfcLink);
+                $this->context->smarty->assign('order', $order);
 
-            $shipback = SRBShipback::getByOrderId($_GET['id_order']);
-            $this->context->smarty->assign('shipback', $shipback);
+                $shipback = SRBShipback::getByOrderId($_GET['id_order']);
+                $this->context->smarty->assign('shipback', $shipback);
 
-            $srbwebhookLink = $this->webhookUrl;
-            $this->context->smarty->assign('webhookLink', $srbwebhookLink);
+                $srbwebhookLink = $this->webhookUrl;
+                $this->context->smarty->assign('webhookLink', $srbwebhookLink);
 
-            $this->context->controller->addJs(_PS_MODULE_DIR_ . $this->name . '/views/js/front/orderDetail.js');
-            $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/srbGlobal.css');
-            $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/front/orderDetail.css');
+                $this->context->controller->addJs(_PS_MODULE_DIR_ . $this->name . '/views/js/front/orderDetail.js');
+                $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/srbGlobal.css');
+                $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/front/orderDetail.css');
 
-            $display = $this->display(__FILE__, 'orderDetail.tpl');
-            return $display;
-        } catch (Exception $e) {
-            return $e;
+                $display = $this->display(__FILE__, 'orderDetail.tpl');
+                return $display;
+            } catch (Exception $e) {
+                return $e;
+            }
         }
     }
 }

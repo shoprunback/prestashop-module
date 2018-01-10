@@ -26,7 +26,7 @@ class ShopRunBackShipbackModuleFrontController extends ModuleFrontController
             header('Location: ' . $this->context->link->getPageLink('index'));
         }
 
-        $this->context->smarty->assign('redirectURL', $shipback->getPublicUrl());
+        $this->context->smarty->assign('redirectURL', $shipback->public_url);
         $this->context->smarty->assign('url', $url);
         $this->setTemplate('../../../modules/' . $this->module->name . '/views/templates/front/redirect.tpl');
     }

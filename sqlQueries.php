@@ -20,7 +20,8 @@ function createReturnTableQuery () {
         `id_order` INT(11) UNIQUE NOT NULL,
         `state` VARCHAR(255) NOT NULL,
         `mode` VARCHAR(255) NOT NULL,
-        `created_at` DATETIME NOT NULL
+        `created_at` DATETIME NOT NULL,
+        `public_url` VARCHAR(255) NOT NULL
     )';
 }
 
