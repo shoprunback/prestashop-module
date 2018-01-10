@@ -121,6 +121,8 @@ class ShopRunBack extends Module
             return false;
         }
 
+        Configuration::updateValue('srbtoken', '');
+
         SRBLogger::addLog('Module uninstalled');
         return true;
     }

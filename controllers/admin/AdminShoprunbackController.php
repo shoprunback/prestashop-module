@@ -149,6 +149,34 @@ class AdminShoprunbackController extends ModuleAdminController
     private function getConfigForm () {
         $defaultLang = (int) Configuration::get('PS_LANG_DEFAULT');
 
+        $helper = new HelperForm();
+
+        // Module, token and currentIndex
+        $helper->module = $this->module;
+        $helper->name_controller = $this->module->name;
+        $helper->token = Tools::getAdminTokenLite('AdminShoprunback');
+        $helper->currentIndex = $this->tabUrl . '&itemType=config';
+
+        // Language
+        $helper->default_form_language = $defaultLang;
+        $helper->allow_employee_form_lang = $defaultLang;
+
+        // Title and toolbar
+        $helper->title = $this->module->displayName;
+        $helper->show_toolbar = true;
+        $helper->toolbar_scroll = true;
+        $helper->submit_action = 'submittoken';
+        $helper->toolbar_btn = array(
+            'save' => array(
+                'desc' => $this->module->l('config.form.save'),
+                'href' => $helper->currentIndex,
+            )
+        );
+
+        // Load current value
+        $helper->fields_value['srbtoken'] = Configuration::get('srbtoken');
+        $helper->fields_value['sandbox'] = Configuration::get('sandbox');
+
         $fieldsForm[0]['form'] = [
             'legend' => [
                 'title' => $this->l('config.form.title'),
@@ -186,37 +214,6 @@ class AdminShoprunbackController extends ModuleAdminController
                 'class' => 'btn btn-default pull-right'
             ]
         ];
-        // $translator = $this->module->getTranslator();
-        // var_dump($this->l('config.form.title'));
-        // die;
-
-        $helper = new HelperForm();
-
-        // Module, token and currentIndex
-        $helper->module = $this->module;
-        $helper->name_controller = $this->module->name;
-        $helper->token = Tools::getAdminTokenLite('AdminShoprunback');
-        $helper->currentIndex = $this->tabUrl . '&itemType=config';
-
-        // Language
-        $helper->default_form_language = $defaultLang;
-        $helper->allow_employee_form_lang = $defaultLang;
-
-        // Title and toolbar
-        $helper->title = $this->module->displayName;
-        $helper->show_toolbar = true;
-        $helper->toolbar_scroll = true;
-        $helper->submit_action = 'submittoken';
-        $helper->toolbar_btn = array(
-            'save' => array(
-                'desc' => $this->module->l('config.form.save'),
-                'href' => $helper->currentIndex,
-            )
-        );
-
-        // Load current value
-        $helper->fields_value['srbtoken'] = Configuration::get('srbtoken');
-        $helper->fields_value['sandbox'] = Configuration::get('sandbox');
 
         $this->context->smarty->assign('form', $helper->generateForm(array($fieldsForm[0])));
     }

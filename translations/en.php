@@ -7,11 +7,11 @@ $_MODULE['<{shoprunback}prestashop>shoprunback_8ff63b277c7cd76096e7e03431f51c3f'
 $_MODULE['<{shoprunback}prestashop>adminshoprunbackcontroller_536e5c02c641b33bcc42cf255e7d41bf'] = 'This token doesn\'t exist';
 $_MODULE['<{shoprunback}prestashop>adminshoprunbackcontroller_cd7f50bf12c9b35fca7dab3331340ff4'] = 'Token registered ! Good to see you, %s %s!';
 $_MODULE['<{shoprunback}prestashop>adminshoprunbackcontroller_fa152001a93f98c22968c049e24e27da'] = 'My account';
+$_MODULE['<{shoprunback}prestashop>adminshoprunbackcontroller_fdee20cfd1628ee55d4f9e792f7b6082'] = 'Save';
 $_MODULE['<{shoprunback}prestashop>adminshoprunbackcontroller_57bcc854def680d7733d6cba3ec64a96'] = 'API Token';
 $_MODULE['<{shoprunback}prestashop>adminshoprunbackcontroller_ef59573056a242f8f5786921db1ececf'] = 'Sandbox mode';
 $_MODULE['<{shoprunback}prestashop>adminshoprunbackcontroller_f63d26bbe70aad57af4e09a791b6ebb1'] = 'Yes';
 $_MODULE['<{shoprunback}prestashop>adminshoprunbackcontroller_8b5abe07d8516c6f00011a9b51295988'] = 'No';
-$_MODULE['<{shoprunback}prestashop>adminshoprunbackcontroller_fdee20cfd1628ee55d4f9e792f7b6082'] = 'Save';
 $_MODULE['<{shoprunback}prestashop>config_34002c416d66c6e8c5b49dd3e66d6756'] = 'No account? Create one here';
 $_MODULE['<{shoprunback}prestashop>header_5b76b512ae9a1e33065c7a2d19311579'] = 'Go to';
 $_MODULE['<{shoprunback}prestashop>header_a037a12b6b817c814b550d30deb85c29'] = 'My Dashboard';
