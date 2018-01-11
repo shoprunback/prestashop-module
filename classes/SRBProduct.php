@@ -79,8 +79,8 @@ class SRBProduct extends SRBObject
         return $responses;
     }
 
-    public function getCover () {
-        $productCover = Product::getCover($this->ps['id_product']);
+    public function getCoverPicture () {
+        $productCover = Product::getCoverPicture($this->ps['id_product']);
         $image = new Image($productCover['id_image']);
         $imagePath = $_SERVER['DOCUMENT_ROOT'] . _THEME_PROD_DIR_ . $image->getExistingImgPath() . '.jpg';
 
@@ -92,7 +92,7 @@ class SRBProduct extends SRBObject
     }
 
     private function addCoverToSync () {
-        $thumbnail = $this->getCover();
+        $thumbnail = $this->getCoverPicture();
 
         if ($thumbnail) {
             $this->picture_file_url = 'ps-' . $this->label;
