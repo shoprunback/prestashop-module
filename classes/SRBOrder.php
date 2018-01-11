@@ -23,6 +23,10 @@ class SRBOrder extends SRBObject
         return 'order';
     }
 
+    static public function getPathForAPICall () {
+        return 'orders';
+    }
+
     static public function getIdentifier () {
         return 'order_number';
     }
@@ -74,7 +78,7 @@ class SRBOrder extends SRBObject
 
     public function sync () {
         SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', 0, null, self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
-        return Synchronizer::sync($this, self::getObjectTypeForMapping());
+        return Synchronizer::sync($this, self::getObjectTypeForMapping(), self::getPathForAPICall());
     }
 
     static private function extractOrderNumberFromPSArray ($psOrderArrayName) {

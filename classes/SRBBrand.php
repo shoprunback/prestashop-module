@@ -17,6 +17,10 @@ class SRBBrand extends SRBObject
         return 'brand';
     }
 
+    static public function getPathForAPICall () {
+        return 'manufacturer';
+    }
+
     static public function getIdentifier () {
         return 'reference';
     }
@@ -35,7 +39,7 @@ class SRBBrand extends SRBObject
 
     public function sync () {
         SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', 0, null, self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
-        return Synchronizer::sync($this, self::getObjectTypeForMapping());
+        return Synchronizer::sync($this, self::getObjectTypeForMapping(), self::getPathForAPICall());
     }
 
     static protected function findAllQuery () {

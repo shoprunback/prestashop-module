@@ -64,9 +64,7 @@ abstract class Synchronizer
         return false;
     }
 
-    static public function sync ($item, $itemType) {
-        $itemType = rtrim($itemType, 's'); // Without an "s" at the end (Product)
-        $path = $itemType . 's'; // With an "s" (Products)
+    static public function sync ($item, $itemType, $path) {
         $identifier = $item::getIdentifier();
         $reference = $item->{$identifier};
 
@@ -108,9 +106,7 @@ abstract class Synchronizer
         return $postResult;
     }
 
-    static public function delete ($item, $itemType) {
-        $itemType = rtrim($itemType, 's'); // Without an "s" at the end (Product)
-        $path = $itemType . 's'; // With an "s" (Products)
+    static public function delete ($item, $itemType, $path) {
         $identifier = $item::getIdentifier();
         $reference = self::referenceMapping($item->getDBId(), $itemType) ? self::referenceMapping($item->getDBId(), $itemType) : $item->{$identifier};
 

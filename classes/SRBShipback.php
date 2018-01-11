@@ -30,6 +30,10 @@ class SRBShipback extends SRBObject
         return 'shipbacks';
     }
 
+    static public function getPathForAPICall () {
+        return 'shipbacks';
+    }
+
     static public function getIdentifier () {
         return 'id_srb_shipback';
     }
@@ -58,7 +62,7 @@ class SRBShipback extends SRBObject
     public function sync () {
         $this->order->sync();
         SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', 0, null, self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
-        return Synchronizer::sync($this, self::getObjectTypeForMapping());
+        return Synchronizer::sync($this, self::getObjectTypeForMapping(), self::getPathForAPICall());
     }
 
     public function save () {

@@ -19,6 +19,8 @@ abstract class SRBObject
 
     abstract static public function getObjectTypeForMapping();
 
+    abstract static public function getPathForAPICall();
+
     static public function syncAll ($newOnly = false) {
         $brands = $newOnly ? self::getAllNotSync() : self::getAll();
 

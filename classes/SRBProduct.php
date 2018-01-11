@@ -30,6 +30,10 @@ class SRBProduct extends SRBObject
         return 'product';
     }
 
+    static public function getPathForAPICall () {
+        return 'products';
+    }
+
     static public function getIdentifier () {
         return 'reference';
     }
@@ -110,7 +114,7 @@ class SRBProduct extends SRBObject
         $this->addCoverPictureToSync();
 
         SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', 0, null, self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
-        return Synchronizer::sync($this, self::getObjectTypeForMapping());
+        return Synchronizer::sync($this, self::getObjectTypeForMapping(), self::getPathForAPICall());
     }
 
     public function deleteWithCheck () {
@@ -145,7 +149,7 @@ class SRBProduct extends SRBObject
 
     public function syncDelete () {
         SRBLogger::addLog('DELETING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', 0, null, self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
-        return Synchronizer::delete($this, self::getObjectTypeForMapping());
+        return Synchronizer::delete($this, self::getObjectTypeForMapping(), self::getPathForAPICall());
     }
 
     static protected function findOrderProductsQuery ($orderId) {
