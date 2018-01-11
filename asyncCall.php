@@ -28,6 +28,7 @@ if (isset($_POST['params'])) {
             $result = $class::syncAll($_POST['params']);
             break;
         default:
+            SRBLogger::addLog('AsyncCall unknown action ' . $action . '. Param: ' . $_POST['params'], 0, null, $class);
             echo false;
             die;
     }
