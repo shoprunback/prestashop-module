@@ -55,17 +55,6 @@ abstract class Synchronizer
         return $response;
     }
 
-    static private function referenceMapping ($itemId, $itemType)
-    {
-        $map = SRBMap::getByIdItemAndIdType($itemId, $itemType);
-
-        if ($map) {
-            return $map->id_item_srb;
-        }
-
-        return false;
-    }
-
     static public function sync ($item, $itemType, $path)
     {
         if (! Configuration::get('srbtoken')) {
@@ -77,7 +66,7 @@ abstract class Synchronizer
 
         // Checks if we already have synchronized this item. If yes, we use the SRB ID, else we use the PS reference
         if ($item->getDBId() && ! ($item->{$identifier} == 0 && $itemType == 'shipback')) {
-            $mapId = self::referenceMapping($item->getDBId(), $itemType);
+            $mapId = SRBMap::getMappingIdIfExists($item->getDBId(), $itemType);
             $reference = $mapId ? $mapId : $item->{$identifier};
         }
 
@@ -133,7 +122,8 @@ abstract class Synchronizer
     static public function delete ($item, $itemType, $path)
     {
         $identifier = $item::getIdentifier();
-        $reference = self::referenceMapping($item->getDBId(), $itemType) ? self::referenceMapping($item->getDBId(), $itemType) : $item->{$identifier};
+        $mapId = SRBMap::getMappingIdIfExists($item->getDBId(), $itemType);
+        $reference = $mapId ? $mapId : $item->{$identifier};
 
         $deleteResult = self::APIcall($path . '/' . $reference, 'DELETE');
 

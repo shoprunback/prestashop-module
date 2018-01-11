@@ -67,6 +67,17 @@ class SRBMap
         return (is_array($result) && isset($result[0])) ? new self($result[0]) : false;
     }
 
+    static public function getMappingIdIfExists ($itemId, $itemType)
+    {
+        $map = self::getByIdItemAndIdType($itemId, $itemType);
+
+        if ($map) {
+            return $map->id_item_srb;
+        }
+
+        return false;
+    }
+
     static public function getById ($id)
     {
         $sql = self::findAllQuery();
