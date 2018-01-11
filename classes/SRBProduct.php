@@ -157,9 +157,7 @@ class SRBProduct extends SRBObject
         $sql->innerJoin('orders', 'o', 'ca.id_cart = o.id_cart');
         $sql->where(self::getTableName() . '.' . self::getIdColumnName() . ' = ' . $this->ps[self::getIdColumnName()]);
 
-        $result = Db::getInstance()->getValue($sql);
-
-        return ($result == 0);
+        return (Db::getInstance()->getValue($sql) == 0);
     }
 
     public function syncDelete ()
