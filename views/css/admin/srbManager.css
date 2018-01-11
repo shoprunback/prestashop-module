@@ -6,8 +6,6 @@
   text-decoration: none;
 }
 
-
-
 #srb-manager .display .banner .top {
   vertical-align: middle;
 }
@@ -38,8 +36,6 @@
 #srb-manager .display .banner p.col-sm-12 {
   margin: 20px 0;
 }
-
-
 
 #srb-manager table {
   border: 1px solid #737C89;
@@ -142,8 +138,6 @@
   color: #303030;
 }
 
-
-
 #srb-manager .pagination {
   padding: 0;
   width: 100%;
@@ -165,7 +159,8 @@
 }
 
 #srb-manager .pagination ul li button {
-  padding: 5px 2px;
+  border-width: 2px;
+  padding: 9px 14px;
   font-weight: bold;
 }
 

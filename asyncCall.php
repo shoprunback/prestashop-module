@@ -28,13 +28,12 @@ if (isset($_POST['params'])) {
             $result = $class::syncAll($_POST['params']);
             break;
         default:
-            SRBLogger::addLog('AsyncCall unknown action ' . $action . '. Param: ' . $_POST['params'], 0, null, $class);
-            echo false;
-            die;
+            SRBLogger::addLog('AsyncCall unknown action ' . $action . '. Param: ' . $_POST['params'], 3, null, $class);
+            throw new Exception('AsyncCall unknown action ' . $action . '. Param: ' . $_POST['params']);
     }
 } else {
-    SRBLogger::addLog('AsyncCall No param', 0, null, $class);
-    $result = $class->{$action}();
+    SRBLogger::addLog('AsyncCall params is missing. Action: ' . $action, 3, null, $class);
+    throw new Exception('AsyncCall params is missing. Action: ' . $action);
 }
 
 if (! is_string($result)) {
