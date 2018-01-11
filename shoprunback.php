@@ -24,7 +24,8 @@ class ShopRunBack extends Module
     public $url;
     public $webhookUrl;
 
-    public function __construct () {
+    public function __construct ()
+    {
         // Mandatory parameters
         $this->name = 'shoprunback';
         $this->author = 'ShopRunBack';
@@ -56,7 +57,8 @@ class ShopRunBack extends Module
         }
     }
 
-    private function installTab ($controllerClassName, $tabName, $tabParentControllerName = false) {
+    private function installTab ($controllerClassName, $tabName, $tabParentControllerName = false)
+    {
         $tab = new Tab();
         $tab->active = 1;
         $tab->class_name = $controllerClassName;
@@ -76,12 +78,14 @@ class ShopRunBack extends Module
         return $tab->add();
     }
 
-    private function uninstallTab ($controllerClassName) {
+    private function uninstallTab ($controllerClassName)
+    {
         $tab = new Tab((int)Tab::getIdFromClassName($controllerClassName));
         return $tab->delete();
     }
 
-    public function install () {
+    public function install ()
+    {
         foreach ($this->tabs as $index => $tab) {
             if (! $this->installTab($index, $tab['name'], $tab['parent'])) {
                 return false;
@@ -108,7 +112,8 @@ class ShopRunBack extends Module
         return true;
     }
 
-    public function uninstall () {
+    public function uninstall ()
+    {
         foreach ($this->tabs as $index => $tab) {
             if (! $this->uninstallTab($index)) {
                 return false;
@@ -135,7 +140,8 @@ class ShopRunBack extends Module
         return true;
     }
 
-    private function executeQueries ($queries) {
+    private function executeQueries ($queries)
+    {
         foreach ($queries as $key => $query) {
             if (! Db::getInstance()->Execute($query)) {
                 return false;
@@ -145,7 +151,8 @@ class ShopRunBack extends Module
         return true;
     }
 
-    private function installSQL () {
+    private function installSQL ()
+    {
         $queries = [];
 
         $queries[] = createTableQuery();
@@ -156,7 +163,8 @@ class ShopRunBack extends Module
         return $this->executeQueries($queries);
     }
 
-    private function uninstallSQL () {
+    private function uninstallSQL ()
+    {
         $queries = [];
 
         $queries[] = dropTableQuery();
@@ -166,11 +174,13 @@ class ShopRunBack extends Module
     }
 
     // Redirect to configuration page
-    public function getContent () {
+    public function getContent ()
+    {
         Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminShoprunback') . '&itemType=config');
     }
 
-    public function hookActionProductDelete ($params) {
+    public function hookActionProductDelete ($params)
+    {
         if (Configuration::get('srbtoken')) {
             $productParam = $params['product'];
 
@@ -187,7 +197,8 @@ class ShopRunBack extends Module
         }
     }
 
-    public function hookNewOrder ($params) {
+    public function hookNewOrder ($params)
+    {
         if (Configuration::get('srbtoken')) {
             try {
                 $order = SRBOrder::getById($params['order']->id);
@@ -198,7 +209,8 @@ class ShopRunBack extends Module
         }
     }
 
-    public function hookActionProductUpdate ($params) {
+    public function hookActionProductUpdate ($params)
+    {
         if (Configuration::get('srbtoken')) {
             try {
                 $product = SRBProduct::getById($params['product']->id);
@@ -209,7 +221,8 @@ class ShopRunBack extends Module
         }
     }
 
-    public function hookActionOrderStatusPostUpdate ($params) {
+    public function hookActionOrderStatusPostUpdate ($params)
+    {
         if (Configuration::get('srbtoken')) {
             try {
                 $order = SRBOrder::getById($params['id_order']);
@@ -220,7 +233,8 @@ class ShopRunBack extends Module
         }
     }
 
-    public function hookDisplayOrderDetail ($params) {
+    public function hookDisplayOrderDetail ($params)
+    {
         if (Configuration::get('srbtoken')) {
             try {
                 $order = SRBOrder::getById($_GET['id_order']);

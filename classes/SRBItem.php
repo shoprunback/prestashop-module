@@ -10,7 +10,8 @@ class SRBItem
     public $currency;
     public $product;
 
-    public function __construct ($psProduct) {
+    public function __construct ($psProduct)
+    {
         $this->label = 'string';
         $this->reference = 'string';
         $this->price_cents = $psProduct['price'];
@@ -18,7 +19,8 @@ class SRBItem
         $this->product = new SRBProduct($psProduct);
     }
 
-    static public function createItemsFromOrderId ($orderId) {
+    static public function createItemsFromOrderId ($orderId)
+    {
         $sql = self::findProductsForItems();
         $sql->where('o.' . SRBOrder::getIdColumnName() . ' = "' . pSQL($orderId) . '"');
         $productsFromDB = Db::getInstance()->executeS($sql);
@@ -26,7 +28,8 @@ class SRBItem
         return self::generateItemsWithProducts($productsFromDB);
     }
 
-    static public function createItemsFromOrderDetail ($orderDetailId) {
+    static public function createItemsFromOrderDetail ($orderDetailId)
+    {
         $sql = self::findProductsForItems();
         $sql->innerJoin('order_detail', 'od', 'od.id_order = o.id_order');
         $sql->where('od.id_order_detail = ' . pSQL($orderDetailId));
@@ -35,7 +38,8 @@ class SRBItem
         return self::generateItemsWithProducts($productsFromDB);
     }
 
-    static private function findProductsForItems () {
+    static private function findProductsForItems ()
+    {
         $sql = new DbQuery();
         $sql->select(SRBProduct::getTableName() . '.*, pl.name, cu.iso_code');
         $sql->from('product', SRBProduct::getTableName());
@@ -48,7 +52,8 @@ class SRBItem
         return $sql;
     }
 
-    static private function generateItemsWithProducts ($products) {
+    static private function generateItemsWithProducts ($products)
+    {
         $items = [];
         foreach ($products as $product) {
             $items[] = new self($product);

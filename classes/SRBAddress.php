@@ -10,7 +10,8 @@ class SRBAddress
     public $city;
     public $state;
 
-    public function __construct ($address) {
+    public function __construct ($address)
+    {
         $this->id = $address['id_address'];
         $this->line1 = $address['address1'];
         $this->line2 = $address['address2'];
@@ -20,31 +21,38 @@ class SRBAddress
         $this->state = $address['stateName'];
     }
 
-    static public function getTableName () {
+    static public function getTableName ()
+    {
         return 'a';
     }
 
-    static public function getIdColumnName () {
+    static public function getIdColumnName ()
+    {
         return 'id_address';
     }
 
-    static public function getIdentifier () {
+    static public function getIdentifier ()
+    {
         return 'id';
     }
 
-    static public function getByCustomerId ($customerId) {
+    static public function getByCustomerId ($customerId)
+    {
         return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS(self::findByCustomerIdQuery($customerId)));
     }
 
-    static public function getByOrderId ($orderId) {
+    static public function getByOrderId ($orderId)
+    {
         return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS(self::findByOrderIdQuery($orderId))[0]);
     }
 
-    static public function createFromOrder ($psOrder) {
+    static public function createFromOrder ($psOrder)
+    {
         return new self($psOrder);
     }
 
-    static protected function findAllQuery () {
+    static protected function findAllQuery ()
+    {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*, co.*, s.name as stateName');
         $sql->from('address', self::getTableName());
@@ -54,11 +62,13 @@ class SRBAddress
         return $sql;
     }
 
-    static protected function findByCustomerIdQuery ($customerId) {
+    static protected function findByCustomerIdQuery ($customerId)
+    {
         return self::findAllQuery()->where('id_customer = ' . pSQL($customerId));
     }
 
-    static protected function findByOrderIdQuery ($orderId) {
+    static protected function findByOrderIdQuery ($orderId)
+    {
         return self::findAllQuery()->innerJoin('orders', 'o', 'o.id_address_delivery = ' . self::getTableName() . '.id_address')->where('o.id_order = ' . pSQL($orderId));
     }
 }

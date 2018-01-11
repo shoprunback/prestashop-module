@@ -4,7 +4,8 @@ class AdminShoprunbackController extends ModuleAdminController
     public $token;
     private $actionResult;
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->bootstrap = true;
         $this->token = isset($_GET['token']) ? $_GET['token'] : '';
@@ -21,7 +22,8 @@ class AdminShoprunbackController extends ModuleAdminController
         }
     }
 
-    private function handleConfig () {
+    private function handleConfig ()
+    {
         $srbtoken = Tools::getValue('srbtoken');
 
         if ($srbtoken == '') {
@@ -53,7 +55,8 @@ class AdminShoprunbackController extends ModuleAdminController
         return 'success.token';
     }
 
-    public function initContent () {
+    public function initContent ()
+    {
         $link = new Link();
         parent::initContent();
 
@@ -97,7 +100,8 @@ class AdminShoprunbackController extends ModuleAdminController
         $this->setTemplate('../../../../modules/' . $this->module->name . '/views/templates/admin/layout.tpl');
     }
 
-    private function getItems ($itemType = 'returns') {
+    private function getItems ($itemType = 'returns')
+    {
         $externalLink = $this->module->url;
 
         switch ($itemType) {
@@ -138,7 +142,8 @@ class AdminShoprunbackController extends ModuleAdminController
         $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin/srbManager.css');
     }
 
-    private function getPagination ($items = []) {
+    private function getPagination ($items = [])
+    {
         $countItems = count($items);
         $itemsByPage = 10;
         $pages = ceil($countItems / $itemsByPage);
@@ -159,13 +164,15 @@ class AdminShoprunbackController extends ModuleAdminController
         $this->context->smarty->assign('items', $itemsToShow);
     }
 
-    private function getConfigFormValues () {
+    private function getConfigFormValues ()
+    {
         $this->context->smarty->assign('formActionUrl', $this->tabUrl . '&itemType=config');
         $this->context->smarty->assign('srbtoken', Configuration::get('srbtoken'));
         $this->context->smarty->assign('production', Configuration::get('production'));
     }
 
-    public function asyncCall () {
+    public function asyncCall ()
+    {
         require_once($this->module->SRBModulePath . '/asyncCall.php');
     }
 }

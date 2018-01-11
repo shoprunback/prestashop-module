@@ -5,7 +5,8 @@ abstract class Synchronizer
     const SRB_DASHBOARD_URL = DASHBOARD_URL;
     const SRB_API_URL = self::SRB_DASHBOARD_URL . '/api/v1';
 
-    static public function APIcall ($path, $type, $json = '') {
+    static public function APIcall ($path, $type, $json = '')
+    {
         $path = str_replace(' ', '%20', $path);
         $url = self::SRB_API_URL . '/' . $path;
 
@@ -54,7 +55,8 @@ abstract class Synchronizer
         return $response;
     }
 
-    static private function referenceMapping ($itemId, $itemType) {
+    static private function referenceMapping ($itemId, $itemType)
+    {
         $map = SRBMap::getByIdItemAndIdType($itemId, $itemType);
 
         if ($map) {
@@ -64,7 +66,8 @@ abstract class Synchronizer
         return false;
     }
 
-    static public function sync ($item, $itemType, $path) {
+    static public function sync ($item, $itemType, $path)
+    {
         if (! Configuration::get('srbtoken')) {
             throw new ConfigurationException('No API token');
         }
@@ -127,7 +130,8 @@ abstract class Synchronizer
         return $postResult;
     }
 
-    static public function delete ($item, $itemType, $path) {
+    static public function delete ($item, $itemType, $path)
+    {
         $identifier = $item::getIdentifier();
         $reference = self::referenceMapping($item->getDBId(), $itemType) ? self::referenceMapping($item->getDBId(), $itemType) : $item->{$identifier};
 
@@ -145,7 +149,8 @@ abstract class Synchronizer
         return $deleteResult;
     }
 
-    static private function mapApiCall ($item, $itemType) {
+    static private function mapApiCall ($item, $itemType)
+    {
         $identifier = $item::getIdColumnName();
         $itemId = isset($item->$identifier) ? $item->$identifier : $item->ps[$identifier];
 

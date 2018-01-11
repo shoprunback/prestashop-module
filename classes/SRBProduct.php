@@ -14,7 +14,8 @@ class SRBProduct extends SRBObject
     public $brand_id;
     public $brand;
 
-    public function __construct ($psProduct) {
+    public function __construct ($psProduct)
+    {
         $this->ps = $psProduct;
         $this->label = $this->extractNameFromPSArray($psProduct['name']);
         $this->reference = $psProduct['reference'];
@@ -26,39 +27,48 @@ class SRBProduct extends SRBObject
         $this->brand_id = $this->brand->reference;
     }
 
-    static public function getObjectTypeForMapping () {
+    static public function getObjectTypeForMapping ()
+    {
         return 'product';
     }
 
-    static public function getPathForAPICall () {
+    static public function getPathForAPICall ()
+    {
         return 'products';
     }
 
-    static public function getIdentifier () {
+    static public function getIdentifier ()
+    {
         return 'reference';
     }
 
-    static public function getDisplayNameAttribute () {
+    static public function getDisplayNameAttribute ()
+    {
         return 'label';
     }
 
-    static public function getTableName () {
+    static public function getTableName ()
+    {
         return 'p';
     }
 
-    static public function getIdColumnName () {
+    static public function getIdColumnName ()
+    {
         return 'id_product';
     }
 
-    static public function getOrderProducts ($orderId) {
+    static public function getOrderProducts ($orderId)
+    {
         return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS(self::findOrderProductsQuery($orderId)));
     }
 
-    static private function extractNameFromPSArray ($psProductArrayName) {
+    static private function extractNameFromPSArray ($psProductArrayName)
+    {
         return is_array($psProductArrayName) ? $psProductArrayName[1] : $psProductArrayName;
     }
 
-    static public function syncAll ($newOnly = false) {
+    static public function syncAll ($newOnly = false)
+    {
         $products = $newOnly ? self::getAllNotSync() : self::getAll();
 
         $responses = [
@@ -83,7 +93,8 @@ class SRBProduct extends SRBObject
         return $responses;
     }
 
-    public function getCoverPicture () {
+    public function getCoverPicture ()
+    {
         $productCover = Product::getCover($this->ps['id_product']);
         $image = new Image($productCover['id_image']);
         $imagePath = $_SERVER['DOCUMENT_ROOT'] . _THEME_PROD_DIR_ . $image->getExistingImgPath() . '.jpg';
@@ -95,7 +106,8 @@ class SRBProduct extends SRBObject
         return false;
     }
 
-    private function addCoverPictureToSync () {
+    private function addCoverPictureToSync ()
+    {
         $coverPicture = $this->getCoverPicture();
 
         if ($coverPicture) {
@@ -106,7 +118,8 @@ class SRBProduct extends SRBObject
         return $coverPicture;
     }
 
-    public function sync ($brandChecked = false) {
+    public function sync ($brandChecked = false)
+    {
         if (! $brandChecked) {
             $postBrandResult = $this->brand->sync();
         }
@@ -117,7 +130,8 @@ class SRBProduct extends SRBObject
         return Synchronizer::sync($this, self::getObjectTypeForMapping(), self::getPathForAPICall());
     }
 
-    public function deleteWithCheck () {
+    public function deleteWithCheck ()
+    {
         if ($this->canBeDeleted()) {
             if ($this->syncDelete()) {
                 SRBLogger::addLog('Product "' . $this->{self::getIdentifier()} . '" deleted', self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
@@ -133,7 +147,8 @@ class SRBProduct extends SRBObject
     }
 
     // Check if product has NEVER been ordered
-    public function canBeDeleted () {
+    public function canBeDeleted ()
+    {
         $sql = new DbQuery();
         $sql->select('COUNT(o.id_order)');
         $sql->from('product', self::getTableName());
@@ -147,12 +162,14 @@ class SRBProduct extends SRBObject
         return ($result == 0);
     }
 
-    public function syncDelete () {
+    public function syncDelete ()
+    {
         SRBLogger::addLog('DELETING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
         return Synchronizer::delete($this, self::getObjectTypeForMapping(), self::getPathForAPICall());
     }
 
-    static protected function findOrderProductsQuery ($orderId) {
+    static protected function findOrderProductsQuery ($orderId)
+    {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*, pl.name, cu.iso_code');
         $sql->from('product', self::getTableName());
@@ -167,7 +184,8 @@ class SRBProduct extends SRBObject
         return $sql;
     }
 
-    static protected function findAllQuery () {
+    static protected function findAllQuery ()
+    {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*, pl.*');
         $sql->from('product', self::getTableName());

@@ -36,17 +36,20 @@ abstract class SRBObject
 
     abstract static protected function findAllQuery();
 
-    static public function getAll () {
+    static public function getAll ()
+    {
         $class = get_called_class();
         return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS($class::findAllQuery()));
     }
 
-    static public function getAllNotSync () {
+    static public function getAllNotSync ()
+    {
         $class = get_called_class();
         return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS($class::findNotSyncQuery()));
     }
 
-    static public function getAllWithMapping ($onlySyncItems = false) {
+    static public function getAllWithMapping ($onlySyncItems = false)
+    {
         $class = get_called_class();
         $items = self::convertPSArrayToSRBObjects(Db::getInstance()->executeS($class::findAllWithMappingQuery($onlySyncItems)));
         foreach ($items as $key => $item) {
@@ -56,21 +59,25 @@ abstract class SRBObject
         return $items;
     }
 
-    public function getDBId () {
+    public function getDBId ()
+    {
         return $this->ps[static::getIdColumnName()];
     }
 
-    public function getName() {
+    public function getName ()
+    {
         $name = static::getDisplayNameAttribute();
         return $this->{$name};
     }
 
-    public function getReference() {
+    public function getReference ()
+    {
         $reference = static::getIdentifier();
         return $this->{$reference};
     }
 
-    protected function convertPSArrayToSRBObjects($PSArray) {
+    protected function convertPSArrayToSRBObjects ($PSArray)
+    {
         $class = get_called_class();
         $SRBObjects = [];
         foreach ($PSArray as $PSItem) {
@@ -80,11 +87,13 @@ abstract class SRBObject
         return $SRBObjects;
     }
 
-    public function getTableIdentifier () {
+    public function getTableIdentifier ()
+    {
         return static::getTableName() . '.' . static::getIdColumnName();
     }
 
-    protected function findNotSyncQuery () {
+    protected function findNotSyncQuery ()
+    {
         $identifier = static::getIdColumnName();
         $type = static::getObjectTypeForMapping();
         $mapQuery = SRBMap::findOnlyIdItemByTypeQuery($type);
@@ -92,7 +101,8 @@ abstract class SRBObject
         return static::findAllQuery()->where(static::getTableName() . '.' . static::getIdColumnName() . ' NOT IN (' . $mapQuery . ')');
     }
 
-    protected function findAllWithMappingQuery ($onlySyncItems = false) {
+    protected function findAllWithMappingQuery ($onlySyncItems = false)
+    {
         $identifier = static::getIdColumnName();
         $type = static::getObjectTypeForMapping();
         $joinType = $onlySyncItems ? 'innerJoin' : 'leftJoin';
@@ -111,11 +121,13 @@ abstract class SRBObject
                         ->orderBy('srb.last_sent_at DESC');
     }
 
-    static protected function findOneQuery ($id) {
+    static protected function findOneQuery ($id)
+    {
         return static::findAllQuery()->where(self::getTableIdentifier() . ' = "' . pSQL($id) . '"');
     }
 
-    static public function getById ($id) {
+    static public function getById ($id)
+    {
         $class = get_called_class();
         $result = Db::getInstance()->executeS(static::findOneQuery($id));
 

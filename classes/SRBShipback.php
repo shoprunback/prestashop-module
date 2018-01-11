@@ -15,7 +15,8 @@ class SRBShipback extends SRBObject
     public $state;
     public $created_at;
 
-    public function __construct ($psReturn) {
+    public function __construct ($psReturn)
+    {
         $this->ps = $psReturn;
         $this->id_srb_shipback = isset($psReturn['id_srb_shipback']) ? $psReturn['id_srb_shipback'] : '';
         $this->order = isset($psReturn['order']) ? $psReturn['order'] : SRBOrder::getById($this->ps['id_order']);
@@ -26,31 +27,38 @@ class SRBShipback extends SRBObject
         $this->public_url = $psReturn['public_url'];
     }
 
-    static public function getObjectTypeForMapping () {
+    static public function getObjectTypeForMapping ()
+    {
         return 'shipback';
     }
 
-    static public function getPathForAPICall () {
+    static public function getPathForAPICall ()
+    {
         return 'shipbacks';
     }
 
-    static public function getIdentifier () {
+    static public function getIdentifier ()
+    {
         return 'id_srb_shipback';
     }
 
-    static public function getDisplayNameAttribute () {
+    static public function getDisplayNameAttribute ()
+    {
         return 'id_srb_shipback';
     }
 
-    static public function getTableName () {
+    static public function getTableName ()
+    {
         return 'srbr';
     }
 
-    static public function getIdColumnName () {
+    static public function getIdColumnName ()
+    {
         return 'id_srb_shipback';
     }
 
-    public function getShipbackDetails () {
+    public function getShipbackDetails ()
+    {
         $sql = self::findAllQuery();
         $sql->innerJoin('order_detail', 'od', 'ord.id_order_detail = od.id_order_detail');
         $sql->where(self::getTableName() . '.' . self::getIdColumnName() . ' = ' . pSQL($this->id));
@@ -59,13 +67,15 @@ class SRBShipback extends SRBObject
         return Db::getInstance()->executeS($sql);
     }
 
-    public function sync () {
+    public function sync ()
+    {
         $this->order->sync();
         SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
         return Synchronizer::sync($this, self::getObjectTypeForMapping(), self::getPathForAPICall());
     }
 
-    public function save () {
+    public function save ()
+    {
         $shipbackToUpdate = [
             'state' => $this->state,
             'mode' => $this->mode,
@@ -83,7 +93,8 @@ class SRBShipback extends SRBObject
         return $result;
     }
 
-    static public function createShipbackFromOrderId ($orderId) {
+    static public function createShipbackFromOrderId ($orderId)
+    {
         if (! $orderId) {
             return false;
         }
@@ -135,7 +146,8 @@ class SRBShipback extends SRBObject
         return $result;
     }
 
-    static private function createReturnFromSyncResult ($item, $orderId) {
+    static private function createReturnFromSyncResult ($item, $orderId)
+    {
         $shipbackToInsert = [
             'id_srb_shipback' => $item->id,
             'id_order' => $orderId,
@@ -152,7 +164,8 @@ class SRBShipback extends SRBObject
         return self::getById($item->id);
     }
 
-    private function findAllByCreateDateQuery () {
+    private function findAllByCreateDateQuery ()
+    {
         $sql = self::findAllQuery();
         $sql = SRBOrder::addComponentsToQuery($sql);
         $sql->orderBy('created_at DESC');
@@ -160,14 +173,16 @@ class SRBShipback extends SRBObject
         return $sql;
     }
 
-    static public function getAllByCreateDate () {
+    static public function getAllByCreateDate ()
+    {
         $sql = self::findAllByCreateDateQuery();
         $shipbacksFromDB = Db::getInstance()->executeS($sql);
 
         return self::generateReturnsFromDBResult($shipbacksFromDB);
     }
 
-    static public function getLikeOrderIdByCreateDate ($orderId) {
+    static public function getLikeOrderIdByCreateDate ($orderId)
+    {
         $sql = self::findAllByCreateDateQuery();
         $sql->where(self::getTableName() . '.id_order LIKE "%' . pSQL($orderId) . '%"');
         $shipbacksFromDB = Db::getInstance()->executeS($sql);
@@ -175,7 +190,8 @@ class SRBShipback extends SRBObject
         return self::generateReturnsFromDBResult($shipbacksFromDB);
     }
 
-    static public function getLikeCustomerByCreateDate ($customer) {
+    static public function getLikeCustomerByCreateDate ($customer)
+    {
         $sql = self::findAllByCreateDateQuery();
         $sql->where('
             c.firstname LIKE "%' . pSQL($customer) . '%" OR
@@ -187,7 +203,8 @@ class SRBShipback extends SRBObject
         return self::generateReturnsFromDBResult($shipbacksFromDB);
     }
 
-    static public function getByOrderId ($orderId) {
+    static public function getByOrderId ($orderId)
+    {
         $sql = self::findAllQuery();
         $sql = SRBOrder::addComponentsToQuery($sql);
         $sql->where(self::getTableName() . '.id_order = ' . pSQL($orderId));
@@ -204,7 +221,8 @@ class SRBShipback extends SRBObject
         return new self($shipbackFromDB);
     }
 
-    static private function generateReturnsFromDBResult ($shipbacksFromDB) {
+    static private function generateReturnsFromDBResult ($shipbacksFromDB)
+    {
         $shipbacks = [];
         foreach ($shipbacksFromDB as $key => $shipback) {
             $shipback['order'] = SRBOrder::createFromShipback($shipback);
@@ -214,7 +232,8 @@ class SRBShipback extends SRBObject
         return $shipbacks;
     }
 
-    static protected function findAllQuery () {
+    static protected function findAllQuery ()
+    {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*, o.*');
         $sql->from(self::SHIPBACK_TABLE_NAME_NO_PREFIX, self::getTableName());

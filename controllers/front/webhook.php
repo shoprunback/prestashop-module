@@ -5,14 +5,16 @@ if (! defined('_PS_VERSION_')) {
 
 class ShopRunBackWebhookModuleFrontController extends ModuleFrontController
 {
-    public function initContent () {
+    public function initContent ()
+    {
         parent::initContent();
 
         echo $this->executeWebhook();
         exit;
     }
 
-    private function executeWebhook () {
+    private function executeWebhook ()
+    {
         SRBLogger::addLog('WEBHOOK CALLED');
 
         $webhook = file_get_contents("php://input");

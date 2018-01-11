@@ -1,7 +1,8 @@
 <?php
 class ShopRunBackShipbackModuleFrontController extends ModuleFrontController
 {
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/srbGlobal.css');
         $this->actionResult = false;
@@ -12,7 +13,8 @@ class ShopRunBackShipbackModuleFrontController extends ModuleFrontController
         }
     }
 
-    public function initContent () {
+    public function initContent ()
+    {
         $url = $this->context->link->getPageLink('index') . '?controller=order-detail&id_order=' . $_GET['orderId'];
         $shipback = SRBShipback::createShipbackFromOrderId($_GET['orderId']);
 

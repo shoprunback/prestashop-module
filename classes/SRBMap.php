@@ -12,7 +12,8 @@ class SRBMap
     public $type;
     public $last_sent_at;
 
-    public function __construct ($psMap) {
+    public function __construct ($psMap)
+    {
         $this->id_srb_map = isset($psMap[self::getIdColumnName()]) ? $psMap[self::getIdColumnName()] : 0;
         $this->id_item = $psMap['id_item'];
         $this->id_item_srb = $psMap['id_item_srb'];
@@ -20,15 +21,18 @@ class SRBMap
         $this->last_sent_at = $psMap['last_sent_at'];
     }
 
-    static public function getTableName () {
+    static public function getTableName ()
+    {
         return 'srbm';
     }
 
-    static public function getIdColumnName () {
+    static public function getIdColumnName ()
+    {
         return 'id_srb_map';
     }
 
-    public function save () {
+    public function save ()
+    {
         $mapArray = [];
 
         foreach ($this as $key => $value) {
@@ -58,11 +62,13 @@ class SRBMap
         return $result;
     }
 
-    static private function returnResult ($result) {
+    static private function returnResult ($result)
+    {
         return (is_array($result) && isset($result[0])) ? new self($result[0]) : false;
     }
 
-    static public function getById ($id) {
+    static public function getById ($id)
+    {
         $sql = self::findAllQuery();
         $sql->where(self::getTableName() . '.' . self::getIdColumnName() . ' = ' . pSQL($id));
         $result = Db::getInstance()->executeS($sql);
@@ -70,7 +76,8 @@ class SRBMap
         return self::returnResult($result);
     }
 
-    static public function getByType ($type) {
+    static public function getByType ($type)
+    {
         $shipbacksFromDB = Db::getInstance()->executeS(self::findByTypeQuery($type));
 
         $shipbacks = [];
@@ -81,7 +88,8 @@ class SRBMap
         return $shipbacks;
     }
 
-    static public function getByIdItemAndIdType ($idItem, $type) {
+    static public function getByIdItemAndIdType ($idItem, $type)
+    {
         $sql = self::findAllQuery();
         $sql->where(self::getTableName() . '.id_item = ' . pSQL($idItem) . ' AND ' . pSQL(self::getTableName()) . '.type = "' . pSQL($type) . '"');
         $result = Db::getInstance()->executeS($sql);
@@ -89,7 +97,8 @@ class SRBMap
         return self::returnResult($result);
     }
 
-    static public function getAll () {
+    static public function getAll ()
+    {
         $shipbacksFromDB = Db::getInstance()->executeS(self::findAllQuery());
 
         $shipbacks = [];
@@ -100,7 +109,8 @@ class SRBMap
         return $shipbacks;
     }
 
-    static protected function findAllQuery () {
+    static protected function findAllQuery ()
+    {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*');
         $sql->from(self::MAPPER_TABLE_NAME_NO_PREFIX, self::getTableName());
@@ -108,14 +118,16 @@ class SRBMap
         return $sql;
     }
 
-    static public function findByTypeQuery ($type) {
+    static public function findByTypeQuery ($type)
+    {
         $sql = self::findAllQuery();
         $sql->where(self::getTableName() . '.type = "' . $type . '"');
 
         return $sql;
     }
 
-    static public function findOnlyIdItemByTypeQuery ($type) {
+    static public function findOnlyIdItemByTypeQuery ($type)
+    {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.id_item');
         $sql->from(self::MAPPER_TABLE_NAME_NO_PREFIX, self::getTableName());
@@ -124,7 +136,8 @@ class SRBMap
         return $sql;
     }
 
-    static public function findOnlyLastSentByTypeQuery ($type) {
+    static public function findOnlyLastSentByTypeQuery ($type)
+    {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.last_sent_at');
         $sql->from(self::MAPPER_TABLE_NAME_NO_PREFIX, self::getTableName());

@@ -9,7 +9,8 @@ class SRBException extends Exception
     public $previous;
     public $prefix;
 
-    public function __construct($message, $errorCode = 0, Exception $previous = null) {
+    public function __construct($message, $errorCode = 0, Exception $previous = null)
+    {
         parent::__construct($message, $errorCode, $previous);
 
         $this->message = $message;
@@ -19,7 +20,8 @@ class SRBException extends Exception
         $this->prefix = '[ShopRunBack]';
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         SRBLogger::addLog($this->message);
 
         return $this->prefix . ' ' . __CLASS__ . ': [' . $this->errorCode . ']: ' . $this->message . '\n';

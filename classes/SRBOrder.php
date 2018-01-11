@@ -11,7 +11,8 @@ class SRBOrder extends SRBObject
     public $order_number;
     public $items;
 
-    public function __construct ($psOrder) {
+    public function __construct ($psOrder)
+    {
         $this->ps = $psOrder;
         $this->order_number = $this->extractOrderNumberFromPSArray($psOrder);
         $this->ordered_at = $psOrder['date_add'];
@@ -19,31 +20,38 @@ class SRBOrder extends SRBObject
         $this->items = SRBItem::createItemsFromOrderId($this->ps['id_order']);
     }
 
-    static public function getObjectTypeForMapping () {
+    static public function getObjectTypeForMapping ()
+    {
         return 'order';
     }
 
-    static public function getPathForAPICall () {
+    static public function getPathForAPICall ()
+    {
         return 'orders';
     }
 
-    static public function getIdentifier () {
+    static public function getIdentifier ()
+    {
         return 'order_number';
     }
 
-    static public function getDisplayNameAttribute () {
+    static public function getDisplayNameAttribute ()
+    {
         return 'order_number';
     }
 
-    static public function getTableName () {
+    static public function getTableName ()
+    {
         return 'o';
     }
 
-    static public function getIdColumnName () {
+    static public function getIdColumnName ()
+    {
         return 'id_order';
     }
 
-    public function getProducts () {
+    public function getProducts ()
+    {
         $products = [];
         foreach ($this->items as $item) {
             $products[] = $item->product;
@@ -52,13 +60,15 @@ class SRBOrder extends SRBObject
         return $products;
     }
 
-    public function sync () {
+    public function sync ()
+    {
         SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
         return Synchronizer::sync($this, self::getObjectTypeForMapping(), self::getPathForAPICall());
     }
 
-    static private function extractOrderNumberFromPSArray ($psOrderArrayName) {
-        if (isset($psOrderArrayName['reference'])) {
+    static private function extractOrderNumberFromPSArray ($psOrderArrayName)
+    {
+        if (isset($psOrderArrayName['reference'])){
             return $psOrderArrayName['reference'];
         } elseif (isset($psOrderArrayName['id_order'])) {
             return $psOrderArrayName['id_order'];
@@ -67,7 +77,8 @@ class SRBOrder extends SRBObject
         }
     }
 
-    static public function getAllWithMapping ($onlySyncItems = false) {
+    static public function getAllWithMapping ($onlySyncItems = false)
+    {
         $sql = self::findAllWithMappingQuery($onlySyncItems);
         $sql->select('srbr.id_srb_shipback, srbr.state, os.delivery');
         $sql->leftJoin( // We use leftJoin because orders may not have a return associated
@@ -101,11 +112,13 @@ class SRBOrder extends SRBObject
         return $items;
     }
 
-    static public function createFromShipback ($shipback) {
+    static public function createFromShipback ($shipback)
+    {
         return new self($shipback);
     }
 
-    static public function addComponentsToQuery ($sql) {
+    static public function addComponentsToQuery ($sql)
+    {
         $sql->select(self::getTableName() . '.*, c.*, a.*, s.name as stateName, co.*');
         $sql->innerJoin('customer', 'c', self::getTableName() . '.id_customer = c.id_customer');
         $sql->innerJoin('address', 'a', 'c.id_customer = a.id_customer');
@@ -115,7 +128,8 @@ class SRBOrder extends SRBObject
         return $sql;
     }
 
-    static protected function findAllQuery () {
+    static protected function findAllQuery ()
+    {
         $sql = new DbQuery();
         $sql->from('orders', self::getTableName());
         $sql = self::addComponentsToQuery($sql);
@@ -123,7 +137,8 @@ class SRBOrder extends SRBObject
         return $sql;
     }
 
-    protected function findAllWithMappingQuery ($onlySyncItems = false) {
+    protected function findAllWithMappingQuery ($onlySyncItems = false)
+    {
         $identifier = static::getIdColumnName();
         $type = static::getObjectTypeForMapping();
         $joinType = $onlySyncItems ? 'innerJoin' : 'leftJoin';
