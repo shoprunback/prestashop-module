@@ -9,7 +9,7 @@ class ShipbackException extends SRBException
     }
 
     public function __toString() {
-        SRBLogger::addLog($this->message, 1, $this->errorCode, 'shipback');
+        SRBLogger::addLog($this->message, 'shipback');
 
         return $this->prefix . ' ' . __CLASS__ . ': [' . $this->errorCode . ']: ' . $this->message . '\n';
     }

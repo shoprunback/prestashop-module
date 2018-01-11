@@ -19,7 +19,7 @@ if (isset($_POST['params'])) {
             $item = $class::getById($_POST['params']);
             $result = $item->sync();
         } catch (SRBException $e) {
-            SRBLogger::addLog($e, 2, null, $class);
+            SRBLogger::addLog($e, $class);
         }
     } elseif ($action == 'syncAll') {
         SRBLogger::addLog('AsyncCall syncAll ' . $class);
@@ -28,7 +28,7 @@ if (isset($_POST['params'])) {
         throw new SRBException('AsyncCall unknown action ' . $action . '. Param: ' . $_POST['params'], 3);
     }
 } else {
-    SRBLogger::addLog('AsyncCall params is missing. Action: ' . $action, 3, null, $class);
+    SRBLogger::addLog('AsyncCall params is missing. Action: ' . $action, $class);
     throw new SRBException('AsyncCall params is missing. Action: ' . $action);
 }
 

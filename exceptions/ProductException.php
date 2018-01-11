@@ -9,7 +9,7 @@ class ProductException extends SRBException
     }
 
     public function __toString() {
-        SRBLogger::addLog($this->message, 1, $this->errorCode, 'product');
+        SRBLogger::addLog($this->message, 'product');
 
         return $this->prefix . ' ' . __CLASS__ . ': [' . $this->errorCode . ']: ' . $this->message . '\n';
     }

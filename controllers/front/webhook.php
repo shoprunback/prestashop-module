@@ -22,7 +22,7 @@ class ShopRunBackWebhookModuleFrontController extends ModuleFrontController
         $id = isset($webhook->data->id) ? $webhook->data->id : '';
 
         if (! $type || ! $id) {
-            SRBLogger::addLog('WEBHOOK FAILED: What is missing? [type: ' . $type . ' ; id: ' . $id . ']', 2);
+            SRBLogger::addLog('WEBHOOK FAILED: What is missing? [type: ' . $type . ' ; id: ' . $id . ']');
             return header('HTTP/1.1 200 OK');
         }
 
@@ -36,14 +36,14 @@ class ShopRunBackWebhookModuleFrontController extends ModuleFrontController
                     $mode = isset($webhook->data->mode) ? $webhook->data->mode : '';
 
                     if (! $state && ! $mode) {
-                        SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: What is missing? [state: ' . $state . '; mode: ' . $mode . ']', 2, null, $type, $id);
+                        SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: What is missing? [state: ' . $state . '; mode: ' . $mode . ']', $type, $id);
                         return header('HTTP/1.1 200 OK');
                     }
 
                     $item->state = $state ? $state : $this->state;
                     $item->mode = $mode ? $mode : $this->mode;
                 } catch (ShipbackException $e) {
-                    SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: ' . $e, 3, null, 'order', $orderId);
+                    SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: ' . $e, 'order', $orderId);
                 }
 
                 break;
@@ -54,7 +54,7 @@ class ShopRunBackWebhookModuleFrontController extends ModuleFrontController
 
         $item->save();
 
-        SRBLogger::addLog('WEBHOOK WORKED', 0, null, $type, $id);
+        SRBLogger::addLog('WEBHOOK WORKED', $type, $id);
         return header('HTTP/1.1 200 OK');
     }
 }

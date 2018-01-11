@@ -20,7 +20,7 @@ class SRBException extends Exception
     }
 
     public function __toString() {
-        SRBLogger::addLog($this->message, 1, $this->errorCode);
+        SRBLogger::addLog($this->message);
 
         return $this->prefix . ' ' . __CLASS__ . ': [' . $this->errorCode . ']: ' . $this->message . '\n';
     }

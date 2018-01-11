@@ -61,7 +61,7 @@ class SRBShipback extends SRBObject
 
     public function sync () {
         $this->order->sync();
-        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', 0, null, self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
+        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
         return Synchronizer::sync($this, self::getObjectTypeForMapping(), self::getPathForAPICall());
     }
 
@@ -76,7 +76,7 @@ class SRBShipback extends SRBObject
         $sql = Db::getInstance();
         $result = $sql->update(self::SHIPBACK_TABLE_NAME_NO_PREFIX, $shipbackToUpdate, 'id_srb_shipback = "' . pSQL($this->id_srb_shipback) . '"');
 
-        SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '" updated', 0, null, self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
+        SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '" updated', self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
 
         $this->sync();
 
@@ -120,13 +120,13 @@ class SRBShipback extends SRBObject
                     try {
                         $shipbackById = self::getById($id);
                     } catch (ShipbackException $e) {
-                        SRBLogger::addLog($e, 3, null, 'order', $orderId);
+                        SRBLogger::addLog($e, 'order', $orderId);
                     }
                 }
 
                 $result = $shipbackById;
             } catch (ShipbackException $e) {
-                SRBLogger::addLog($e, 3, null, 'order', $orderId);
+                SRBLogger::addLog($e, 'order', $orderId);
             }
         } else {
             $result = self::createReturnFromSyncResult($result, $orderId);
@@ -147,7 +147,7 @@ class SRBShipback extends SRBObject
 
         $sql = Db::getInstance();
         $result = $sql->insert(self::SHIPBACK_TABLE_NAME_NO_PREFIX, $shipbackToInsert);
-        SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $item->id . '" inserted', 0, null, self::getObjectTypeForMapping(), $item->id);
+        SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $item->id . '" inserted', self::getObjectTypeForMapping(), $item->id);
 
         return self::getById($item->id);
     }
