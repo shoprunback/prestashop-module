@@ -91,15 +91,15 @@ class SRBProduct extends SRBObject
         return false;
     }
 
-    private function addCoverToSync () {
-        $thumbnail = $this->getCoverPicture();
+    private function addCoverPictureToSync () {
+        $coverPicture = $this->getCoverPicture();
 
-        if ($thumbnail) {
+        if ($coverPicture) {
             $this->picture_file_url = 'ps-' . $this->label;
-            $this->picture_file_base64 = 'data:image/png;base64,' . base64_encode($thumbnail);
+            $this->picture_file_base64 = 'data:image/png;base64,' . base64_encode($coverPicture);
         }
 
-        return $thumbnail;
+        return $coverPicture;
     }
 
     public function sync ($brandChecked = false) {
@@ -107,7 +107,7 @@ class SRBProduct extends SRBObject
             $postBrandResult = $this->brand->sync();
         }
 
-        $this->addCoverToSync();
+        $this->addCoverPictureToSync();
 
         SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', 0, null, self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
         return Synchronizer::sync($this, self::getObjectTypeForMapping());
