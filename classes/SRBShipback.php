@@ -112,7 +112,7 @@ class SRBShipback extends SRBObject
 
                 if (! $shipbackById && strpos($result->shipback->errors[0], 'Order already\'s got return associated') !== false) {
                     $shipbackGet = json_decode(Synchronizer::APICall('shipbacks/' . $id, 'GET'));
-                    self::insertReturnFromSyncResult($shipbackGet, $orderId);
+                    self::createReturnFromSyncResult($shipbackGet, $orderId);
                     try {
                         $shipbackById = self::getById($id);
                     } catch (Exception $e) {
@@ -125,13 +125,13 @@ class SRBShipback extends SRBObject
                 SRBLogger::addLog($e, 3, null, 'order', $orderId);
             }
         } else {
-            $result = self::insertReturnFromSyncResult($result, $orderId);
+            $result = self::createReturnFromSyncResult($result, $orderId);
         }
 
         return $result;
     }
 
-    static private function insertReturnFromSyncResult ($item, $orderId) {
+    static private function createReturnFromSyncResult ($item, $orderId) {
         $shipbackToInsert = [
             'id_srb_shipback' => $item->id,
             'id_order' => $orderId,
