@@ -84,7 +84,7 @@ class SRBProduct extends SRBObject
     }
 
     public function getCoverPicture () {
-        $productCover = Product::getCoverPicture($this->ps['id_product']);
+        $productCover = Product::getCover($this->ps['id_product']);
         $image = new Image($productCover['id_image']);
         $imagePath = $_SERVER['DOCUMENT_ROOT'] . _THEME_PROD_DIR_ . $image->getExistingImgPath() . '.jpg';
 

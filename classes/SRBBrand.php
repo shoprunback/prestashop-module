@@ -18,7 +18,7 @@ class SRBBrand extends SRBObject
     }
 
     static public function getPathForAPICall () {
-        return 'manufacturer';
+        return 'brands';
     }
 
     static public function getIdentifier () {

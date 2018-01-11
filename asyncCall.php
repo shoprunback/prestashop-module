@@ -15,7 +15,7 @@ $result = '';
 if (isset($_POST['params'])) {
     switch ($action) {
         case 'sync':
-            SRBLogger::addLog('AsyncCall sync', 0, null, $class);
+            SRBLogger::addLog('AsyncCall sync ' . $class . ' ' . $_POST['params']);
             try {
                 $item = $class::getById($_POST['params']);
                 $result = $item->sync();
@@ -24,7 +24,7 @@ if (isset($_POST['params'])) {
             }
             break;
         case 'syncAll':
-            SRBLogger::addLog('AsyncCall syncAll', 0, null, $class);
+            SRBLogger::addLog('AsyncCall syncAll ' . $class);
             $result = $class::syncAll($_POST['params']);
             break;
         default:

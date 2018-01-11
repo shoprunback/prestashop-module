@@ -65,6 +65,10 @@ abstract class Synchronizer
     }
 
     static public function sync ($item, $itemType, $path) {
+        if (! Configuration::get('srbtoken')) {
+            throw new Exception('No API token');
+        }
+
         $identifier = $item::getIdentifier();
         $reference = $item->{$identifier};
 
@@ -99,6 +103,11 @@ abstract class Synchronizer
         if ($postResult) {
             $postResultDecoded = json_decode($postResult);
             $class = get_class($item);
+
+            if (! $postResultDecoded) {
+                SRBLogger::addLog('Can\'t decode postresult: ' . $postResult, 3, null, $itemType, $item->ps[$class::getIdColumnName()]);
+                throw new Exception('Can\'t decode postresult: ' . $postResult);
+            }
 
             // If the POST resulted in an error or not
             if (isset($postResultDecoded->{$itemType}->errors)) {
