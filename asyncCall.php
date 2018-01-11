@@ -13,22 +13,19 @@ $action = $_POST['action'];
 $result = '';
 
 if (isset($_POST['params'])) {
-    switch ($action) {
-        case 'sync':
-            SRBLogger::addLog('AsyncCall sync ' . $class . ' ' . $_POST['params']);
-            try {
-                $item = $class::getById($_POST['params']);
-                $result = $item->sync();
-            } catch (SRBException $e) {
-                SRBLogger::addLog($e, 2, null, $class);
-            }
-            break;
-        case 'syncAll':
-            SRBLogger::addLog('AsyncCall syncAll ' . $class);
-            $result = $class::syncAll($_POST['params']);
-            break;
-        default:
-            throw new SRBException('AsyncCall unknown action ' . $action . '. Param: ' . $_POST['params'], 3);
+    if ($action == 'sync') {
+        SRBLogger::addLog('AsyncCall sync ' . $class . ' ' . $_POST['params']);
+        try {
+            $item = $class::getById($_POST['params']);
+            $result = $item->sync();
+        } catch (SRBException $e) {
+            SRBLogger::addLog($e, 2, null, $class);
+        }
+    } elseif ($action == 'syncAll') {
+        SRBLogger::addLog('AsyncCall syncAll ' . $class);
+        $result = $class::syncAll($_POST['params']);
+    } else {
+        throw new SRBException('AsyncCall unknown action ' . $action . '. Param: ' . $_POST['params'], 3);
     }
 } else {
     SRBLogger::addLog('AsyncCall params is missing. Action: ' . $action, 3, null, $class);
