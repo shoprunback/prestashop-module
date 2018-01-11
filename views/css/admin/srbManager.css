@@ -146,6 +146,7 @@
 
 #srb-manager .pagination ul {
   display: inline-block;
+  padding: 0;
 }
 
 #srb-manager .pagination ul li {

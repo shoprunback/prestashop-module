@@ -27,7 +27,7 @@ class SRBShipback extends SRBObject
     }
 
     static public function getObjectTypeForMapping () {
-        return 'shipbacks';
+        return 'shipback';
     }
 
     static public function getPathForAPICall () {

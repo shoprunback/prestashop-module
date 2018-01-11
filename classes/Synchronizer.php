@@ -112,10 +112,12 @@ abstract class Synchronizer
             // If the POST resulted in an error or not
             if (isset($postResultDecoded->{$itemType}->errors)) {
                 SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be synchronized! ' . $postResultDecoded->{$itemType}->errors[0], 1, null, $itemType, $item->ps[$class::getIdColumnName()]);
-            } else {
+            } elseif (isset($postResultDecoded->id)) {
                 SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" synchronized', 0, null, $itemType, $item->ps[$class::getIdColumnName()]);
                 $item->id_item_srb = $postResultDecoded->id;
                 self::mapApiCall($item, $itemType);
+            } else {
+                SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be synchronized because of an unknown error!', 1, null, $itemType, $item->ps[$class::getIdColumnName()]);
             }
         }
 

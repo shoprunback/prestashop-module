@@ -6,7 +6,29 @@
 </script>
 
 <div id="srb-manager">
-    {include file="./tables/$itemType.tpl"}
+    {if count($items) > 0}
+        {include file="./tables/$itemType.tpl"}
+    {else}
+        <div class="no-item text-center">
+            <h2>
+                {if $itemType == "returns"}
+                    {l s='return.no_return' mod='shoprunback'}
+                {/if}
+
+                {if $itemType == "brands"}
+                    {l s='brand.no_brand' mod='shoprunback'}
+                {/if}
+
+                {if $itemType == "products"}
+                    {l s='product.no_product' mod='shoprunback'}
+                {/if}
+
+                {if $itemType == "orders"}
+                    {l s='order.no_order' mod='shoprunback'}
+                {/if}
+            </h2>
+        </div>
+    {/if}
 
     <div class="pagination">
         <ul>
