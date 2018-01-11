@@ -11,7 +11,7 @@ class SRBCustomer
     public $phone;
 
     public function __construct ($customer) {
-        $this->id = $this->extractId($customer);
+        $this->id = $this->extractIdFromPSArray($customer);
         $this->first_name = $customer['firstname'];
         $this->last_name = $customer['lastname'];
         $this->email = $customer['email'];
@@ -29,7 +29,7 @@ class SRBCustomer
         return 'id';
     }
 
-    static private function extractId ($psCustomerArrayName) {
+    static private function extractIdFromPSArray ($psCustomerArrayName) {
         return isset($psCustomerArrayName['id_customer']) ? $psCustomerArrayName['id_customer'] : $psCustomerArrayName['id'];
     }
 

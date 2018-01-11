@@ -13,7 +13,7 @@ class SRBOrder extends SRBObject
 
     public function __construct ($psOrder) {
         $this->ps = $psOrder;
-        $this->order_number = $this->extractOrderNumber($psOrder);
+        $this->order_number = $this->extractOrderNumberFromPSArray($psOrder);
         $this->ordered_at = $psOrder['date_add'];
         $this->customer = SRBCustomer::createFromOrder($psOrder);
         $this->items = SRBItem::createItemsFromOrderId($this->ps['id_order']);
@@ -77,7 +77,7 @@ class SRBOrder extends SRBObject
         return Synchronizer::sync($this, self::getObjectTypeForMapping());
     }
 
-    static private function extractOrderNumber ($psOrderArrayName) {
+    static private function extractOrderNumberFromPSArray ($psOrderArrayName) {
         if (isset($psOrderArrayName['reference'])) {
             return $psOrderArrayName['reference'];
         } elseif (isset($psOrderArrayName['id_order'])) {

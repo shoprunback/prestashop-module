@@ -16,7 +16,7 @@ class SRBProduct extends SRBObject
 
     public function __construct ($psProduct) {
         $this->ps = $psProduct;
-        $this->label = $this->extractName($psProduct['name']);
+        $this->label = $this->extractNameFromPSArray($psProduct['name']);
         $this->reference = $psProduct['reference'];
         $this->weight_grams = $psProduct['weight'] * 1000;
         $this->width_mm = $psProduct['width'];
@@ -50,7 +50,7 @@ class SRBProduct extends SRBObject
         return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS(self::findOrderProductsQuery($orderId)));
     }
 
-    static private function extractName ($psProductArrayName) {
+    static private function extractNameFromPSArray ($psProductArrayName) {
         return is_array($psProductArrayName) ? $psProductArrayName[1] : $psProductArrayName;
     }
 
