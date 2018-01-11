@@ -10,18 +10,20 @@
 
             <div class="form-group">
                 <label for="production">{l s="config.form.production" mod='shoprunback'}</label>
-            </div>
 
-            <div class="radio">
-                <label>
-                    {l s="config.form.yes" mod='shoprunback'}
-                    <input type="radio" name="production" value="1" required {if $production == 1}checked="checked"{/if}>
-                </label>
+                <div class="radio">
+                    <label>
+                        {l s="config.form.yes" mod='shoprunback'}
+                        <input type="radio" name="production" value="1" required {if $production == 1}checked="checked"{/if}>
+                    </label>
+                </div>
 
-                <label>
-                    {l s="config.form.no" mod='shoprunback'}
-                    <input type="radio" name="production" value="0" required {if $production == 0}checked="checked"{/if}>
-                </label>
+                <div class="radio">
+                    <label>
+                        {l s="config.form.no" mod='shoprunback'}
+                        <input type="radio" name="production" value="0" required {if $production == 0}checked="checked"{/if}>
+                    </label>
+                </div>
             </div>
 
             <div class="form-group">
