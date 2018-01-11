@@ -43,30 +43,6 @@ class SRBOrder extends SRBObject
         return 'id_order';
     }
 
-    // Returns the attribute "delivered" of an order, which is in the order_state, available by passing through the order_history
-    public function isDelivered () {
-        $sql = new DbQuery();
-        $sql->select('os.delivery');
-        $sql->from('orders', self::getTableName());
-        $sql->leftJoin(
-            'order_history',
-            'oh',
-            'oh.id_order = ' . self::getTableName() . '.' . self::getIdColumnName() . ' AND oh.id_order_history IN (
-                SELECT MAX(oh.id_order_history)
-                FROM ps_order_history oh
-                GROUP BY id_order
-            )'
-        );
-        $sql->leftJoin(
-            'order_state',
-            'os',
-            'os.id_order_state = oh.id_order_state'
-        );
-        $sql->where('oh.id_order = ' . $this->ps['id_order']);
-
-        return Db::getInstance()->executeS($sql)[0]['delivery'];
-    }
-
     public function getProducts () {
         $products = [];
         foreach ($this->items as $item) {
