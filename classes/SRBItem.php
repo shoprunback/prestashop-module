@@ -37,13 +37,13 @@ class SRBItem
 
     static private function findProductsForItems () {
         $sql = new DbQuery();
-        $sql->select('p.*, pl.name, cu.iso_code');
-        $sql->from('product', 'p');
-        $sql->innerJoin('product_lang', 'pl', 'p.id_product = pl.id_product');
-        $sql->innerJoin('cart_product', 'cp', 'p.id_product = cp.id_product');
+        $sql->select(SRBProduct::getTableName() . '.*, pl.name, cu.iso_code');
+        $sql->from('product', SRBProduct::getTableName());
+        $sql->innerJoin('product_lang', 'pl', SRBProduct::getTableName() . '.id_product = pl.id_product');
+        $sql->innerJoin('cart_product', 'cp', SRBProduct::getTableName() . '.id_product = cp.id_product');
         $sql->innerJoin('cart', 'ca', 'cp.id_cart = ca.id_cart');
-        $sql->innerJoin('orders', 'o', 'ca.id_cart = o.id_cart');
-        $sql->innerJoin('currency', 'cu', 'cu.id_currency = o.id_currency');
+        $sql->innerJoin('orders', SRBOrder::getTableName(), 'ca.id_cart = ' . SRBOrder::getTableName() . '.id_cart');
+        $sql->innerJoin('currency', 'cu', 'cu.id_currency = ' . SRBOrder::getTableName() . '.id_currency');
 
         return $sql;
     }

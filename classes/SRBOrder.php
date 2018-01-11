@@ -19,7 +19,7 @@ class SRBOrder extends SRBObject
         $this->items = SRBItem::createItemsFromOrderId($this->ps['id_order']);
     }
 
-    static public function getMapType () {
+    static public function getObjectTypeForMapping () {
         return 'order';
     }
 
@@ -73,8 +73,8 @@ class SRBOrder extends SRBObject
     }
 
     public function sync () {
-        SRBLogger::addLog('SYNCHRONIZING ' . self::getMapType() . ' "' . $this->{self::getIdentifier()} . '"', 0, null, self::getMapType(), $this->ps[self::getIdColumnName()]);
-        return Synchronizer::sync($this, self::getMapType());
+        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', 0, null, self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
+        return Synchronizer::sync($this, self::getObjectTypeForMapping());
     }
 
     static private function extractOrderNumber ($psOrderArrayName) {
@@ -145,7 +145,7 @@ class SRBOrder extends SRBObject
 
     protected function findAllWithMappingQuery ($onlySyncItems = false) {
         $identifier = static::getIdColumnName();
-        $type = static::getMapType();
+        $type = static::getObjectTypeForMapping();
         $joinType = $onlySyncItems ? 'innerJoin' : 'leftJoin';
 
         $sql = static::findAllQuery();

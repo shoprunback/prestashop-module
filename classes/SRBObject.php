@@ -17,7 +17,7 @@ abstract class SRBObject
 
     abstract static public function getDisplayNameAttribute();
 
-    abstract static public function getMapType();
+    abstract static public function getObjectTypeForMapping();
 
     static public function syncAll ($newOnly = false) {
         $brands = $newOnly ? self::getAllNotSync() : self::getAll();
@@ -84,7 +84,7 @@ abstract class SRBObject
 
     protected function findNotSyncQuery () {
         $identifier = static::getIdColumnName();
-        $type = static::getMapType();
+        $type = static::getObjectTypeForMapping();
         $mapQuery = SRBMap::findOnlyIdItemByTypeQuery($type);
 
         return static::findAllQuery()->where(static::getTableName() . '.' . static::getIdColumnName() . ' NOT IN (' . $mapQuery . ')');
@@ -92,7 +92,7 @@ abstract class SRBObject
 
     protected function findAllWithMappingQuery ($onlySyncItems = false) {
         $identifier = static::getIdColumnName();
-        $type = static::getMapType();
+        $type = static::getObjectTypeForMapping();
         $joinType = $onlySyncItems ? 'innerJoin' : 'leftJoin';
         $mapQuery = SRBMap::findOnlyLastSentByTypeQuery($type);
 
@@ -118,7 +118,7 @@ abstract class SRBObject
         $result = Db::getInstance()->executeS(static::findOneQuery($id));
 
         if (! $result) {
-            throw new Exception('No ' . $class::getMapType() . ' found with id ' . $id);
+            throw new Exception('No ' . $class::getObjectTypeForMapping() . ' found with id ' . $id);
         }
 
         return new $class($result[0]);

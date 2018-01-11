@@ -26,7 +26,7 @@ class SRBShipback extends SRBObject
         $this->public_url = $psReturn['public_url'];
     }
 
-    static public function getMapType () {
+    static public function getObjectTypeForMapping () {
         return 'shipbacks';
     }
 
@@ -57,8 +57,8 @@ class SRBShipback extends SRBObject
 
     public function sync () {
         $this->order->sync();
-        SRBLogger::addLog('SYNCHRONIZING ' . self::getMapType() . ' "' . $this->{self::getIdentifier()} . '"', 0, null, self::getMapType(), $this->ps[self::getIdColumnName()]);
-        return Synchronizer::sync($this, self::getMapType());
+        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', 0, null, self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
+        return Synchronizer::sync($this, self::getObjectTypeForMapping());
     }
 
     public function save () {
@@ -72,7 +72,7 @@ class SRBShipback extends SRBObject
         $sql = Db::getInstance();
         $result = $sql->update(self::SHIPBACK_TABLE_NAME_NO_PREFIX, $shipbackToUpdate, 'id_srb_shipback = "' . pSQL($this->id_srb_shipback) . '"');
 
-        SRBLogger::addLog(self::getMapType() . ' "' . $this->{self::getIdentifier()} . '" updated', 0, null, self::getMapType(), $this->ps[self::getIdColumnName()]);
+        SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '" updated', 0, null, self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
 
         $this->sync();
 
@@ -143,7 +143,7 @@ class SRBShipback extends SRBObject
 
         $sql = Db::getInstance();
         $result = $sql->insert(self::SHIPBACK_TABLE_NAME_NO_PREFIX, $shipbackToInsert);
-        SRBLogger::addLog(self::getMapType() . ' "' . $item->id . '" inserted', 0, null, self::getMapType(), $item->id);
+        SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $item->id . '" inserted', 0, null, self::getObjectTypeForMapping(), $item->id);
 
         return self::getById($item->id);
     }

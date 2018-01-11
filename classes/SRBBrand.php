@@ -13,7 +13,7 @@ class SRBBrand extends SRBObject
         $this->reference = $manufacturer['name'];
     }
 
-    static public function getMapType () {
+    static public function getObjectTypeForMapping () {
         return 'brand';
     }
 
@@ -34,8 +34,8 @@ class SRBBrand extends SRBObject
     }
 
     public function sync () {
-        SRBLogger::addLog('SYNCHRONIZING ' . self::getMapType() . ' "' . $this->{self::getIdentifier()} . '"', 0, null, self::getMapType(), $this->ps[self::getIdColumnName()]);
-        return Synchronizer::sync($this, self::getMapType());
+        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', 0, null, self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
+        return Synchronizer::sync($this, self::getObjectTypeForMapping());
     }
 
     static protected function findAllQuery () {
