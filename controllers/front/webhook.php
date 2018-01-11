@@ -42,7 +42,7 @@ class ShopRunBackWebhookModuleFrontController extends ModuleFrontController
 
                     $item->state = $state ? $state : $this->state;
                     $item->mode = $mode ? $mode : $this->mode;
-                } catch (Exception $e) {
+                } catch (ShipbackException $e) {
                     SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: ' . $e, 3, null, 'order', $orderId);
                 }
 

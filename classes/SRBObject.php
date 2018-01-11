@@ -120,7 +120,8 @@ abstract class SRBObject
         $result = Db::getInstance()->executeS(static::findOneQuery($id));
 
         if (! $result) {
-            throw new Exception('No ' . $class::getObjectTypeForMapping() . ' found with id ' . $id);
+            $exceptionName = ucfirst($class::getObjectTypeForMapping()) . 'Exception';
+            throw new $exceptionName('No ' . $class::getObjectTypeForMapping() . ' found with id ' . $id, 1);
         }
 
         return new $class($result[0]);

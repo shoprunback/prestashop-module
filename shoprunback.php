@@ -10,6 +10,11 @@ define ('DASHBOARD_PROD_URL', 'https://dashboard.shoprunback.com');
 include_once 'classes/Synchronizer.php';
 include_once 'classes/SRBShipback.php';
 include_once 'classes/SRBLogger.php';
+include_once 'exceptions/ConfigurationException.php';
+include_once 'exceptions/OrderException.php';
+include_once 'exceptions/ProductException.php';
+include_once 'exceptions/ShipbackException.php';
+include_once 'exceptions/SynchronizerException.php';
 include_once 'sqlQueries.php';
 
 class ShopRunBack extends Module
@@ -166,44 +171,52 @@ class ShopRunBack extends Module
     }
 
     public function hookActionProductDelete ($params) {
-        $productParam = $params['product'];
+        if (Configuration::get('srbtoken')) {
+            $productParam = $params['product'];
 
-        $productArray = ['id_product' => $params['id_product']];
-        foreach ($productParam as $key => $value) {
-            $productArray[$key] = $value;
-        }
+            $productArray = ['id_product' => $params['id_product']];
+            foreach ($productParam as $key => $value) {
+                $productArray[$key] = $value;
+            }
 
-        $product = new SRBProduct($productArray);
+            $product = new SRBProduct($productArray);
 
-        if ($product) {
-            $product->deleteWithCheck();
+            if ($product) {
+                $product->deleteWithCheck();
+            }
         }
     }
 
     public function hookNewOrder ($params) {
-        try {
-            $order = SRBOrder::getById($params['order']->id);
-            $order->sync();
-        } catch (Exception $e) {
-            return $e;
+        if (Configuration::get('srbtoken')) {
+            try {
+                $order = SRBOrder::getById($params['order']->id);
+                $order->sync();
+            } catch (OrderException $e) {
+                return $e;
+            }
         }
     }
 
     public function hookActionProductUpdate ($params) {
-        try {
-            $product = SRBProduct::getById($params['product']->id);
-            $product->sync();
-        } catch (Exception $e) {
-            return $e;
+        if (Configuration::get('srbtoken')) {
+            try {
+                $product = SRBProduct::getById($params['product']->id);
+                $product->sync();
+            } catch (ProductException $e) {
+                return $e;
+            }
         }
     }
 
     public function hookActionOrderStatusPostUpdate ($params) {
-        try {
-            $order = SRBOrder::getById($params['id_order']);
-            $order->sync();
-        } catch (Exception $e) {
-            return $e;
+        if (Configuration::get('srbtoken')) {
+            try {
+                $order = SRBOrder::getById($params['id_order']);
+                $order->sync();
+            } catch (OrderException $e) {
+                return $e;
+            }
         }
     }
 
@@ -227,7 +240,7 @@ class ShopRunBack extends Module
 
                 $display = $this->display(__FILE__, 'orderDetail.tpl');
                 return $display;
-            } catch (Exception $e) {
+            } catch (OrderException $e) {
                 return $e;
             }
         }

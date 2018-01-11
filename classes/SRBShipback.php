@@ -119,13 +119,13 @@ class SRBShipback extends SRBObject
                     self::createReturnFromSyncResult($shipbackGet, $orderId);
                     try {
                         $shipbackById = self::getById($id);
-                    } catch (Exception $e) {
+                    } catch (ShipbackException $e) {
                         SRBLogger::addLog($e, 3, null, 'order', $orderId);
                     }
                 }
 
                 $result = $shipbackById;
-            } catch (Exception $e) {
+            } catch (ShipbackException $e) {
                 SRBLogger::addLog($e, 3, null, 'order', $orderId);
             }
         } else {
