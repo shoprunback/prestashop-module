@@ -68,32 +68,39 @@ abstract class Synchronizer
         $identifier = $item::getIdentifier();
         $reference = $item->{$identifier};
 
+        // Checks if we already have synchronized this item. If yes, we use the SRB ID, else we use the PS reference
         if ($item->getDBId() && ! ($item->{$identifier} == 0 && $itemType == 'shipback')) {
             $mapId = self::referenceMapping($item->getDBId(), $itemType);
             $reference = $mapId ? $mapId : $item->{$identifier};
         }
 
+        // If we have a reference to use, we check if we have the item in the SRB DB (we check if we have a reference for the shipback case)
         $getResult = '';
         if ($reference) {
             $getResult = self::APIcall($path . '/' . $reference, 'GET');
         }
 
+        // If we have a get result, we do a PUT, else we do a POST
         $postResult = '';
         if ($getResult == '') {
             $postResult = self::APIcall($path, 'POST', $item);
         } else {
+            // Orders cannot be modified
             if ($path != 'orders') {
                 $postResult = self::APIcall($path . '/' . $reference, 'PUT', $item);
             } else {
+                // We still save the last sync call for orders (in case the user has installed the module, sync.ed some orders, uninstalled and reinstalled the module)
                 $item->id_item_srb = json_decode($getResult)->id;
                 self::mapApiCall($item, $itemType);
             }
         }
 
+        // We check if we did a POST or a PUT (because of order case)
         if ($postResult) {
             $postResultDecoded = json_decode($postResult);
             $class = get_class($item);
 
+            // If the POST resulted in an error or not
             if (isset($postResultDecoded->{$itemType}->errors)) {
                 SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be synchronized! ' . $postResultDecoded->{$itemType}->errors[0], 1, null, $itemType, $item->ps[$class::getIdColumnName()]);
             } else {
@@ -116,7 +123,7 @@ abstract class Synchronizer
         $deleteResultDecoded = json_decode($deleteResult);
         if (isset($deleteResultDecoded->errors)) {
             SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be deleted! ' . $deleteResultDecoded->errors[0], 3, null, $itemType, $item->ps[$class::getIdColumnName()]);
-            return false;
+            throw new Exception(ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be deleted!' . $deleteResultDecoded->errors[0]);
         }
 
         SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" has been deleted. ' . $deleteResult, 0, null, $itemType, $item->ps[$class::getIdColumnName()]);
