@@ -11,19 +11,19 @@
     {else}
         <div class="no-item text-center">
             <h2>
-                {if $itemType == "returns"}
+                {if $itemType == "return"}
                     {l s='return.no_return' mod='shoprunback'}
                 {/if}
 
-                {if $itemType == "brands"}
+                {if $itemType == "brand"}
                     {l s='brand.no_brand' mod='shoprunback'}
                 {/if}
 
-                {if $itemType == "products"}
+                {if $itemType == "product"}
                     {l s='product.no_product' mod='shoprunback'}
                 {/if}
 
-                {if $itemType == "orders"}
+                {if $itemType == "order"}
                     {l s='order.no_order' mod='shoprunback'}
                 {/if}
             </h2>
