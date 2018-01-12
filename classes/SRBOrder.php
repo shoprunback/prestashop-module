@@ -17,7 +17,7 @@ class SRBOrder extends SRBObject
         $this->order_number = $this->extractOrderNumberFromPSArray($psOrder);
         $this->ordered_at = $psOrder['date_add'];
         $this->customer = SRBCustomer::createFromOrder($psOrder);
-        $this->items = SRBItem::createItemsFromOrderId($this->ps['id_order']);
+        $this->items = SRBItem::createItemsFromOrderId($this->getDBId());
     }
 
     static public function getObjectTypeForMapping ()
@@ -62,7 +62,7 @@ class SRBOrder extends SRBObject
 
     public function sync ()
     {
-        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
+        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', self::getObjectTypeForMapping(), $this->getDBId());
         return Synchronizer::sync($this, self::getObjectTypeForMapping(), self::getPathForAPICall());
     }
 

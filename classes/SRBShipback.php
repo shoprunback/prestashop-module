@@ -70,7 +70,7 @@ class SRBShipback extends SRBObject
     public function sync ()
     {
         $this->order->sync();
-        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
+        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', self::getObjectTypeForMapping(), $this->getDBId());
         return Synchronizer::sync($this, self::getObjectTypeForMapping(), self::getPathForAPICall());
     }
 
@@ -86,7 +86,7 @@ class SRBShipback extends SRBObject
         $sql = Db::getInstance();
         $result = $sql->update(self::SHIPBACK_TABLE_NAME_NO_PREFIX, $shipbackToUpdate, 'id_srb_shipback = "' . pSQL($this->id_srb_shipback) . '"');
 
-        SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '" updated', self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
+        SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '" updated', self::getObjectTypeForMapping(), $this->getDBId());
 
         $this->sync();
 

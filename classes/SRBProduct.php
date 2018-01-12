@@ -95,7 +95,8 @@ class SRBProduct extends SRBObject
 
     public function getCoverPicture ()
     {
-        $productCover = Product::getCover($this->ps['id_product']);
+        $productCover = Product::getCover($this->getDBId());
+        SRBLogger::addLog('Cover picture', self::getObjectTypeForMapping(), $this->getDBId());
         $image = new Image($productCover['id_image']);
         $imagePath = $_SERVER['DOCUMENT_ROOT'] . _THEME_PROD_DIR_ . $image->getExistingImgPath() . '.jpg';
 
@@ -126,7 +127,7 @@ class SRBProduct extends SRBObject
 
         $this->addCoverPictureToSync();
 
-        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
+        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', self::getObjectTypeForMapping(), $this->getDBId());
         return Synchronizer::sync($this, self::getObjectTypeForMapping(), self::getPathForAPICall());
     }
 
@@ -134,15 +135,15 @@ class SRBProduct extends SRBObject
     {
         if ($this->canBeDeleted()) {
             if ($this->syncDelete()) {
-                SRBLogger::addLog('Product "' . $this->{self::getIdentifier()} . '" deleted', self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
+                SRBLogger::addLog('Product "' . $this->{self::getIdentifier()} . '" deleted', self::getObjectTypeForMapping(), $this->getDBId());
                 return true;
             } else {
-                SRBLogger::addLog('An error occured, product "' . $this->{self::getIdentifier()} . '" couldn\'t be deleted', self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
+                SRBLogger::addLog('An error occured, product "' . $this->{self::getIdentifier()} . '" couldn\'t be deleted', self::getObjectTypeForMapping(), $this->getDBId());
                 return false;
             }
         }
 
-        SRBLogger::addLog('Product "' . $this->{self::getIdentifier()} . '" couldn\'t be deleted because it has already been ordered', self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
+        SRBLogger::addLog('Product "' . $this->{self::getIdentifier()} . '" couldn\'t be deleted because it has already been ordered', self::getObjectTypeForMapping(), $this->getDBId());
         return false;
     }
 
@@ -155,14 +156,14 @@ class SRBProduct extends SRBObject
         $sql->innerJoin('cart_product', 'cp', self::getTableName() . '.id_product = cp.id_product');
         $sql->innerJoin('cart', 'ca', 'cp.id_cart = ca.id_cart');
         $sql->innerJoin('orders', 'o', 'ca.id_cart = o.id_cart');
-        $sql->where(self::getTableName() . '.' . self::getIdColumnName() . ' = ' . $this->ps[self::getIdColumnName()]);
+        $sql->where(self::getTableName() . '.' . self::getIdColumnName() . ' = ' . $this->getDBId());
 
         return (Db::getInstance()->getValue($sql) == 0);
     }
 
     public function syncDelete ()
     {
-        SRBLogger::addLog('DELETING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', self::getObjectTypeForMapping(), $this->ps[self::getIdColumnName()]);
+        SRBLogger::addLog('DELETING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', self::getObjectTypeForMapping(), $this->getDBId());
         return Synchronizer::delete($this, self::getObjectTypeForMapping(), self::getPathForAPICall());
     }
 

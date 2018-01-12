@@ -64,7 +64,7 @@ abstract class Synchronizer
         $identifier = $item::getIdentifier();
         $reference = $item->{$identifier};
 
-        // Checks if we already have synchronized this item. If yes, we use the SRB ID, else we use the PS reference
+        // Checks if we already have synchronized this item. If yes, we use the SRB ID, else we use the PS reference (on creation, a shipback doesn't have a DBId yet)
         if ($item->getDBId() && ! ($item->{$identifier} == 0 && $itemType == 'shipback')) {
             $mapId = SRBMap::getMappingIdIfExists($item->getDBId(), $itemType);
             $reference = $mapId ? $mapId : $item->{$identifier};
@@ -103,13 +103,13 @@ abstract class Synchronizer
 
                 // If the POST resulted in an error or not
                 if (isset($postResultDecoded->{$itemType}->errors)) {
-                    SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be synchronized! ' . $postResultDecoded->{$itemType}->errors[0], $itemType, $item->ps[$class::getIdColumnName()]);
+                    SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be synchronized! ' . $postResultDecoded->{$itemType}->errors[0], $itemType, $item->getDBId());
                 } elseif (isset($postResultDecoded->id)) {
-                    SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" synchronized', $itemType, $item->ps[$class::getIdColumnName()]);
+                    SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" synchronized', $itemType, $item->getDBId());
                     $item->id_item_srb = $postResultDecoded->id;
                     self::mapApiCall($item, $itemType);
                 } else {
-                    SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be synchronized because of an unknown error!', $itemType, $item->ps[$class::getIdColumnName()]);
+                    SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be synchronized because of an unknown error!', $itemType, $item->getDBId());
                 }
             } catch (SynchronizerException $e) {
                 SRBLogger::addLog($e, 3, null, $itemType, $item->ps[$class::getIdColumnName()]);
@@ -142,7 +142,7 @@ abstract class Synchronizer
     static private function mapApiCall ($item, $itemType)
     {
         $identifier = $item::getIdColumnName();
-        $itemId = isset($item->$identifier) ? $item->$identifier : $item->ps[$identifier];
+        $itemId = isset($item->$identifier) ? $item->$identifier : $item->getDBId();
 
         $srbSql = Db::getInstance();
 
