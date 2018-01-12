@@ -25,39 +25,49 @@ class ShopRunBackWebhookModuleFrontController extends ModuleFrontController
 
         if (! $type || ! $id) {
             SRBLogger::addLog('WEBHOOK FAILED: What is missing? [type: ' . $type . ' ; id: ' . $id . ']');
-            return header('HTTP/1.1 200 OK');
+            return self::returnHeaderHTTP(200);
         }
 
-        $item;
-        switch ($type) {
-            case 'shipback':
-                SRBLogger::addLog('WEBHOOK IS SHIPBACK', $type, $id);
-                try {
-                    $item = SRBShipback::getById($id);
-                    $state = isset($webhook->data->state) ? $webhook->data->state : '';
-                    $mode = isset($webhook->data->mode) ? $webhook->data->mode : '';
+        if ($type == 'shipback') {
+            SRBLogger::addLog('WEBHOOK IS SHIPBACK', $type, $id);
+            try {
+                $item = SRBShipback::getById($id);
+                $state = isset($webhook->data->state) ? $webhook->data->state : '';
+                $mode = isset($webhook->data->mode) ? $webhook->data->mode : '';
 
-                    if (! $state && ! $mode) {
-                        SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: What is missing? [state: ' . $state . '; mode: ' . $mode . ']', $type, $id);
-                        return header('HTTP/1.1 200 OK');
-                    }
-
-                    $item->state = $state ? $state : $this->state;
-                    $item->mode = $mode ? $mode : $this->mode;
-                } catch (ShipbackException $e) {
-                    SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: ' . $e, $type, $id);
+                if (! $state && ! $mode) {
+                    SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: What is missing? [state: ' . $state . '; mode: ' . $mode . ']', $type, $id);
+                    return self::returnHeaderHTTP(200);
                 }
 
-                break;
-            default:
-                SRBLogger::addLog('WEBHOOK TYPE UNKNOWN: ' . $type, $type, $id);
-                return header('HTTP/1.1 200 OK');
-                break;
+                $item->state = $state ? $state : $this->state;
+                $item->mode = $mode ? $mode : $this->mode;
+                $item->save();
+            } catch (ShipbackException $e) {
+                SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: ' . $e, $type, $id);
+            }
+        } else {
+            SRBLogger::addLog('WEBHOOK TYPE UNKNOWN: ' . $type, $type, $id);
+            return self::returnHeaderHTTP(200);
         }
 
-        $item->save();
-
         SRBLogger::addLog('WEBHOOK WORKED', $type, $id);
-        return header('HTTP/1.1 200 OK');
+        return self::returnHeaderHTTP(200);
+    }
+
+    static private function returnHeaderHTTP ($httpCode)
+    {
+        switch ($httpCode) {
+            case 403:
+                return header('HTTP/1.0 403 Forbidden');
+                break;
+            case 404:
+                return header('HTTP/1.0 404 Not Found');
+                break;
+            case 200:
+            default:
+                return header('HTTP/1.0 200 OK');
+                break;
+        }
     }
 }
