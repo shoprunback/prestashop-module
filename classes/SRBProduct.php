@@ -127,7 +127,7 @@ class SRBProduct extends SRBObject
         $this->addCoverPictureToSync();
 
         SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', self::getObjectTypeForMapping(), $this->getDBId());
-        return Synchronizer::sync($this, self::getObjectTypeForMapping(), self::getPathForAPICall());
+        return Synchronizer::sync($this);
     }
 
     public function deleteWithCheck ()

@@ -64,6 +64,23 @@ abstract class SRBObject
         return $this->ps[static::getIdColumnName()];
     }
 
+    // Checks if we already have synchronized this object. If yes, we use the SRB ID, else we use the PS reference
+    public function getItemReference ()
+    {
+        $itemType = static::getObjectTypeForMapping();
+        $identifier = static::getIdentifier();
+        SRBLogger::addLog($itemType);
+
+        // On creation, a shipback doesn't have a DBId yet (it's the only case where we create on SRB DB before on PS DB)
+        if (! $this->getDBId() || ($this->{$identifier} == 0 && $itemType == 'shipback')) {
+            return $this->{$identifier};
+        }
+
+        $mapId = SRBMap::getMappingIdIfExists($this->getDBId(), $itemType);
+
+        return $mapId ? $mapId : $this->{$identifier};
+    }
+
     public function getName ()
     {
         $name = static::getDisplayNameAttribute();

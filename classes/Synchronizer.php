@@ -55,22 +55,18 @@ abstract class Synchronizer
         return $response;
     }
 
-    static public function sync ($item, $itemType, $path)
+    static public function sync ($item)
     {
         if (! Configuration::get('srbtoken')) {
             throw new ConfigurationException('No API token');
         }
 
         $identifier = $item::getIdentifier();
-        $reference = $item->{$identifier};
+        $itemType = $item::getObjectTypeForMapping();
+        $path = $item::getPathForAPICall();
+        $reference = $item->getItemReference();
 
-        // Checks if we already have synchronized this item. If yes, we use the SRB ID, else we use the PS reference (on creation, a shipback doesn't have a DBId yet)
-        if ($item->getDBId() && ! ($item->{$identifier} == 0 && $itemType == 'shipback')) {
-            $mapId = SRBMap::getMappingIdIfExists($item->getDBId(), $itemType);
-            $reference = $mapId ? $mapId : $item->{$identifier};
-        }
-
-        // If we have a reference to use, we check if we have the item in the SRB DB (we check if we have a reference for the shipback case)
+        // If we have a reference to use, we check if we have the item in the SRB DB (we check if we have a reference because of the shipback case)
         $getResult = '';
         if ($reference) {
             $getResult = self::APIcall($path . '/' . $reference, 'GET');
@@ -119,11 +115,12 @@ abstract class Synchronizer
         return $postResult;
     }
 
-    static public function delete ($item, $itemType, $path)
+    static public function delete ($item)
     {
         $identifier = $item::getIdentifier();
-        $mapId = SRBMap::getMappingIdIfExists($item->getDBId(), $itemType);
-        $reference = $mapId ? $mapId : $item->{$identifier};
+        $reference = $item->getItemReference();
+        $itemType = $item::getObjectTypeForMapping();
+        $path = $item::getPathForAPICall();
 
         $deleteResult = self::APIcall($path . '/' . $reference, 'DELETE');
 
@@ -139,8 +136,9 @@ abstract class Synchronizer
         return $deleteResult;
     }
 
-    static private function mapApiCall ($item, $itemType)
+    static private function mapApiCall ($item)
     {
+        $itemType = $item::getObjectTypeForMapping();
         $identifier = $item::getIdColumnName();
         $itemId = isset($item->$identifier) ? $item->$identifier : $item->getDBId();
 

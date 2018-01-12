@@ -63,7 +63,7 @@ class SRBOrder extends SRBObject
     public function sync ()
     {
         SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', self::getObjectTypeForMapping(), $this->getDBId());
-        return Synchronizer::sync($this, self::getObjectTypeForMapping(), self::getPathForAPICall());
+        return Synchronizer::sync($this);
     }
 
     static private function extractOrderNumberFromPSArray ($psOrderArrayName)
