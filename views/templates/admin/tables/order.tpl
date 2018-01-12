@@ -26,7 +26,7 @@
                         <th>{l s="order.orders" mod='shoprunback'}</th>
                         <th>{l s="order.customer" mod='shoprunback'}</th>
                         <th>{l s="order.command_date" mod='shoprunback'}</th>
-                        <th>{l s="order.returned" mod='shoprunback'}</th>
+                        <th>{l s="order.return_status" mod='shoprunback'}</th>
                         <th>{l s="item.last_sync" mod='shoprunback'}</th>
                         <th>{l s="item.sync" mod='shoprunback'}</th>
                         <th></th>

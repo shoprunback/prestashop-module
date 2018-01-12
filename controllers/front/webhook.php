@@ -23,20 +23,36 @@ class ShopRunBackWebhookModuleFrontController extends ModuleFrontController
         $type = isset($webhook->event) ? explode('.', $webhook->event)[0] : '';
         $id = isset($webhook->data->id) ? $webhook->data->id : '';
 
-        if (! $type || ! $id) {
-            SRBLogger::addLog('WEBHOOK FAILED: What is missing? [type: ' . $type . ' ; id: ' . $id . ']');
+        if (! $type && ! $id) {
+            SRBLogger::addLog('WEBHOOK FAILED: NO TYPE AND NO ID!', SRBLogger::FATAL);
+            return self::returnHeaderHTTP(200);
+        }
+        if (! $type) {
+            SRBLogger::addLog('WEBHOOK FAILED: TYPE IS MISSING! id: ' . $id, SRBLogger::FATAL);
+            return self::returnHeaderHTTP(200);
+        }
+        if (! $id) {
+            SRBLogger::addLog('WEBHOOK FAILED: ID IS MISSING! type: ' . $type, SRBLogger::FATAL);
             return self::returnHeaderHTTP(200);
         }
 
         if ($type == 'shipback') {
-            SRBLogger::addLog('WEBHOOK IS SHIPBACK', $type, $id);
+            SRBLogger::addLog('WEBHOOK IS SHIPBACK', SRBLogger::INFO, $type, $id);
             try {
                 $item = SRBShipback::getById($id);
                 $state = isset($webhook->data->state) ? $webhook->data->state : '';
                 $mode = isset($webhook->data->mode) ? $webhook->data->mode : '';
 
-                if (! $state && ! $mode) {
-                    SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: What is missing? [state: ' . $state . '; mode: ' . $mode . ']', $type, $id);
+                if (! $mode && ! $state) {
+                    SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: NO MODE AND NO STATE!', SRBLogger::FATAL, $type, $id);
+                    return self::returnHeaderHTTP(200);
+                }
+                if (! $mode) {
+                    SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: MODE IS MISSING! state: ' . $state, SRBLogger::FATAL, $type, $id);
+                    return self::returnHeaderHTTP(200);
+                }
+                if (! $state) {
+                    SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: STATE IS MISSING! mode: ' . $mode, SRBLogger::FATAL, $type, $id);
                     return self::returnHeaderHTTP(200);
                 }
 
@@ -44,14 +60,14 @@ class ShopRunBackWebhookModuleFrontController extends ModuleFrontController
                 $item->mode = $mode ? $mode : $this->mode;
                 $item->save();
             } catch (ShipbackException $e) {
-                SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: ' . $e, $type, $id);
+                SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: ' . $e, SRBLogger::FATAL, $type, $id);
             }
         } else {
-            SRBLogger::addLog('WEBHOOK TYPE UNKNOWN: ' . $type, $type, $id);
+            SRBLogger::addLog('WEBHOOK TYPE UNKNOWN: ' . $type, SRBLogger::ERROR, $type, $id);
             return self::returnHeaderHTTP(200);
         }
 
-        SRBLogger::addLog('WEBHOOK WORKED', $type, $id);
+        SRBLogger::addLog('WEBHOOK WORKED', SRBLogger::INFO, $type, $id);
         return self::returnHeaderHTTP(200);
     }
 

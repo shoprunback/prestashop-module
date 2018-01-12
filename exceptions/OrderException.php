@@ -11,7 +11,7 @@ class OrderException extends SRBException
 
     public function __toString()
     {
-        SRBLogger::addLog($this->message, 'order');
+        SRBLogger::addLog($this->message, SRBLogger::FATAL, 'order');
 
         return $this->prefix . ' ' . __CLASS__ . ': [' . $this->errorCode . ']: ' . $this->message . '\n';
     }

@@ -53,10 +53,10 @@ class SRBMap
         $sql = Db::getInstance();
         if (isset($this->id_srb_map) && $this->id_srb_map != 0) {
             $result = $sql->update(SRBMap::MAPPER_TABLE_NAME_NO_PREFIX, $mapArray, 'id_item_srb = "' . pSQL($this->id_item_srb) . '"');
-            SRBLogger::addLog('Map of ' . ucfirst($this->type) . ' ' . $this->id_item . ' updated', $this->type, $this->id_item);
+            SRBLogger::addLog('Map of ' . ucfirst($this->type) . ' ' . $this->id_item . ' updated', SRBLogger::INFO, $this->type, $this->id_item);
         } else {
             $result = $sql->insert(SRBMap::MAPPER_TABLE_NAME_NO_PREFIX, $mapArray);
-            SRBLogger::addLog(ucfirst($this->type) . ' ' . $this->id_item . ' mapped', $this->type, $this->id_item);
+            SRBLogger::addLog(ucfirst($this->type) . ' ' . $this->id_item . ' mapped', SRBLogger::INFO, $this->type, $this->id_item);
         }
 
         return $result;

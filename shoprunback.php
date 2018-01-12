@@ -108,7 +108,7 @@ class ShopRunBack extends Module
 
         Configuration::updateValue('production', false);
 
-        SRBLogger::addLog('Module installed');
+        SRBLogger::addLog('Module installed', SRBLogger::INFO);
         return true;
     }
 
@@ -136,7 +136,7 @@ class ShopRunBack extends Module
 
         Configuration::updateValue('srbtoken', '');
 
-        SRBLogger::addLog('Module uninstalled');
+        SRBLogger::addLog('Module uninstalled', SRBLogger::INFO);
         return true;
     }
 

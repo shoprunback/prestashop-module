@@ -11,7 +11,7 @@ class SynchronizerException extends SRBException
 
     public function __toString()
     {
-        SRBLogger::addLog($this->message, 'synchronizer');
+        SRBLogger::addLog($this->message, SRBLogger::FATAL, 'synchronizer');
 
         return $this->prefix . ' ' . __CLASS__ . ': [' . $this->errorCode . ']: ' . $this->message . '\n';
     }

@@ -11,7 +11,7 @@ class ConfigurationException extends SRBException
 
     public function __toString()
     {
-        SRBLogger::addLog($this->message, 'configuration');
+        SRBLogger::addLog($this->message, SRBLogger::FATAL, 'configuration');
 
         return $this->prefix . ' ' . __CLASS__ . ': [' . $this->errorCode . ']: ' . $this->message . '\n';
     }

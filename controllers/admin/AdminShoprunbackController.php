@@ -40,17 +40,17 @@ class AdminShoprunbackController extends ModuleAdminController
         $user = json_decode(Synchronizer::APIcall('me', 'GET'));
 
         if (! $user) {
-            SRBLogger::addLog('Invalid API token: ' . $srbtoken, 'apitoken');
+            SRBLogger::addLog('Invalid API token: ' . $srbtoken, SRBLogger::WARNING, 'configuration');
             Configuration::updateValue('srbtoken', $oldsrbToken);
             return 'error.no_token';
         }
 
-        SRBLogger::addLog('API token saved: ' . substr($srbtoken, 0, 3) . '...' . substr($srbtoken, -3), 'apitoken');
+        SRBLogger::addLog('API token saved: ' . substr($srbtoken, 0, 3) . '...' . substr($srbtoken, -3), SRBLogger::INFO, 'configuration');
 
         Synchronizer::APIcall('company', 'PUT', ['webhook_url' => $this->module->webhookUrl]);
 
         Configuration::updateValue('production', Tools::getValue('production'));
-        SRBLogger::addLog('Sandbox mode: ' . Tools::getValue('production'), 'production');
+        SRBLogger::addLog('Sandbox mode: ' . Tools::getValue('production'), SRBLogger::INFO, 'configuration');
 
         return 'success.token';
     }

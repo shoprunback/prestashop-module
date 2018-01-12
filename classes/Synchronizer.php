@@ -99,13 +99,13 @@ abstract class Synchronizer
 
                 // If the POST resulted in an error or not
                 if (isset($postResultDecoded->{$itemType}->errors)) {
-                    SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be synchronized! ' . $postResultDecoded->{$itemType}->errors[0], $itemType, $item->getDBId());
+                    SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be synchronized! ' . $postResultDecoded->{$itemType}->errors[0], SRBLogger::FATAL, $itemType, $item->getDBId());
                 } elseif (isset($postResultDecoded->id)) {
-                    SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" synchronized', $itemType, $item->getDBId());
+                    SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" synchronized', SRBLogger::INFO, $itemType, $item->getDBId());
                     $item->id_item_srb = $postResultDecoded->id;
                     self::mapApiCall($item, $itemType);
                 } else {
-                    SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be synchronized because of an unknown error!', $itemType, $item->getDBId());
+                    SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be synchronized because of an unknown error!', SRBLogger::UNKNOWN, $itemType, $item->getDBId());
                 }
             } catch (SynchronizerException $e) {
                 SRBLogger::addLog($e, 3, null, $itemType, $item->ps[$class::getIdColumnName()]);
@@ -127,11 +127,11 @@ abstract class Synchronizer
         $class = get_class($item);
         $deleteResultDecoded = json_decode($deleteResult);
         if (isset($deleteResultDecoded->errors)) {
-            SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be deleted! ' . $deleteResultDecoded->errors[0], $itemType, $item->ps[$class::getIdColumnName()]);
+            SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be deleted! ' . $deleteResultDecoded->errors[0], SRBLogger::FATAL, $itemType, $item->ps[$class::getIdColumnName()]);
             throw new SynchronizerException(ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be deleted!' . $deleteResultDecoded->errors[0]);
         }
 
-        SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" has been deleted. ' . $deleteResult, $itemType, $item->ps[$class::getIdColumnName()]);
+        SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" has been deleted. ' . $deleteResult, SRBLogger::INFO, $itemType, $item->ps[$class::getIdColumnName()]);
 
         return $deleteResult;
     }
@@ -144,7 +144,7 @@ abstract class Synchronizer
 
         $srbSql = Db::getInstance();
 
-        SRBLogger::addLog($itemType . ': ' . $itemId . ' was the id', $itemType);
+        SRBLogger::addLog('Saving map for ' . $itemType . ' with ID ' . $itemId, SRBLogger::INFO, $itemType);
         $data = [
             'id_item' => $itemId,
             'id_item_srb' => $item->id_item_srb,

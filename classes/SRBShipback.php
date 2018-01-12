@@ -70,7 +70,7 @@ class SRBShipback extends SRBObject
     public function sync ()
     {
         $this->order->sync();
-        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', self::getObjectTypeForMapping(), $this->getDBId());
+        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
         return Synchronizer::sync($this);
     }
 
@@ -86,7 +86,7 @@ class SRBShipback extends SRBObject
         $sql = Db::getInstance();
         $result = $sql->update(self::SHIPBACK_TABLE_NAME_NO_PREFIX, $shipbackToUpdate, 'id_srb_shipback = "' . pSQL($this->id_srb_shipback) . '"');
 
-        SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '" updated', self::getObjectTypeForMapping(), $this->getDBId());
+        SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '" updated', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
 
         $this->sync();
 
@@ -137,7 +137,7 @@ class SRBShipback extends SRBObject
 
                 $result = $shipbackById;
             } catch (ShipbackException $e) {
-                SRBLogger::addLog($e, 'order', $orderId);
+                SRBLogger::addLog($e, SRBLogger::ERROR, 'order', $orderId);
             }
         } else {
             $result = self::createReturnFromSyncResult($result, $orderId);
@@ -159,7 +159,7 @@ class SRBShipback extends SRBObject
 
         $sql = Db::getInstance();
         $result = $sql->insert(self::SHIPBACK_TABLE_NAME_NO_PREFIX, $shipbackToInsert);
-        SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $item->id . '" inserted', self::getObjectTypeForMapping(), $item->id);
+        SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $item->id . '" inserted', SRBLogger::INFO, self::getObjectTypeForMapping(), $item->id);
 
         return self::getById($item->id);
     }

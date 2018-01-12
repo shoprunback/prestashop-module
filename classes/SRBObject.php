@@ -69,7 +69,6 @@ abstract class SRBObject
     {
         $itemType = static::getObjectTypeForMapping();
         $identifier = static::getIdentifier();
-        SRBLogger::addLog($itemType);
 
         // On creation, a shipback doesn't have a DBId yet (it's the only case where we create on SRB DB before on PS DB)
         if (! $this->getDBId() || ($this->{$identifier} == 0 && $itemType == 'shipback')) {

@@ -46,7 +46,7 @@ class SRBBrand extends SRBObject
 
     public function sync ()
     {
-        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', self::getObjectTypeForMapping(), $this->getDBId());
+        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
         return Synchronizer::sync($this);
     }
 

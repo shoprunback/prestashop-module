@@ -126,7 +126,7 @@ class SRBProduct extends SRBObject
 
         $this->addCoverPictureToSync();
 
-        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', self::getObjectTypeForMapping(), $this->getDBId());
+        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
         return Synchronizer::sync($this);
     }
 
@@ -134,15 +134,15 @@ class SRBProduct extends SRBObject
     {
         if ($this->canBeDeleted()) {
             if ($this->syncDelete()) {
-                SRBLogger::addLog('Product "' . $this->{self::getIdentifier()} . '" deleted', self::getObjectTypeForMapping(), $this->getDBId());
+                SRBLogger::addLog('Product "' . $this->{self::getIdentifier()} . '" deleted', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
                 return true;
             } else {
-                SRBLogger::addLog('An error occured, product "' . $this->{self::getIdentifier()} . '" couldn\'t be deleted', self::getObjectTypeForMapping(), $this->getDBId());
+                SRBLogger::addLog('An error occured, product "' . $this->{self::getIdentifier()} . '" couldn\'t be deleted', SRBLogger::FATAL, self::getObjectTypeForMapping(), $this->getDBId());
                 return false;
             }
         }
 
-        SRBLogger::addLog('Product "' . $this->{self::getIdentifier()} . '" couldn\'t be deleted because it has already been ordered', self::getObjectTypeForMapping(), $this->getDBId());
+        SRBLogger::addLog('Product "' . $this->{self::getIdentifier()} . '" couldn\'t be deleted because it has already been ordered', SRBLogger::WARNING, self::getObjectTypeForMapping(), $this->getDBId());
         return false;
     }
 
@@ -162,7 +162,7 @@ class SRBProduct extends SRBObject
 
     public function syncDelete ()
     {
-        SRBLogger::addLog('DELETING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', self::getObjectTypeForMapping(), $this->getDBId());
+        SRBLogger::addLog('DELETING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
         return Synchronizer::delete($this, self::getObjectTypeForMapping(), self::getPathForAPICall());
     }
 
