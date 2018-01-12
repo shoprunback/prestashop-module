@@ -84,7 +84,7 @@ class SRBShipback extends SRBObject
         ];
 
         $sql = Db::getInstance();
-        $result = $sql->update(self::SHIPBACK_TABLE_NAME_NO_PREFIX, $shipbackToUpdate, 'id_srb_shipback = "' . pSQL($this->id_srb_shipback) . '"');
+        $result = $sql->update(self::SHIPBACK_TABLE_NAME_NO_PREFIX, $shipbackToUpdate, SRBShipback::getIdColumnName() . ' = "' . pSQL($this->id_srb_shipback) . '"');
 
         SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '" updated', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
 
@@ -230,9 +230,9 @@ class SRBShipback extends SRBObject
     static protected function findAllQuery ()
     {
         $sql = new DbQuery();
-        $sql->select(self::getTableName() . '.*, o.*');
+        $sql->select(self::getTableName() . '.*, ' . SRBOrder::getTableName() . '.*');
         $sql->from(self::SHIPBACK_TABLE_NAME_NO_PREFIX, self::getTableName());
-        $sql->innerJoin('orders', 'o', self::getTableName() . '.id_order = o.id_order');
+        $sql->innerJoin('orders', SRBOrder::getTableName(), self::getTableName() . '.id_order = ' . SRBOrder::getTableName() . '.' . SRBOrder::getIdColumnName());
         $sql->groupBy(self::getTableName() . '.' . self::getIdColumnName());
 
         return $sql;

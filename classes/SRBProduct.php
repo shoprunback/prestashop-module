@@ -150,11 +150,11 @@ class SRBProduct extends SRBObject
     public function canBeDeleted ()
     {
         $sql = new DbQuery();
-        $sql->select('COUNT(o.id_order)');
+        $sql->select('COUNT(' . SRBOrder::getTableName() . '.id_order)');
         $sql->from('product', self::getTableName());
-        $sql->innerJoin('cart_product', 'cp', self::getTableName() . '.id_product = cp.id_product');
+        $sql->innerJoin('cart_product', 'cp', self::getTableName() . '.' . self::getIdColumnName() . ' = cp.id_product');
         $sql->innerJoin('cart', 'ca', 'cp.id_cart = ca.id_cart');
-        $sql->innerJoin('orders', 'o', 'ca.id_cart = o.id_cart');
+        $sql->innerJoin('orders', SRBOrder::getTableName(), 'ca.id_cart = ' . SRBOrder::getTableName() . '.id_cart');
         $sql->where(self::getTableName() . '.' . self::getIdColumnName() . ' = ' . $this->getDBId());
 
         return (Db::getInstance()->getValue($sql) == 0);
@@ -174,10 +174,10 @@ class SRBProduct extends SRBObject
         $sql->innerJoin('product_lang', 'pl', self::getTableName() . '.id_product = pl.id_product');
         $sql->innerJoin('cart_product', 'cp', self::getTableName() . '.id_product = cp.id_product');
         $sql->innerJoin('cart', 'ca', 'cp.id_cart = ca.id_cart');
-        $sql->innerJoin('orders', 'o', 'ca.id_cart = o.id_cart');
-        $sql->innerJoin('currency', 'cu', 'cu.id_currency = o.id_currency');
+        $sql->innerJoin('orders', SRBOrder::getTableName(), 'ca.id_cart = ' . SRBOrder::getTableName() . '.id_cart');
+        $sql->innerJoin('currency', 'cu', 'cu.id_currency = ' . SRBOrder::getTableName() . '.id_currency');
         $sql->where('pl.id_lang = ' . Configuration::get('PS_LANG_DEFAULT'));
-        $sql->where('o.id_order = ' . pSQL($orderId));
+        $sql->where(SRBOrder::getTableName() . '.id_order = ' . pSQL($orderId));
 
         return $sql;
     }

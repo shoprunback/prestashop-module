@@ -31,7 +31,7 @@ class SRBItem
     static public function createItemsFromOrderDetail ($orderDetailId)
     {
         $sql = self::findProductsForItems();
-        $sql->innerJoin('order_detail', 'od', 'od.id_order = o.id_order');
+        $sql->innerJoin('order_detail', 'od', 'od.id_order = ' . SRBOrder::getTableName() . '.id_order');
         $sql->where('od.id_order_detail = ' . pSQL($orderDetailId));
         $productsFromDB = Db::getInstance()->executeS($sql);
 

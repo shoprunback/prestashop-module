@@ -69,6 +69,6 @@ class SRBAddress
 
     static protected function findByOrderIdQuery ($orderId)
     {
-        return self::findAllQuery()->innerJoin('orders', 'o', 'o.id_address_delivery = ' . self::getTableName() . '.id_address')->where('o.id_order = ' . pSQL($orderId));
+        return self::findAllQuery()->innerJoin('orders', SRBOrder::getTableName(), SRBOrder::getTableName() . '.id_address_delivery = ' . self::getTableName() . '.id_address')->where(SRBOrder::getTableName() . '.id_order = ' . pSQL($orderId));
     }
 }
