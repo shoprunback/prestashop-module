@@ -132,18 +132,18 @@ class SRBProduct extends SRBObject
 
     public function deleteWithCheck ()
     {
-        if ($this->canBeDeleted()) {
-            if ($this->syncDelete()) {
-                SRBLogger::addLog('Product "' . $this->{self::getIdentifier()} . '" deleted', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
-                return true;
-            } else {
-                SRBLogger::addLog('An error occured, product "' . $this->{self::getIdentifier()} . '" couldn\'t be deleted', SRBLogger::FATAL, self::getObjectTypeForMapping(), $this->getDBId());
-                return false;
-            }
+        if (! $this->canBeDeleted()) {
+            SRBLogger::addLog('Product "' . $this->{self::getIdentifier()} . '" couldn\'t be deleted because it has already been ordered', SRBLogger::WARNING, self::getObjectTypeForMapping(), $this->getDBId());
+            return false;
         }
 
-        SRBLogger::addLog('Product "' . $this->{self::getIdentifier()} . '" couldn\'t be deleted because it has already been ordered', SRBLogger::WARNING, self::getObjectTypeForMapping(), $this->getDBId());
-        return false;
+        if ($this->syncDelete() != '') {
+            SRBLogger::addLog('An error occured, product "' . $this->{self::getIdentifier()} . '" couldn\'t be deleted', SRBLogger::FATAL, self::getObjectTypeForMapping(), $this->getDBId());
+            return false;
+        }
+
+        SRBLogger::addLog('Product "' . $this->{self::getIdentifier()} . '" deleted', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
+        return true;
     }
 
     // Check if product has NEVER been ordered
@@ -163,7 +163,7 @@ class SRBProduct extends SRBObject
     public function syncDelete ()
     {
         SRBLogger::addLog('DELETING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
-        return Synchronizer::delete($this, self::getObjectTypeForMapping(), self::getPathForAPICall());
+        return Synchronizer::delete($this);
     }
 
     static protected function findOrderProductsQuery ($orderId)
