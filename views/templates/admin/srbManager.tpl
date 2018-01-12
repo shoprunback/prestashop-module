@@ -9,7 +9,7 @@
     {if count($items) > 0}
         {include file="./tables/$itemType.tpl"}
     {else}
-        <div class="no-item text-center">
+        <div class="text-center">
             <h2>
                 {if $itemType == "return"}
                     {l s='return.no_return' mod='shoprunback'}
