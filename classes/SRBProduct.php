@@ -96,7 +96,6 @@ class SRBProduct extends SRBObject
     public function getCoverPicture ()
     {
         $productCover = Product::getCover($this->getDBId());
-        SRBLogger::addLog('Cover picture', self::getObjectTypeForMapping(), $this->getDBId());
         $image = new Image($productCover['id_image']);
         $imagePath = $_SERVER['DOCUMENT_ROOT'] . _THEME_PROD_DIR_ . $image->getExistingImgPath() . '.jpg';
 
