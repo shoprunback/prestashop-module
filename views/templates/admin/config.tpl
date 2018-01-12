@@ -31,10 +31,12 @@
             </div>
         </form>
 
-        <div class="link-to-srb row">
-            <div class="col-12 no-account">
-                <a href="{$shoprunbackURLProd}" class="srb-button pull-center" target="_blank">{l s="config.no_account" mod='shoprunback'}</a>
+        {if ! $srbtoken}
+            <div class="link-to-srb row">
+                <div class="col-12 no-account">
+                    <a href="{$shoprunbackURLProd}" class="srb-button pull-center" target="_blank">{l s="config.no_account" mod='shoprunback'}</a>
+                </div>
             </div>
-        </div>
+        {/if}
     </div>
 </div>
