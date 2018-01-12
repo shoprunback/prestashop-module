@@ -10,7 +10,7 @@
                 </div>
 
                 <div class="external-link col-sm-2">
-                    <a href="{$shoprunbackURL}/products" target="_blank" class="srb-button">{l s="title.link_to_products" mod='shoprunback'}</a>
+                    <a href="{$shoprunbackURL}/product" target="_blank" class="srb-button">{l s="title.link_to_products" mod='shoprunback'}</a>
                 </div>
             </div>
 

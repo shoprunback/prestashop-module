@@ -1,8 +1,6 @@
 $(document).ready(function() {
   function getSRBObjectName (string) {
-    var objectName = string.charAt(0).toUpperCase() + string.slice(1).toLowerCase(); // Capitalize to have for example "Products"
-    objectName = objectName.slice(0, -1); // Removes the "s" to have for example "Product"
-    return 'SRB' + objectName;
+    return 'SRB' + string.charAt(0).toUpperCase() + string.slice(1).toLowerCase(); // Capitalize to have for example "SRBProduct"
   }
 
   function ajaxAsyncCall(data) {

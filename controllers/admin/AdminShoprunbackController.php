@@ -61,7 +61,7 @@ class AdminShoprunbackController extends ModuleAdminController
         parent::initContent();
 
         $pages = 1;
-        $itemType = (isset($_GET['itemType'])) ? $_GET['itemType'] : 'returns';
+        $itemType = (isset($_GET['itemType'])) ? $_GET['itemType'] : 'return';
         $items = [];
         $template = 'srbManager';
         $message = '';
@@ -100,12 +100,12 @@ class AdminShoprunbackController extends ModuleAdminController
         $this->setTemplate('../../../../modules/' . $this->module->name . '/views/templates/admin/layout.tpl');
     }
 
-    private function getItems ($itemType = 'returns')
+    private function getItems ($itemType = 'return')
     {
         $externalLink = $this->module->url;
 
         switch ($itemType) {
-            case 'returns':
+            case 'return':
                 if (Tools::getValue('orderId') !== false) {
                     $items = SRBShipback::getLikeOrderIdByCreateDate(Tools::getValue('orderId'));
                 } elseif (Tools::getValue('customer') !== false) {
@@ -116,22 +116,25 @@ class AdminShoprunbackController extends ModuleAdminController
 
                 $externalLink .= '/shipbacks/';
 
-                $actionUrl = Context::getContext()->link->getAdminLink('AdminShoprunback') . '&itemType=returns';
+                $actionUrl = Context::getContext()->link->getAdminLink('AdminShoprunback') . '&itemType=return';
                 $this->context->smarty->assign('actionUrl', $actionUrl);
                 $this->context->smarty->assign('searchOrderId', Tools::getValue('orderId'));
                 $this->context->smarty->assign('searchCustomer', Tools::getValue('customer'));
                 break;
-            case 'products':
+            case 'brand':
+                $items = SRBBrand::getAllWithMapping();
+                $externalLink .= '/brands/';
+                break;
+            case 'product':
                 $items = SRBProduct::getAllWithMapping();
                 $externalLink .= '/products/';
                 break;
-            case 'orders':
+            case 'order':
                 $items = SRBOrder::getAllWithMapping();
                 $externalLink .= '/orders/';
                 break;
-            case 'brands':
-                $items = SRBBrand::getAllWithMapping();
-                $externalLink .= '/brands/';
+            default:
+                Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminShoprunback') . '&itemType=return');
                 break;
         }
 

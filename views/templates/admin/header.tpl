@@ -11,17 +11,17 @@
 
     <div class="navigation">
         <ul class="nav nav-pills nav-justified">
-            <li class="{if $itemType eq 'returns'}active{/if}">
-                <a href="{$srbManager}&itemType=returns">{l s='return.my_returns' mod='shoprunback'}</a>
+            <li class="{if $itemType eq 'return'}active{/if}">
+                <a href="{$srbManager}&itemType=return">{l s='return.my_returns' mod='shoprunback'}</a>
             </li>
-            <li class="{if $itemType eq 'brands'}active{/if}">
-                <a href="{$srbManager}&itemType=brands">{l s='brand.my_brands' mod='shoprunback'}</a>
+            <li class="{if $itemType eq 'brand'}active{/if}">
+                <a href="{$srbManager}&itemType=brand">{l s='brand.my_brands' mod='shoprunback'}</a>
             </li>
-            <li class="{if $itemType eq 'products'}active{/if}">
-                <a href="{$srbManager}&itemType=products">{l s="product.my_products" mod='shoprunback'}</a>
+            <li class="{if $itemType eq 'product'}active{/if}">
+                <a href="{$srbManager}&itemType=product">{l s="product.my_products" mod='shoprunback'}</a>
             </li>
-            <li class="{if $itemType eq 'orders'}active{/if}">
-                <a href="{$srbManager}&itemType=orders">{l s="order.my_orders" mod='shoprunback'}</a>
+            <li class="{if $itemType eq 'order'}active{/if}">
+                <a href="{$srbManager}&itemType=order">{l s="order.my_orders" mod='shoprunback'}</a>
             </li>
             <li class="{if $itemType eq 'config'}active{/if}">
                 <a href="{$srbManager}&itemType=config">{l s="config" mod='shoprunback'}</a>
