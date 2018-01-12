@@ -43,9 +43,17 @@
                                     <a href="{$shoprunbackURL}/shipbacks/{$item->id_srb_shipback}" target="blank">
                                         <span class="badge badge-default {$item->state}">{$item->state|capitalize}</span>
                                     </a>
+                                {else}
+                                    -
                                 {/if}
                             </td>
-                            <td>{$item->last_sent_at}</td>
+                            <td>
+                                {if $item->last_sent_at}
+                                    {$item->last_sent_at}
+                                {else}
+                                    -
+                                {/if}
+                            </td>
                             <td>
                                 {if $item->delivery}
                                     {l s="item.delivered" mod='shoprunback'}
