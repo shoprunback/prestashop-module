@@ -64,7 +64,7 @@ class SRBMap
 
     static private function returnResult ($result)
     {
-        return (is_array($result) && isset($result[0])) ? new self($result[0]) : false;
+        return $result ? new self($result) : false;
     }
 
     static public function getMappingIdIfExists ($itemId, $itemType)
@@ -82,7 +82,7 @@ class SRBMap
     {
         $sql = self::findAllQuery();
         $sql->where(self::getTableName() . '.' . self::getIdColumnName() . ' = ' . pSQL($id));
-        $result = Db::getInstance()->executeS($sql);
+        $result = Db::getInstance()->getRow($sql);
 
         return self::returnResult($result);
     }
@@ -103,7 +103,7 @@ class SRBMap
     {
         $sql = self::findAllQuery();
         $sql->where(self::getTableName() . '.id_item = ' . pSQL($idItem) . ' AND ' . pSQL(self::getTableName()) . '.type = "' . pSQL($type) . '"');
-        $result = Db::getInstance()->executeS($sql);
+        $result = Db::getInstance()->getRow($sql);
 
         return self::returnResult($result);
     }

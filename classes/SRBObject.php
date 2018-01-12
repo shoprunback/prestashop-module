@@ -145,13 +145,13 @@ abstract class SRBObject
     static public function getById ($id)
     {
         $class = get_called_class();
-        $result = Db::getInstance()->executeS(static::findOneQuery($id));
+        $result = Db::getInstance()->getRow(static::findOneQuery($id));
 
         if (! $result) {
             $exceptionName = ucfirst($class::getObjectTypeForMapping()) . 'Exception';
             throw new $exceptionName('No ' . $class::getObjectTypeForMapping() . ' found with id ' . $id, 1);
         }
 
-        return new $class($result[0]);
+        return new $class($result);
     }
 }

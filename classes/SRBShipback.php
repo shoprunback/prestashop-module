@@ -209,13 +209,12 @@ class SRBShipback extends SRBObject
         $sql = SRBOrder::addComponentsToQuery($sql);
         $sql->where(self::getTableName() . '.id_order = ' . pSQL($orderId));
         $sql->orderBy('created_at', 'DESC');
-        $result = Db::getInstance()->executeS($sql);
+        $shipbackFromDB = Db::getInstance()->getRow($sql);
 
-        if (! $result) {
+        if (! $shipbackFromDB) {
             return false;
         }
 
-        $shipbackFromDB = $result[0];
         $shipbackFromDB['order'] = SRBOrder::createFromShipback($shipbackFromDB);
 
         return new self($shipbackFromDB);

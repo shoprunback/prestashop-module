@@ -43,7 +43,7 @@ class SRBAddress
 
     static public function getByOrderId ($orderId)
     {
-        return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS(self::findByOrderIdQuery($orderId))[0]);
+        return self::convertPSArrayToSRBObjects(Db::getInstance()->getRow(self::findByOrderIdQuery($orderId)));
     }
 
     static public function createFromOrder ($psOrder)
