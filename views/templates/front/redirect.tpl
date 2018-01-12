@@ -1,12 +1,12 @@
 <script type="text/javascript">
-    var redirectURL = '{$redirectURL nofilter}';
-    var url = '{$url nofilter}';
+    var newTabUrl = '{$newTabUrl nofilter}';
+    var redirectUrl = '{$redirectUrl nofilter}';
 
-    if (redirectURL) {
-        window.open(redirectURL, '_blank');
+    if (newTabUrl) {
+        window.open(newTabUrl, '_blank');
     }
 
     (function() {
-        window.location.href = url;
+        window.location.href = redirectUrl;
     })();
 </script>

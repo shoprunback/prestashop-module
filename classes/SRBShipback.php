@@ -95,10 +95,6 @@ class SRBShipback extends SRBObject
 
     static public function createShipbackFromOrderId ($orderId)
     {
-        if (! $orderId) {
-            return false;
-        }
-
         if (self::getByOrderId($orderId)) {
             return false;
         }

@@ -1,6 +1,5 @@
 <script type="text/javascript">
     var asyncCall = '{$asyncCall}';
-    var shoprunbackAPIURL = '{$shoprunbackAPIURL}';
     var itemType = '{$itemType}';
     var token = '{$token}';
 </script>

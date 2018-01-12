@@ -15,11 +15,16 @@ class ShopRunBackShipbackModuleFrontController extends ModuleFrontController
 
     public function initContent ()
     {
-        $url = $this->context->link->getPageLink('index') . '?controller=order-detail&id_order=' . $_GET['orderId'];
+        $redirectUrl = $this->context->link->getPageLink('index') . '?controller=order-detail&id_order=' . $_GET['orderId'];
+
+        if (! isset($_GET['orderId'])) {
+            Tools::redirect($redirectUrl);
+        }
+
         $shipback = SRBShipback::createShipbackFromOrderId($_GET['orderId']);
 
         if (! $shipback || isset($shipback->shipback)) {
-            Tools::redirect($url);
+            Tools::redirect($redirectUrl);
         }
 
         if ($shipback == 'Order not found') {
@@ -28,8 +33,8 @@ class ShopRunBackShipbackModuleFrontController extends ModuleFrontController
             header('Location: ' . $this->context->link->getPageLink('index'));
         }
 
-        $this->context->smarty->assign('redirectURL', $shipback->public_url);
-        $this->context->smarty->assign('url', $url);
+        $this->context->smarty->assign('newTabUrl', $shipback->public_url);
+        $this->context->smarty->assign('redirectUrl', $redirectUrl);
         $this->setTemplate('../../../modules/' . $this->module->name . '/views/templates/front/redirect.tpl');
     }
 }
