@@ -155,8 +155,14 @@ class ShopRunBack extends Module
     {
         $queries = [];
 
+
         $queries[] = createTableQuery();
-        $queries[] = createIndexQuery();
+
+        $indexExists = Db::getInstance()->Execute(checkIfIndexExists());
+        if ($indexExists < 1) {
+            $queries[] = createIndexQuery();
+        }
+
         $queries[] = createReturnTableQuery();
         $queries[] = enableReturns();
 
