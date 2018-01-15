@@ -7,8 +7,8 @@ function createIndexQuery () {
 function createTableQuery () {
     return 'CREATE TABLE IF NOT EXISTS ' . SRBMap::MAPPER_TABLE_NAME . '(
         `id_srb_map` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        `id_item` INT(11) NOT NULL,
         `id_item_srb` VARCHAR(255) NOT NULL,
+        `id_item` INT(11) NOT NULL,
         `type` VARCHAR(255) NOT NULL,
         `last_sent_at` DATETIME NOT NULL
     )';
