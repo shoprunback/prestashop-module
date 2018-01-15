@@ -4,9 +4,9 @@
 
     {if $message}
         <div class="alert alert-{$messageType}">
-            {if $message == 'success.token'}
-                {l s="sucess.token" mod='shoprunback'}
-            {elseif $message == 'error.no_token'}
+            {if $message == AdminShoprunbackController::SUCCESS_CONFIG}
+                {l s="sucess.config" mod='shoprunback'}
+            {elseif $message == AdminShoprunbackController::ERROR_NO_TOKEN}
                 {l s="error.no_token" mod='shoprunback'}
             {/if}
         </div>

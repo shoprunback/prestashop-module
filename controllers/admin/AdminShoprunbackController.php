@@ -1,6 +1,9 @@
 <?php
 class AdminShoprunbackController extends ModuleAdminController
 {
+    const SUCCESS_CONFIG = 'success.config';
+    const ERROR_NO_TOKEN = 'error.no_token';
+
     public $token;
     private $actionResult;
 
@@ -42,7 +45,7 @@ class AdminShoprunbackController extends ModuleAdminController
         if (! $user) {
             SRBLogger::addLog('Invalid API token: ' . $srbtoken, SRBLogger::WARNING, 'configuration');
             Configuration::updateValue('srbtoken', $oldsrbToken);
-            return 'error.no_token';
+            return self::ERROR_NO_TOKEN;
         }
 
         SRBLogger::addLog('API token saved: ' . substr($srbtoken, 0, 3) . '...' . substr($srbtoken, -3), SRBLogger::INFO, 'configuration');
@@ -52,7 +55,7 @@ class AdminShoprunbackController extends ModuleAdminController
         Configuration::updateValue('production', Tools::getValue('production'));
         SRBLogger::addLog('Sandbox mode: ' . Tools::getValue('production'), SRBLogger::INFO, 'configuration');
 
-        return 'success.token';
+        return self::SUCCESS_CONFIG;
     }
 
     public function initContent ()
@@ -71,10 +74,10 @@ class AdminShoprunbackController extends ModuleAdminController
             if (Tools::getValue('srbtoken')) {
                 $message = $this->handleConfig();
 
-                if ($message == 'error.no_token') {
+                if ($message == self::ERROR_NO_TOKEN) {
                     $this->context->smarty->assign('messageType', 'danger');
                 }
-                if ($message == 'success.token') {
+                if ($message == self::SUCCESS_CONFIG) {
                     $this->context->smarty->assign('messageType', 'success');
                 }
             }
