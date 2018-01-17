@@ -12,11 +12,11 @@ class SRBItem
 
     public function __construct ($psProduct)
     {
-        $this->label = 'string';
-        $this->reference = 'string';
         $this->price_cents = $psProduct['price'];
         $this->currency = $psProduct['iso_code'];
         $this->product = new SRBProduct($psProduct);
+        $this->label = $this->product->label;
+        $this->reference = $this->product->getReference();
     }
 
     static public function createItemsFromOrderId ($orderId)
@@ -48,6 +48,7 @@ class SRBItem
         $sql->innerJoin('cart', 'ca', 'cp.id_cart = ca.id_cart');
         $sql->innerJoin('orders', SRBOrder::getTableName(), 'ca.id_cart = ' . SRBOrder::getTableName() . '.id_cart');
         $sql->innerJoin('currency', 'cu', 'cu.id_currency = ' . SRBOrder::getTableName() . '.id_currency');
+        $sql->where('pl.id_lang = ' . Configuration::get('PS_LANG_DEFAULT'));
 
         return $sql;
     }
