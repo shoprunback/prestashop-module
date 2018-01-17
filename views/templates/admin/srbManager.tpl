@@ -6,8 +6,10 @@
 
 <div id="srb-manager">
     {if $srbtoken == ''}
-        <div class="col-md-10 col-md-offset-1 alert alert-warning">
-            {l s="error.need_token" mod='shoprunback'}
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1 alert alert-warning">
+                {l s="error.need_token" mod='shoprunback'}
+            </div>
         </div>
     {/if}
 
