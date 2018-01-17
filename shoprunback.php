@@ -143,7 +143,8 @@ class ShopRunBack extends Module
     private function executeQueries ($queries)
     {
         foreach ($queries as $key => $query) {
-            if (! Db::getInstance()->Execute($query)) {
+            if (! Db::getInstance()->execute($query)) {
+                SRBLogger::addLog(Db::getInstance()->getMsgError(), SRBLogger::INFO);
                 return false;
             }
         }
@@ -155,10 +156,10 @@ class ShopRunBack extends Module
     {
         $queries = [];
 
-
         $queries[] = createTableQuery();
 
-        $indexExists = Db::getInstance()->Execute(checkIfIndexExists());
+        $indexExists = Db::getInstance()->getValue(checkIfIndexExists());
+        SRBLogger::addLog('Count index: ' . $indexExists, SRBLogger::INFO);
         if ($indexExists < 1) {
             $queries[] = createIndexQuery();
         }
