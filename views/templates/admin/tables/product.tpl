@@ -17,8 +17,10 @@
                 <div class="title col-sm-6">
                     <h1>{l s="product.my_products" mod='shoprunback'}</h1>
 
-                    <a class="srb-button post-all" data-type="{$itemType}">{l s="title.sync_all" mod='shoprunback'}</a>
-                    <a class="srb-button post-new" data-type="{$itemType}">{l s="title.sync_new" mod='shoprunback'}</a>
+                    {if $srbtoken != ''}
+                        <a class="srb-button post-all" data-type="{$itemType}">{l s="title.sync_all" mod='shoprunback'}</a>
+                        <a class="srb-button post-new" data-type="{$itemType}">{l s="title.sync_new" mod='shoprunback'}</a>
+                    {/if}
                 </div>
 
                 <div class="external-link col-sm-2">
