@@ -160,7 +160,7 @@ class AdminShoprunbackController extends ModuleAdminController
         $currentPage = ($currentPage <= $pages) ? $currentPage : 1;
         $itemMin = ($currentPage - 1) * self::ITEMS_BY_PAGE;
 
-        $items = $searchCondition != '' ? $class::$function(Tools::getValue($searchCondition), false, self::ITEMS_BY_PAGE, $itemMin) : $items = $class::$function(false, self::ITEMS_BY_PAGE, $itemMin);
+        $items = $searchCondition != '' ? $class::$function(Tools::getValue($searchCondition), false, self::ITEMS_BY_PAGE, $itemMin) : $class::$function(false, self::ITEMS_BY_PAGE, $itemMin);
 
         if ($itemType == 'product') {
             $noBrand = [];
