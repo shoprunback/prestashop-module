@@ -1,6 +1,18 @@
 <div class="display">
     <div class="col-md-10 col-md-offset-1">
         <div class="banner">
+            {if count($noBrand) > 0}
+                <div class="row">
+                    <p class="col-sm-12 alert alert-danger">
+                        {l s="product.no_brand" mod='shoprunback'}
+
+                        {foreach from=$noBrand key=id item=reference}
+                            <b> {$reference} </b>
+                        {/foreach}
+                    </p>
+                </div>
+            {/if}
+
             <div class="top row">
                 <div class="title col-sm-6">
                     <h1>{l s="product.my_products" mod='shoprunback'}</h1>
@@ -32,7 +44,7 @@
                 </thead>
                 <tbody>
                     {foreach from=$items key=id item=item}
-                        <tr data-id="{$item->getDBId()}">
+                        <tr data-id="{$item->getDBId()}" class="{if in_array($item->getReference(), $noBrand)}danger{/if}">
                             <td class="left"><a href="{$externalLink}{$item->getReference()}" target="_blank"><b>{$item->getName()}</b></a></td>
                             <td><b>{$item->getReference()}</b></td>
                             <td>

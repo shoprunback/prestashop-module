@@ -130,6 +130,17 @@ class AdminShoprunbackController extends ModuleAdminController
             case 'product':
                 $items = SRBProduct::getAllWithMapping();
                 $externalLink .= '/products/';
+
+                $noBrand = [];
+                $productIdentifier = SRBProduct::getIdentifier();
+                foreach ($items as $product) {
+                    if (! isset($product->brand) || $product->brand == '') {
+                        $noBrand[] = $product->{$productIdentifier};
+                    }
+                }
+
+                $this->context->smarty->assign('noBrand', $noBrand);
+
                 break;
             case 'order':
                 $items = SRBOrder::getAllWithMapping();

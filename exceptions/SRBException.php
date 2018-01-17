@@ -18,12 +18,12 @@ class SRBException extends Exception
         $this->previous = $previous;
 
         $this->prefix = '[ShopRunBack]';
+
+        SRBLogger::addLog($this->message, SRBLogger::FATAL);
     }
 
     public function __toString()
     {
-        SRBLogger::addLog($this->message, SRBLogger::FATAL);
-
         return $this->prefix . ' ' . __CLASS__ . ': [' . $this->errorCode . ']: ' . $this->message . '\n';
     }
 }

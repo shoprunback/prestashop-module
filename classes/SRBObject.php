@@ -97,7 +97,11 @@ abstract class SRBObject
         $class = get_called_class();
         $SRBObjects = [];
         foreach ($PSArray as $PSItem) {
-            $SRBObjects[] =  new $class($PSItem);
+            try {
+                $SRBObjects[] =  new $class($PSItem);
+            } catch (SRBException $e) {
+
+            }
         }
 
         return $SRBObjects;

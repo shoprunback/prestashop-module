@@ -18,11 +18,16 @@ class SRBProduct extends SRBObject
     {
         $this->ps = $psProduct;
         $this->label = $this->extractNameFromPSArray($psProduct['name']);
-        $this->reference = $psProduct['reference'];
+        $this->reference = $psProduct['reference'] != '' ? $psProduct['reference'] : $this->label;
         $this->weight_grams = $psProduct['weight'] * 1000;
         $this->width_mm = $psProduct['width'];
         $this->height_mm = $psProduct['height'];
         $this->length_mm = $psProduct['depth'];
+
+        if ($psProduct['id_manufacturer'] == 0) {
+            return new ProductException('The product "' . $this->getReference() . '" has no brand attached!', SRBLogger::FATAL);;
+        }
+
         $this->brand = SRBBrand::getById($psProduct['id_manufacturer']);
         $this->brand_id = $this->brand->reference;
     }
@@ -77,7 +82,7 @@ class SRBProduct extends SRBObject
         ];
         $brands = [];
         foreach ($products as $product) {
-            if (! isset($brands[$product->brand_id])) {
+            if (isset($product->brand_id) && ! isset($brands[$product->brand_id])) {
                 $brands[$product->brand_id] = $product->brand;
             }
         }
@@ -87,7 +92,11 @@ class SRBProduct extends SRBObject
         }
 
         foreach ($products as $product) {
-            $responses['product'][] = $product->sync(true);
+            try {
+                $responses['product'][] = $product->sync(true);
+            } catch (ProductException $e) {
+
+            }
         }
 
         return $responses;
@@ -120,6 +129,10 @@ class SRBProduct extends SRBObject
 
     public function sync ($brandChecked = false)
     {
+        if (! isset($this->brand)) {
+            return new ProductException('Products must have a brand to be synchronized', SRBLogger::FATAL);
+        }
+
         if (! $brandChecked) {
             $postBrandResult = $this->brand->sync();
         }
