@@ -50,24 +50,26 @@
             </ul>
         </div>
     {else}
-        <div class="text-center col-md-12">
-            <h2>
-                {if $itemType == "return"}
-                    {l s='return.no_return' mod='shoprunback'}
-                {/if}
+        <div class="row">
+            <div class="text-center col-md-12">
+                <h2>
+                    {if $itemType == "return"}
+                        {l s='return.no_return' mod='shoprunback'}
+                    {/if}
 
-                {if $itemType == "brand"}
-                    {l s='brand.no_brand' mod='shoprunback'}
-                {/if}
+                    {if $itemType == "brand"}
+                        {l s='brand.no_brand' mod='shoprunback'}
+                    {/if}
 
-                {if $itemType == "product"}
-                    {l s='product.no_product' mod='shoprunback'}
-                {/if}
+                    {if $itemType == "product"}
+                        {l s='product.no_product' mod='shoprunback'}
+                    {/if}
 
-                {if $itemType == "order"}
-                    {l s='order.no_order' mod='shoprunback'}
-                {/if}
-            </h2>
+                    {if $itemType == "order"}
+                        {l s='order.no_order' mod='shoprunback'}
+                    {/if}
+                </h2>
+            </div>
         </div>
     {/if}
 </div>
