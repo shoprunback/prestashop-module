@@ -25,11 +25,11 @@ class SRBProduct extends SRBObject
         $this->length_mm = $psProduct['depth'];
 
         if ($psProduct['id_manufacturer'] == 0) {
-            return new ProductException('The product "' . $this->getReference() . '" has no brand attached!', SRBLogger::FATAL);;
+            SRBLogger::addLog('The product "' . $this->getReference() . '" has no brand attached!', SRBLogger::WARNING);
+        } else {
+            $this->brand = SRBBrand::getById($psProduct['id_manufacturer']);
+            $this->brand_id = $this->brand->reference;
         }
-
-        $this->brand = SRBBrand::getById($psProduct['id_manufacturer']);
-        $this->brand_id = $this->brand->reference;
     }
 
     static public function getObjectTypeForMapping ()
@@ -130,10 +130,8 @@ class SRBProduct extends SRBObject
     public function sync ($brandChecked = false)
     {
         if (! isset($this->brand)) {
-            return new ProductException('Products must have a brand to be synchronized', SRBLogger::FATAL);
-        }
-
-        if (! $brandChecked) {
+            SRBLogger::addLog('The product "' . $this->getReference() . '" has no brand attached!', SRBLogger::WARNING);
+        } elseif (! $brandChecked) {
             $postBrandResult = $this->brand->sync();
         }
 
