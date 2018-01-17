@@ -57,7 +57,7 @@
                             <td>
                                 {if $item->delivery}
                                     {l s="item.delivered" mod='shoprunback'}
-                                {elseif ! $item->last_sent_at}
+                                {elseif ! $item->last_sent_at && $srbtoken != ''}
                                     <a class="sync-item srb-button" data-type="{$itemType}">
                                         {l s="item.sync" mod='shoprunback'}
                                     </a>

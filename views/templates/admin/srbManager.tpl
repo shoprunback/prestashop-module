@@ -1,10 +1,16 @@
 <script type="text/javascript">
     var asyncCall = '{$asyncCall}';
     var itemType = '{$itemType}';
-    var token = '{$token}';
+    var token = '{$srbtoken}';
 </script>
 
 <div id="srb-manager">
+    {if $srbtoken == ''}
+        <div class="col-md-10 col-md-offset-1 alert alert-warning">
+            {l s="error.need_token" mod='shoprunback'}
+        </div>
+    {/if}
+
     {if count($items) > 0}
         {include file="./tables/$itemType.tpl"}
 
@@ -42,7 +48,7 @@
             </ul>
         </div>
     {else}
-        <div class="text-center">
+        <div class="text-center col-md-12">
             <h2>
                 {if $itemType == "return"}
                     {l s='return.no_return' mod='shoprunback'}

@@ -91,7 +91,7 @@ class AdminShoprunbackController extends ModuleAdminController
             $this->getItems($itemType);
         }
 
-        $this->context->smarty->assign('token', Configuration::get('srbtoken'));
+        $this->context->smarty->assign('srbtoken', Configuration::get('srbtoken'));
         $this->context->smarty->assign('shoprunbackURL', $this->module->url);
         $this->context->smarty->assign('shoprunbackURLProd', $this->module->urlProd);
         $this->context->smarty->assign('srbManager', $this->tabUrl);
@@ -183,7 +183,6 @@ class AdminShoprunbackController extends ModuleAdminController
     private function getConfigFormValues ()
     {
         $this->context->smarty->assign('formActionUrl', $this->tabUrl . '&itemType=config');
-        $this->context->smarty->assign('srbtoken', Configuration::get('srbtoken'));
         $this->context->smarty->assign('production', Configuration::get('production'));
     }
 
