@@ -13,7 +13,7 @@
         </div>
     {/if}
 
-    {if count($items) > 0}
+    {if count($items) > 0 || $searchCondition}
         {include file="./tables/$itemType.tpl"}
 
         <div class="pagination">

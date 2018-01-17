@@ -3,6 +3,7 @@ class AdminShoprunbackController extends ModuleAdminController
 {
     const SUCCESS_CONFIG = 'success.config';
     const ERROR_NO_TOKEN = 'error.no_token';
+    const ITEMS_BY_PAGE = 10;
 
     public $token;
     private $actionResult;
@@ -105,79 +106,81 @@ class AdminShoprunbackController extends ModuleAdminController
     private function getItems ($itemType = 'return')
     {
         $externalLink = $this->module->url;
+        $countItems = 0;
+        $searchCondition = false;
+
+        $currentPage = (isset($_GET['currentPage'])) ? $_GET['currentPage'] : 1;
+        $class = 'SRBShipback';
+        $function = 'getAllByCreateDate';
 
         switch ($itemType) {
             case 'return':
-                if (Tools::getValue('orderId') !== false) {
-                    $items = SRBShipback::getLikeOrderIdByCreateDate(Tools::getValue('orderId'));
-                } elseif (Tools::getValue('customer') !== false) {
-                    $items = SRBShipback::getLikeCustomerByCreateDate(Tools::getValue('customer'));
-                } else {
-                    $items = SRBShipback::getAllByCreateDate();
-                }
-
                 $externalLink .= '/shipbacks/';
-
                 $actionUrl = Context::getContext()->link->getAdminLink('AdminShoprunback') . '&itemType=return';
                 $this->context->smarty->assign('actionUrl', $actionUrl);
-                $this->context->smarty->assign('searchOrderId', Tools::getValue('orderId'));
+                $this->context->smarty->assign('searchOrderReference', Tools::getValue('orderReference'));
                 $this->context->smarty->assign('searchCustomer', Tools::getValue('customer'));
+
+                if (Tools::getValue('orderReference') !== false) {
+                    $searchCondition = 'orderReference';
+                    $function = 'getLikeOrderReferenceByCreateDate';
+                    $countItems = SRBShipback::getCountLikeOrderReferenceByCreateDate(Tools::getValue('orderReference'));
+                } elseif (Tools::getValue('customer') !== false) {
+                    $searchCondition = 'customer';
+                    $function = 'getLikeCustomerByCreateDate';
+                    $countItems = SRBShipback::getCountLikeCustomerByCreateDate(Tools::getValue('customer'));
+                } else {
+                    $countItems = SRBShipback::getCountAll();
+                }
                 break;
             case 'brand':
-                $items = SRBBrand::getAllWithMapping();
                 $externalLink .= '/brands/';
+                $countItems = SRBBrand::getCountAllWithMapping();
+                $class = 'SRBBrand';
+                $function = 'getAllWithMapping';
                 break;
             case 'product':
-                $items = SRBProduct::getAllWithMapping();
                 $externalLink .= '/products/';
-
-                $noBrand = [];
-                $productIdentifier = SRBProduct::getIdentifier();
-                foreach ($items as $product) {
-                    if (! isset($product->brand) || $product->brand == '') {
-                        $noBrand[] = $product->{$productIdentifier};
-                    }
-                }
-
-                $this->context->smarty->assign('noBrand', $noBrand);
-
+                $countItems = SRBProduct::getCountAllWithMapping();
+                $class = 'SRBProduct';
+                $function = 'getAllWithMapping';
                 break;
             case 'order':
-                $items = SRBOrder::getAllWithMapping();
                 $externalLink .= '/orders/';
+                $countItems = SRBOrder::getCountAllWithMapping();
+                $class = 'SRBOrder';
+                $function = 'getAllWithMapping';
                 break;
             default:
                 Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminShoprunback') . '&itemType=return');
                 break;
         }
 
-        $this->getPagination($items);
-
-        $this->context->smarty->assign('externalLink', $externalLink);
-        $this->addJs(_PS_MODULE_DIR_ . $this->module->name . '/views/js/admin/srbManager.js');
-        $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin/srbManager.css');
-    }
-
-    private function getPagination ($items = [])
-    {
-        $countItems = count($items);
-        $itemsByPage = 10;
-        $pages = ceil($countItems / $itemsByPage);
-        $currentPage = (isset($_GET['currentPage'])) ? $_GET['currentPage'] : 1;
+        $pages = ceil($countItems / self::ITEMS_BY_PAGE);
         $currentPage = ($currentPage <= $pages) ? $currentPage : 1;
+        $itemMin = ($currentPage - 1) * self::ITEMS_BY_PAGE;
 
-        $itemMin = ($currentPage - 1) * $itemsByPage;
-        $itemMax = $currentPage * $itemsByPage;
-        $itemsToShow = [];
-        for ($itemMin; $itemMin < $itemMax; $itemMin++) {
-            if (isset($items[$itemMin])) {
-                $itemsToShow[] = $items[$itemMin];
+        $items = $searchCondition != '' ? $class::$function(Tools::getValue($searchCondition), false, self::ITEMS_BY_PAGE, $itemMin) : $items = $class::$function(false, self::ITEMS_BY_PAGE, $itemMin);
+
+        if ($itemType == 'product') {
+            $noBrand = [];
+            $productIdentifier = SRBProduct::getIdentifier();
+            foreach ($items as $product) {
+                if (! isset($product->brand) || $product->brand == '') {
+                    $noBrand[] = $product->{$productIdentifier};
+                }
             }
+
+            $this->context->smarty->assign('noBrand', $noBrand);
         }
 
         $this->context->smarty->assign('pages', $pages);
         $this->context->smarty->assign('currentPage', $currentPage);
-        $this->context->smarty->assign('items', $itemsToShow);
+        $this->context->smarty->assign('items', $items);
+        $this->context->smarty->assign('externalLink', $externalLink);
+        $this->context->smarty->assign('searchCondition', $searchCondition);
+        $this->addJs(_PS_MODULE_DIR_ . $this->module->name . '/views/js/admin/srbManager.js');
+        $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin/srbManager.css');
     }
 
     private function getConfigFormValues ()

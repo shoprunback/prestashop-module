@@ -31,7 +31,7 @@
                         <th>
                             {l s='order.id' mod='shoprunback'}
                             <form action="{$actionUrl}" method="POST">
-                                <input type="number" min="0" name="orderId" placeholder="{l s='form.placeholder' mod='shoprunback'}" value="{$searchOrderId}" />
+                                <input type="text" min="0" name="orderReference" placeholder="{l s='form.placeholder' mod='shoprunback'}" value="{$searchOrderReference}" />
                                 <a href="{$srbManager}&itemType={$itemType}" class="btn btn-default">{l s='form.clear' mod='shoprunback'}</a>
                             </form>
                         </th>
@@ -41,20 +41,26 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {foreach from=$items key=id item=item}
-                        <tr data-id="{$item->getReference()}">
-                            <td><a href="{$externalLink}{$item->getReference()}" target="_blank"><b>{$item->getName()}</b></a></td>
-                            <td>{$item->order->customer->first_name} {$item->order->customer->last_name}</td>
-                            <td>{$item->order_id}</td>
-                            <td>
-                                <a href="{$externalLink}{$item->getReference()}" target="blank">
-                                    <span class="badge badge-default {$item->state}">{$item->state|capitalize}</span>
-                                </a>
-                            </td>
-                            <td>{$item->created_at}</td>
-                            <td><a href="{$externalLink}{$item->getReference()}" target="_blank"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a></td>
+                    {if count($items) > 0}
+                        {foreach from=$items key=id item=item}
+                            <tr data-id="{$item->getReference()}">
+                                <td><a href="{$externalLink}{$item->getReference()}" target="_blank"><b>{$item->getName()}</b></a></td>
+                                <td>{$item->order->customer->first_name} {$item->order->customer->last_name}</td>
+                                <td>{$item->order_id}</td>
+                                <td>
+                                    <a href="{$externalLink}{$item->getReference()}" target="blank">
+                                        <span class="badge badge-default {$item->state}">{$item->state|capitalize}</span>
+                                    </a>
+                                </td>
+                                <td>{$item->created_at}</td>
+                                <td><a href="{$externalLink}{$item->getReference()}" target="_blank"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a></td>
+                            </tr>
+                        {/foreach}
+                    {else}
+                        <tr>
+                            <td colspan="6">{l s="search.no_result" mod='shoprunback'}</td>
                         </tr>
-                    {/foreach}
+                    {/if}
                 </tbody>
             </table>
         </div>

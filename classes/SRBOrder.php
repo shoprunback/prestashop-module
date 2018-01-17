@@ -77,9 +77,9 @@ class SRBOrder extends SRBObject
         }
     }
 
-    static public function getAllWithMapping ($onlySyncItems = false)
+    static public function getAllWithMapping ($onlySyncItems = false, $limit = 0, $offset = 0)
     {
-        $sql = self::findAllWithMappingQuery($onlySyncItems);
+        $sql = self::findAllWithMappingQuery($onlySyncItems, $limit, $offset);
         $sql->select(SRBShipback::getTableName() . '.' . SRBShipback::getIdColumnName() . ', ' . SRBShipback::getTableName() . '.state, os.delivery');
         $sql->leftJoin( // We use leftJoin because orders may not have a return associated
             SRBShipback::SHIPBACK_TABLE_NAME_NO_PREFIX,
@@ -137,7 +137,7 @@ class SRBOrder extends SRBObject
         return $sql;
     }
 
-    protected function findAllWithMappingQuery ($onlySyncItems = false)
+    protected function findAllWithMappingQuery ($onlySyncItems = false, $limit = 0, $offset = 0)
     {
         $identifier = static::getIdColumnName();
         $type = static::getObjectTypeForMapping();
@@ -159,6 +159,7 @@ class SRBOrder extends SRBObject
         );
         $sql->groupBy(static::getTableName() . '.' . $identifier);
         $sql->orderBy('srb.last_sent_at DESC');
+        $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
     }

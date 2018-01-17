@@ -160,43 +160,61 @@ class SRBShipback extends SRBObject
         return self::getById($item->id);
     }
 
-    private function findAllByCreateDateQuery ()
+    private function findAllByCreateDateQuery ($limit = 0, $offset = 0)
     {
         $sql = self::findAllQuery();
         $sql = SRBOrder::addComponentsToQuery($sql);
         $sql->orderBy('created_at DESC');
+        $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
     }
 
-    static public function getAllByCreateDate ()
+    static public function getAllByCreateDate ($limit = 0, $offset = 0)
     {
-        $sql = self::findAllByCreateDateQuery();
-        $shipbacksFromDB = Db::getInstance()->executeS($sql);
-
-        return self::generateReturnsFromDBResult($shipbacksFromDB);
+        return self::generateReturnsFromDBResult(Db::getInstance()->executeS(self::findAllByCreateDateQuery($limit, $offset)));
     }
 
-    static public function getLikeOrderIdByCreateDate ($orderId)
+    static public function getLikeOrderReferenceByCreateDate ($orderReference, $limit = 0, $offset = 0)
     {
-        $sql = self::findAllByCreateDateQuery();
-        $sql->where(self::getTableName() . '.id_order LIKE "%' . pSQL($orderId) . '%"');
-        $shipbacksFromDB = Db::getInstance()->executeS($sql);
-
-        return self::generateReturnsFromDBResult($shipbacksFromDB);
+        return self::generateReturnsFromDBResult(Db::getInstance()->executeS(self::findLikeOrderIdByCreateDateQuery($orderReference, $limit, $offset)));
     }
 
-    static public function getLikeCustomerByCreateDate ($customer)
+    static public function getCountLikeOrderReferenceByCreateDate ($orderReference)
     {
-        $sql = self::findAllByCreateDateQuery();
+        return self::getCountOfQuery(self::findLikeOrderIdByCreateDateQuery($orderReference));
+    }
+
+    static public function getLikeCustomerByCreateDate ($customer, $limit = 0, $offset = 0)
+    {
+        return self::generateReturnsFromDBResult(Db::getInstance()->executeS(self::findLikeCustomerByCreateDateQuery($customer, $limit, $offset)));
+    }
+
+    static public function getCountLikeCustomerByCreateDate ($customer)
+    {
+        return self::getCountOfQuery(self::findLikeCustomerByCreateDateQuery($customer));
+    }
+
+    static public function findLikeOrderIdByCreateDateQuery ($orderReference, $limit = 0, $offset = 0)
+    {
+        $sql = self::findAllByCreateDateQuery($limit, $offset);
+        $sql->where(SRBOrder::getTableName() . '.reference LIKE "%' . pSQL($orderReference) . '%"');
+        $sql = self::addLimitToQuery($sql, $limit, $offset);
+
+        return $sql;
+    }
+
+    static public function findLikeCustomerByCreateDateQuery ($customer, $limit = 0, $offset = 0)
+    {
+        $sql = self::findAllByCreateDateQuery($limit, $offset);
         $sql->where('
             c.firstname LIKE "%' . pSQL($customer) . '%" OR
             c.lastname LIKE "%' . pSQL($customer) . '%" OR
             CONCAT(c.firstname, " ", c.lastname) LIKE "%' . pSQL($customer) . '%"'
         );
-        $shipbacksFromDB = Db::getInstance()->executeS($sql);
+        $sql = self::addLimitToQuery($sql, $limit, $offset);
 
-        return self::generateReturnsFromDBResult($shipbacksFromDB);
+        return $sql;
     }
 
     static public function getByOrderId ($orderId)
