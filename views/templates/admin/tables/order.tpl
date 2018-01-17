@@ -1,4 +1,4 @@
-<div class="display">
+<div class="display row">
     <div class="col-md-10 col-md-offset-1">
         <div class="banner">
             <div class="top row">
