@@ -206,15 +206,6 @@ abstract class SRBObject
         return new $class($result);
     }
 
-    static public function findCountAllQuery ()
-    {
-        $class = get_called_class();
-        $sql = $class::findAllQuery();
-        $sql = self::addCountToQuery($sql);
-
-        return $sql;
-    }
-
     static public function getCountOfQuery ($sql)
     {
         $sql = self::addCountToQuery($sql);
