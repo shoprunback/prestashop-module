@@ -122,6 +122,8 @@ class SRBProduct extends SRBObject
         if ($coverPicture) {
             $this->picture_file_url = 'ps-' . $this->label;
             $this->picture_file_base64 = 'data:image/png;base64,' . base64_encode($coverPicture);
+        } else {
+            $this->syncDeleteProductImage();
         }
 
         return $coverPicture;
@@ -137,23 +139,23 @@ class SRBProduct extends SRBObject
 
         $this->addCoverPictureToSync();
 
-        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
+        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
         return Synchronizer::sync($this);
     }
 
     public function deleteWithCheck ()
     {
         if (! $this->canBeDeleted()) {
-            SRBLogger::addLog('Product "' . $this->{self::getIdentifier()} . '" couldn\'t be deleted because it has already been ordered', SRBLogger::WARNING, self::getObjectTypeForMapping(), $this->getDBId());
+            SRBLogger::addLog('Product "' . $this->getReference() . '" couldn\'t be deleted because it has already been ordered', SRBLogger::WARNING, self::getObjectTypeForMapping(), $this->getDBId());
             return false;
         }
 
         if ($this->syncDelete() != '') {
-            SRBLogger::addLog('An error occured, product "' . $this->{self::getIdentifier()} . '" couldn\'t be deleted', SRBLogger::FATAL, self::getObjectTypeForMapping(), $this->getDBId());
+            SRBLogger::addLog('An error occured, product "' . $this->getReference() . '" couldn\'t be deleted', SRBLogger::FATAL, self::getObjectTypeForMapping(), $this->getDBId());
             return false;
         }
 
-        SRBLogger::addLog('Product "' . $this->{self::getIdentifier()} . '" deleted', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
+        SRBLogger::addLog('Product "' . $this->getReference() . '" deleted', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
         return true;
     }
 
@@ -173,7 +175,7 @@ class SRBProduct extends SRBObject
 
     public function syncDelete ()
     {
-        SRBLogger::addLog('DELETING ' . self::getObjectTypeForMapping() . ' "' . $this->{self::getIdentifier()} . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
+        SRBLogger::addLog('DELETING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
         return Synchronizer::delete($this);
     }
 
@@ -202,5 +204,11 @@ class SRBProduct extends SRBObject
         $sql->where('pl.id_lang = ' . Configuration::get('PS_LANG_DEFAULT'));
 
         return $sql;
+    }
+
+    public function syncDeleteProductImage ()
+    {
+        SRBLogger::addLog('DELETING IMAGE OF ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
+        return Synchronizer::APIcall(self::getPathForAPICall() . '/' . $this->getReference() . '/image', 'DELETE');
     }
 }
