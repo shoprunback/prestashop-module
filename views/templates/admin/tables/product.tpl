@@ -5,10 +5,6 @@
                 <div class="row">
                     <p class="col-sm-12 alert alert-warning">
                         {l s="product.no_brand" mod='shoprunback'}
-
-                        {foreach from=$noBrand key=id item=reference}
-                            <b> {$reference} </b>
-                        {/foreach}
                     </p>
                 </div>
             {/if}
@@ -46,7 +42,7 @@
                 </thead>
                 <tbody>
                     {foreach from=$items key=id item=item}
-                        <tr data-id="{$item->getDBId()}" class="{if in_array($item->getReference(), $noBrand)}warning{/if}">
+                        <tr data-id="{$item->getDBId()}" class="{if in_array($item->getDBId(), $noBrand)}warning{/if}">
                             <td class="left">
                                 {if $item->id_item_srb}
                                     <a href="{$externalLink}{$item->id_item_srb}" target="_blank">

@@ -164,10 +164,9 @@ class AdminShoprunbackController extends ModuleAdminController
 
         if ($itemType == 'product') {
             $noBrand = [];
-            $productIdentifier = SRBProduct::getIdentifier();
             foreach ($items as $product) {
                 if (! isset($product->brand) || $product->brand == '') {
-                    $noBrand[] = $product->{$productIdentifier};
+                    $noBrand[] = $product->getDBId();
                 }
             }
 
