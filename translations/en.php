@@ -6,6 +6,7 @@ $_MODULE['<{shoprunback}prestashop>shoprunback_bb4768ee80af89876784e903eebc5f40'
 $_MODULE['<{shoprunback}prestashop>shoprunback_8ff63b277c7cd76096e7e03431f51c3f'] = 'Are you sure you want to delete ShopRunBack?';
 $_MODULE['<{shoprunback}prestashop>config_fa152001a93f98c22968c049e24e27da'] = 'My account';
 $_MODULE['<{shoprunback}prestashop>config_57bcc854def680d7733d6cba3ec64a96'] = 'API Token';
+$_MODULE['<{shoprunback}prestashop>config_5be1b52b648be08ece1d1e01cbce33c6'] = 'If you activate the production environment, the PrestaShop\'s returns system will be disabled and replaced by ShopRunBack\'s.';
 $_MODULE['<{shoprunback}prestashop>config_e2d6542d4264758ee257ad72a3fd8a3c'] = 'Production environment';
 $_MODULE['<{shoprunback}prestashop>config_f63d26bbe70aad57af4e09a791b6ebb1'] = 'Yes';
 $_MODULE['<{shoprunback}prestashop>config_8b5abe07d8516c6f00011a9b51295988'] = 'No';

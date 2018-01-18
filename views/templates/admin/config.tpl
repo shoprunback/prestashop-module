@@ -8,6 +8,12 @@
                 <input type="text" name="srbtoken" value="{$srbtoken}" class="form-control" required />
             </div>
 
+            {if $PSOrderReturn == 1}
+                <div class="alert alert-warning">
+                    <p>{l s="config.form.disable_ps_returns" mod='shoprunback'}</p>
+                </div>
+            {/if}
+
             <div class="form-group">
                 <label for="production">{l s="config.form.production" mod='shoprunback'}</label>
 

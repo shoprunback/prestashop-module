@@ -54,6 +54,10 @@ class AdminShoprunbackController extends ModuleAdminController
         Synchronizer::APIcall('company', 'PUT', ['webhook_url' => $this->module->webhookUrl]);
 
         Configuration::updateValue('production', Tools::getValue('production'));
+        if (Configuration::get('production') == 1) {
+            Configuration::updateValue('PS_ORDER_RETURN', false);
+        }
+
         SRBLogger::addLog('Sandbox mode: ' . Tools::getValue('production'), SRBLogger::INFO, 'configuration');
 
         return self::SUCCESS_CONFIG;
@@ -184,6 +188,7 @@ class AdminShoprunbackController extends ModuleAdminController
 
     private function getConfigFormValues ()
     {
+        $this->context->smarty->assign('PSOrderReturn', Configuration::get('PS_ORDER_RETURN'));
         $this->context->smarty->assign('formActionUrl', $this->tabUrl . '&itemType=config');
         $this->context->smarty->assign('production', Configuration::get('production'));
     }
