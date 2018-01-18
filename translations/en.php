@@ -29,7 +29,7 @@ $_MODULE['<{shoprunback}prestashop>srbmanager_5f1cb29a89300688965f8c1962dbf59d']
 $_MODULE['<{shoprunback}prestashop>srbmanager_2bb7bdf609eb9be4c89e6616cb56ba85'] = 'You have no brand yet';
 $_MODULE['<{shoprunback}prestashop>srbmanager_7d32a25861b1e091c440f3462c774ffb'] = 'You have no product yet';
 $_MODULE['<{shoprunback}prestashop>srbmanager_6e081a4fc1464aa0fe275ae3ee8fa57d'] = 'You have no return yet';
-$_MODULE['<{shoprunback}prestashop>productmainleftmiddle_49bb9b738e2960d620e4ecfa82aca317'] = 'ShopRunBack links each product with a brand. If you don\'t attach a product to a brand, it will be attached do a default brand on ShopRunBack\'s site.';
+$_MODULE['<{shoprunback}prestashop>productmainleftmiddle_49bb9b738e2960d620e4ecfa82aca317'] = 'ShopRunBack links each product with a brand. If you don\'t attach a product to a brand, it will be attached to a default brand on ShopRunBack\'s site.';
 $_MODULE['<{shoprunback}prestashop>brand_d8101faeafeb857c26a1aa832374f20a'] = 'My brands';
 $_MODULE['<{shoprunback}prestashop>brand_ca69e7227610e37cf051265a9e0415ba'] = 'Synchronize all';
 $_MODULE['<{shoprunback}prestashop>brand_e966757a696b5c1c158821c6ffd5e036'] = 'Synchronize New only';
