@@ -99,6 +99,12 @@ class SRBShipback extends SRBObject
             return false;
         }
 
+        $order = SRBOrder::getById($orderId);
+        $order->sync();
+        if (! $order->isDelivered()) {
+            return false;
+        }
+
         $psReturn = [
             'id_srb_shipback' => 0,
             'id_order' => $orderId,

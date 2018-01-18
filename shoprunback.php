@@ -100,6 +100,7 @@ class ShopRunBack extends Module
             || ! $this->registerHook('actionProductDelete')
             || ! $this->registerHook('actionProductUpdate')
             || ! $this->registerHook('actionOrderStatusPostUpdate')
+            || ! $this->registerHook('displayAdminProductsMainStepLeftColumnMiddle')
             || ! $this->registerHook('displayOrderDetail')
             || ! $this->registerHook('newOrder')
         ) {
@@ -128,6 +129,7 @@ class ShopRunBack extends Module
             || ! $this->unregisterHook('actionProductDelete')
             || ! $this->unregisterHook('actionProductUpdate')
             || ! $this->unregisterHook('actionOrderStatusPostUpdate')
+            || ! $this->unregisterHook('displayAdminProductsMainStepLeftColumnMiddle')
             || ! $this->unregisterHook('displayOrderDetail')
             || ! $this->unregisterHook('newOrder')
         ) {
@@ -240,11 +242,24 @@ class ShopRunBack extends Module
         }
     }
 
+    public function hookDisplayAdminProductsMainStepLeftColumnMiddle ()
+    {
+        $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/srbGlobal.css');
+        $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/admin/productMainLeftMiddle.css');
+
+        return $this->display(__FILE__, 'views/templates/admin/product/productMainLeftMiddle.tpl');
+    }
+
     public function hookDisplayOrderDetail ($params)
     {
         if (Configuration::get('srbtoken')) {
             try {
                 $order = SRBOrder::getById($_GET['id_order']);
+
+                if (! $order->isDelivered()) {
+                    return false;
+                }
+
                 $srbfcLink = $this->context->link->getModuleLink('shoprunback', 'shipback', []);
                 $this->context->smarty->assign('createReturnLink', $srbfcLink);
                 $this->context->smarty->assign('order', $order);
@@ -259,8 +274,7 @@ class ShopRunBack extends Module
                 $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/srbGlobal.css');
                 $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/front/orderDetail.css');
 
-                $display = $this->display(__FILE__, 'orderDetail.tpl');
-                return $display;
+                return $this->display(__FILE__, 'orderDetail.tpl');;
             } catch (OrderException $e) {
                 return $e;
             }

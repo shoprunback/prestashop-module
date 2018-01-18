@@ -60,6 +60,7 @@ abstract class SRBObject
         $items = self::convertPSArrayToSRBObjects(Db::getInstance()->executeS($class::findAllWithMappingQuery($onlySyncItems, $limit, $offset)));
 
         foreach ($items as $key => $item) {
+            $items[$key]->id_item_srb = $item->ps['id_item_srb'];
             $items[$key]->last_sent_at = $item->ps['last_sent_at'];
         }
 

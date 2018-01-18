@@ -103,6 +103,7 @@ class SRBOrder extends SRBObject
         $items = self::convertPSArrayToSRBObjects(Db::getInstance()->executeS($sql));
 
         foreach ($items as $key => $item) {
+            $items[$key]->id_item_srb = $item->ps['id_item_srb'];
             $items[$key]->last_sent_at = $item->ps['last_sent_at'];
             $items[$key]->id_srb_shipback = $item->ps['id_srb_shipback'];
             $items[$key]->state = $item->ps['state'];
@@ -162,5 +163,29 @@ class SRBOrder extends SRBObject
         $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
+    }
+
+    // Returns the attribute "delivered" of an order, which is in the order_state, available by passing through the order_history
+    public function isDelivered () {
+        $sql = new DbQuery();
+        $sql->select('os.delivery');
+        $sql->from('orders', self::getTableName());
+        $sql->leftJoin(
+            'order_history',
+            'oh',
+            'oh.id_order = ' . self::getTableName() . '.' . self::getIdColumnName() . ' AND oh.id_order_history IN (
+                SELECT MAX(oh.id_order_history)
+                FROM ps_order_history oh
+                GROUP BY id_order
+            )'
+        );
+        $sql->leftJoin(
+            'order_state',
+            'os',
+            'os.id_order_state = oh.id_order_state'
+        );
+        $sql->where('oh.id_order = ' . $this->ps['id_order']);
+
+        return Db::getInstance()->getRow($sql)['delivery'];
     }
 }
