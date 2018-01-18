@@ -253,7 +253,7 @@ class ShopRunBack extends Module
             try {
                 $order = SRBOrder::getById($_GET['id_order']);
 
-                if (! $order->isDelivered()) {
+                if (! $order->isShipped()) {
                     return false;
                 }
 

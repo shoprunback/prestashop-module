@@ -101,7 +101,7 @@ class SRBShipback extends SRBObject
 
         $order = SRBOrder::getById($orderId);
         $order->sync();
-        if (! $order->isDelivered()) {
+        if (! $order->isShipped()) {
             return false;
         }
 

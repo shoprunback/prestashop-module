@@ -41,7 +41,7 @@ class SRBItem
     static private function findProductsForItems ()
     {
         $sql = new DbQuery();
-        $sql->select(SRBProduct::getTableName() . '.*, pl.name, cu.iso_code');
+        $sql->select(SRBProduct::getTableName() . '.*, pl.name, cu.iso_code, cp.quantity');
         $sql->from('product', SRBProduct::getTableName());
         $sql->innerJoin('product_lang', 'pl', SRBProduct::getTableName() . '.id_product = pl.id_product');
         $sql->innerJoin('cart_product', 'cp', SRBProduct::getTableName() . '.id_product = cp.id_product');
@@ -57,7 +57,12 @@ class SRBItem
     {
         $items = [];
         foreach ($products as $product) {
-            $items[] = new self($product);
+            $item = new self($product);
+            $quantity = $product['quantity'];
+
+            for ($i = 1; $i <= $quantity; $i++) {
+                $items[] = $item;
+            }
         }
 
         return $items;

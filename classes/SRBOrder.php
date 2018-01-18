@@ -165,10 +165,28 @@ class SRBOrder extends SRBObject
         return $sql;
     }
 
-    // Returns the attribute "delivered" of an order, which is in the order_state, available by passing through the order_history
-    public function isDelivered () {
-        $sql = new DbQuery();
+    // Returns the attribute "delivered" of an order
+    public function isDelivered ()
+    {
+        $sql = $this->getComponentsToFindOrderState();
         $sql->select('os.delivery');
+
+        return Db::getInstance()->getRow($sql)['delivery'];
+    }
+
+    // Returns the attribute "shipped" of an order
+    public function isShipped ()
+    {
+        $sql = $this->getComponentsToFindOrderState();
+        $sql->select('os.shipped');
+
+        return Db::getInstance()->getRow($sql)['shipped'];
+    }
+
+    // Base query to get the order_state, available by passing through the order_history
+    public function getComponentsToFindOrderState ()
+    {
+        $sql = new DbQuery();
         $sql->from('orders', self::getTableName());
         $sql->leftJoin(
             'order_history',
@@ -186,6 +204,6 @@ class SRBOrder extends SRBObject
         );
         $sql->where('oh.id_order = ' . $this->ps['id_order']);
 
-        return Db::getInstance()->getRow($sql)['delivery'];
+        return $sql;
     }
 }
