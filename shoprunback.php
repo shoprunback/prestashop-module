@@ -244,9 +244,6 @@ class ShopRunBack extends Module
 
     public function hookDisplayAdminProductsMainStepLeftColumnMiddle ()
     {
-        $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/srbGlobal.css');
-        $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/admin/productMainLeftMiddle.css');
-
         return $this->display(__FILE__, 'views/templates/admin/product/productMainLeftMiddle.tpl');
     }
 
