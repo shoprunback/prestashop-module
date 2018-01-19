@@ -44,7 +44,7 @@
                 <tbody>
                     {foreach from=$items key=id item=item}
                         <tr data-id="{$item->getDBId()}">
-                            <td class="left" data-link="{if $item->id_item_srb}{$externalLink}{$item->id_item_srb}{/if}"><b>{$item->getName()}</b></td>
+                            <td class="left" data-link="{$link->getAdminLink('AdminProducts', true, ['id_product' => $item->getDBId()])}"><b>{$item->getName()}</b></td>
                             <td>{if $item->brand != ''}{$item->brand->getReference()}{/if}</td>
                             <td><b>{$item->getReference()}</b></td>
                             <td>

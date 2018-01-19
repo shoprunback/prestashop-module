@@ -65,7 +65,7 @@ class AdminShoprunbackController extends ModuleAdminController
 
     public function initContent ()
     {
-        $link = new Link();
+        $link = Context::getContext()->link;
         parent::initContent();
 
         $pages = 1;
