@@ -69,9 +69,22 @@ class SRBShipback extends SRBObject
 
     public function sync ()
     {
-        $this->order->sync();
         SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
-        return Synchronizer::sync($this);
+
+        $this->order->sync();
+
+        if (isset($this->order_id) && $this->order_id != '') {
+            $order = $this->order;
+            unset($this->order);
+        }
+
+        $result = Synchronizer::sync($this);
+
+        if (isset($this->order_id) && $this->order_id != '') {
+            $this->order = $order;
+        }
+
+        return $result;
     }
 
     public function save ()

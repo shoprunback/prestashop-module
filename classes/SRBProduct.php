@@ -140,7 +140,19 @@ class SRBProduct extends SRBObject
         $this->addCoverPictureToSync();
 
         SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
-        return Synchronizer::sync($this);
+
+        if (isset($this->brand_id) && $this->brand_id != '') {
+            $brand = $this->brand;
+            unset($this->brand);
+        }
+
+        $result = Synchronizer::sync($this);
+
+        if (isset($this->brand_id) && $this->brand_id != '') {
+            $this->brand = $brand;
+        }
+
+        return $result;
     }
 
     public function deleteWithCheck ()
