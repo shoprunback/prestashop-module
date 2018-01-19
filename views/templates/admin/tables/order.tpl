@@ -37,17 +37,7 @@
                 <tbody>
                     {foreach from=$items key=id item=item}
                         <tr data-id="{$item->getDBId()}">
-                            <td>
-                                {if $item->id_item_srb}
-                                    <a href="{$externalLink}{$item->id_item_srb}" target="_blank">
-                                {/if}
-
-                                <b>{$item->getName()}</b>
-
-                                {if $item->id_item_srb}
-                                    </a>
-                                {/if}
-                            </td>
+                            <td data-link="{if $item->id_item_srb}{$externalLink}{$item->id_item_srb}{/if}"><b>{$item->getName()}</b></td>
                             <td>{$item->customer->first_name} {$item->customer->last_name}</td>
                             <td>{$item->ordered_at}</td>
                             <td>

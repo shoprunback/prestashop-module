@@ -56,4 +56,8 @@ $(document).ready(function() {
 
     ajaxAsyncCall(data);
   });
+
+  $('#srb-content td[data-link][data-link!=""]').on('click', function (e) {
+    window.open($(this).data('link'), '_blank');
+  });
 });

@@ -46,6 +46,10 @@
   height: 40px;
 }
 
+#srb-manager table td[data-link]:not([data-link=""]):hover {
+    cursor: pointer;
+}
+
 #srb-manager table td, #srb-manager table th {
   text-align: center;
 }
