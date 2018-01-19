@@ -188,6 +188,9 @@ class SRBOrder extends SRBObject
     {
         $sql = new DbQuery();
         $sql->from('orders', self::getTableName());
+        // LeftJoin because the order may have no history
+        // id_order_history is the primary key of order_history
+        // Each order can have many lines of history, so we catch the MAX id_order_history to have the most recent state of the order
         $sql->leftJoin(
             'order_history',
             'oh',
@@ -197,6 +200,7 @@ class SRBOrder extends SRBObject
                 GROUP BY id_order
             )'
         );
+        // To catch a state, we need to go through an history, so we keep the leftJoin
         $sql->leftJoin(
             'order_state',
             'os',
