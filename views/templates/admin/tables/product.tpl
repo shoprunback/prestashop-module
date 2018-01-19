@@ -35,6 +35,7 @@
                     <tr>
                         <th>{l s="product.products" mod='shoprunback'}</th>
                         <th>{l s="product.reference" mod='shoprunback'}</th>
+                        <th>{l s="product.brand" mod='shoprunback'}</th>
                         <th>{l s="item.last_sync" mod='shoprunback'}</th>
                         <th>{l s="item.sync" mod='shoprunback'}</th>
                         <th></th>
@@ -42,7 +43,7 @@
                 </thead>
                 <tbody>
                     {foreach from=$items key=id item=item}
-                        <tr data-id="{$item->getDBId()}" class="{if in_array($item->getDBId(), $noBrand)}warning{/if}">
+                        <tr data-id="{$item->getDBId()}">
                             <td class="left">
                                 {if $item->id_item_srb}
                                     <a href="{$externalLink}{$item->id_item_srb}" target="_blank">
@@ -54,6 +55,7 @@
                                     </a>
                                 {/if}
                             </td>
+                            <td>{if $item->brand != ''}{$item->brand->getReference()}{/if}</td>
                             <td><b>{$item->getReference()}</b></td>
                             <td>
                                 {if $item->last_sent_at}
