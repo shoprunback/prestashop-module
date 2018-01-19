@@ -108,6 +108,7 @@ class SRBShipback extends SRBObject
         $psReturn = [
             'id_srb_shipback' => 0,
             'id_order' => $orderId,
+            'order' => $order,
             'state' => '0',
             'mode' => 'postal',
             'created_at' => date('Y-m-d H:i:s'),
