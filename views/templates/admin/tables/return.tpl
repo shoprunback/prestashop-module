@@ -24,14 +24,14 @@
                         <th>
                             {l s="return.customer" mod='shoprunback'}
                             <form action="{$actionUrl}" method="POST">
-                                <input type="text" name="customer" placeholder="{l s='form.placeholder' mod='shoprunback'}" value="{$searchCustomer}" />
+                                <input type="text" name="customer" placeholder="{l s='form.placeholder' mod='shoprunback'}" value="{$searchCustomer}" autocomplete="off" />
                                 <a href="{$srbManager}&itemType={$itemType}" class="btn btn-default">{l s='form.clear' mod='shoprunback'}</a>
                             </form>
                         </th>
                         <th>
                             {l s='order.id' mod='shoprunback'}
                             <form action="{$actionUrl}" method="POST">
-                                <input type="text" min="0" name="orderReference" placeholder="{l s='form.placeholder' mod='shoprunback'}" value="{$searchOrderReference}" />
+                                <input type="text" min="0" name="orderReference" placeholder="{l s='form.placeholder' mod='shoprunback'}" value="{$searchOrderReference}" autocomplete="off" />
                                 <a href="{$srbManager}&itemType={$itemType}" class="btn btn-default">{l s='form.clear' mod='shoprunback'}</a>
                             </form>
                         </th>
