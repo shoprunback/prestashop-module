@@ -156,19 +156,20 @@
 #srb-manager .pagination ul li {
   float: left;
   list-style-type: none;
+  background-color: white;
+  border: #DDDDDD 1px solid;
+  padding: 8px 0px;
 }
 
-#srb-manager .pagination ul li a {
-  padding: 0;
-  color: #505050;
+#srb-manager .pagination ul li span {
+  padding: 0px 12px;
+  color: #333C49;
 }
 
-#srb-manager .pagination ul li button {
-  border-width: 2px;
-  padding: 9px 14px;
-  font-weight: bold;
+#srb-manager .pagination ul li.active {
+  background-color: #333C49;
 }
 
-#srb-manager .pagination ul .active button {
-  color: #40A0F0;
+#srb-manager .pagination ul li.active span {
+  color: white;
 }
