@@ -18,6 +18,8 @@ class SRBOrder extends SRBObject
         $this->ordered_at = $psOrder['date_add'];
         $this->customer = SRBCustomer::createFromOrder($psOrder);
         $this->items = SRBItem::createItemsFromOrderId($this->getDBId());
+
+        $this->attributesToSend = ['order_number', 'ordered_at', 'customer', 'items'];
     }
 
     static public function getObjectTypeForMapping ()

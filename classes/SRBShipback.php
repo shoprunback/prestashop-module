@@ -25,6 +25,8 @@ class SRBShipback extends SRBObject
         $this->state = $psReturn['state'];
         $this->created_at = $psReturn['created_at'];
         $this->public_url = $psReturn['public_url'];
+
+        $this->attributesToSend = ['order', 'order_id'];
     }
 
     static public function getObjectTypeForMapping ()
@@ -101,8 +103,6 @@ class SRBShipback extends SRBObject
 
         SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $this->getReference() . '" updated', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
 
-        $this->sync();
-
         return $result;
     }
 
@@ -164,7 +164,7 @@ class SRBShipback extends SRBObject
     static private function createReturnFromSyncResult ($item, $orderId)
     {
         $shipbackToInsert = [
-            'id_srb_shipback' => $item->id,
+            'id_srb_shipback' => $item->id_srb_shipback,
             'id_order' => $orderId,
             'state' => $item->state,
             'mode' => $item->mode,
@@ -174,7 +174,7 @@ class SRBShipback extends SRBObject
 
         $sql = Db::getInstance();
         $result = $sql->insert(self::SHIPBACK_TABLE_NAME_NO_PREFIX, $shipbackToInsert);
-        SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $item->id . '" inserted', SRBLogger::INFO, self::getObjectTypeForMapping(), $item->id);
+        SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $item->id_srb_shipback . '" inserted', SRBLogger::INFO, self::getObjectTypeForMapping(), $item->id);
 
         return self::getById($item->id);
     }

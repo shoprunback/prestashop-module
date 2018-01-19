@@ -18,11 +18,12 @@ class SRBProduct extends SRBObject
     {
         $this->ps = $psProduct;
         $this->label = $this->extractNameFromPSArray($psProduct['name']);
-        $this->reference = $psProduct['reference'] != '' ? $psProduct['reference'] : $this->label;
-        $this->weight_grams = $psProduct['weight'] * 1000;
-        $this->width_mm = $psProduct['width'];
-        $this->height_mm = $psProduct['height'];
-        $this->length_mm = $psProduct['depth'];
+        $reference = $psProduct['reference'] != '' ? $psProduct['reference'] : $this->label;
+        $this->reference = str_replace(' ', '-', $reference);
+        $this->weight_grams = intval($psProduct['weight'] * 1000);
+        $this->width_mm = intval($psProduct['width'] * 10);
+        $this->height_mm = intval($psProduct['height'] * 10);
+        $this->length_mm = intval($psProduct['depth'] * 10);
 
         if ($psProduct['id_manufacturer'] == 0) {
             SRBLogger::addLog('The product "' . $this->getReference() . '" has no brand attached!', SRBLogger::WARNING);
@@ -30,6 +31,8 @@ class SRBProduct extends SRBObject
             $this->brand = SRBBrand::getById($psProduct['id_manufacturer']);
             $this->brand_id = $this->brand->reference;
         }
+
+        $this->attributesToSend = ['label', 'reference', 'weight_grams', 'width_mm', 'height_mm', 'length_mm', 'brand', 'brand_id'];
     }
 
     static public function getObjectTypeForMapping ()

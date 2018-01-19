@@ -11,7 +11,9 @@ class SRBBrand extends SRBObject
     {
         $this->ps = $manufacturer;
         $this->name = $manufacturer['name'];
-        $this->reference = $manufacturer['name'];
+        $this->reference = str_replace(' ', '-', $manufacturer['name']);
+
+        $this->attributesToSend = ['name', 'reference'];
     }
 
     static public function getObjectTypeForMapping ()

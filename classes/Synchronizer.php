@@ -72,14 +72,16 @@ abstract class Synchronizer
             $getResult = self::APIcall($path . '/' . $reference, 'GET');
         }
 
+        $itemJson = $item->toJson();
+
         // If we have a get result, we do a PUT, else we do a POST
         $postResult = '';
         if ($getResult == '') {
-            $postResult = self::APIcall($path, 'POST', $item);
+            $postResult = self::APIcall($path, 'POST', $itemJson);
         } else {
             // Orders cannot be modified
             if ($path != 'orders') {
-                $postResult = self::APIcall($path . '/' . $reference, 'PUT', $item);
+                $postResult = self::APIcall($path . '/' . $reference, 'PUT', $itemJson);
             } else {
                 // We still save the last sync call for orders (in case the user has installed the module, sync.ed some orders, uninstalled and reinstalled the module)
                 $item->id_item_srb = json_decode($getResult)->id;

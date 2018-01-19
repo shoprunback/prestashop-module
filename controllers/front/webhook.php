@@ -24,7 +24,7 @@ class ShopRunBackWebhookModuleFrontController extends ModuleFrontController
         $id = isset($webhook->data->id) ? $webhook->data->id : '';
 
         if (! $type && ! $id) {
-            SRBLogger::addLog('WEBHOOK FAILED: NO TYPE AND NO ID!', SRBLogger::FATAL);
+            SRBLogger::addLog('WEBHOOK FAILED: NO TYPE AND NO ID! ' . json_encode($webhook), SRBLogger::FATAL);
             return self::returnHeaderHTTP(200);
         }
         if (! $type) {

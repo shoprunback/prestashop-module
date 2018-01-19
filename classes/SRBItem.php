@@ -12,7 +12,7 @@ class SRBItem
 
     public function __construct ($psProduct)
     {
-        $this->price_cents = $psProduct['price'];
+        $this->price_cents = intval($psProduct['price'] * 100);
         $this->currency = $psProduct['iso_code'];
         $this->product = new SRBProduct($psProduct);
         $this->label = $this->product->label;

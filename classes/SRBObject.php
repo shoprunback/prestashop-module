@@ -8,6 +8,7 @@ abstract class SRBObject
     public $id;
     public $identifier;
     public $ps;
+    public $attributesToSend;
 
     abstract static public function getTableName();
 
@@ -211,5 +212,59 @@ abstract class SRBObject
     {
         $sql = self::addCountToQuery($sql);
         return Db::getInstance()->getRow($sql)['count'];
+    }
+
+    public function getAttributesNeeded ()
+    {
+        $attributesToSend = $this->attributesToSend;
+
+        $object = new stdClass();
+        foreach ($attributesToSend as $key => $attribute) {
+            if (isset($this->$attribute)) {
+                $object->$attribute = $this->$attribute;
+            }
+        }
+
+        if (isset($object->items)) {
+            $items = $object->items;
+
+            $itemsNeeded = [];
+            foreach ($items as $key => $item) {
+                $item->product = $item->product->getAttributesNeeded();
+                $itemsNeeded[] = $item;
+            }
+
+            $object->items = $itemsNeeded;
+        }
+
+        if (isset($object->customer)) {
+            unset($object->customer->id);
+
+            if (isset($object->customer->address)) {
+                unset($object->customer->address->id);
+            }
+        }
+
+        if (isset($object->product)) {
+            $object->product = $object->product->getAttributesNeeded();
+        }
+
+        if (isset($object->brand)) {
+            if (isset($object->brand_id)) {
+                unset($object->brand);
+            } else {
+                $object->brand = $object->brand->getAttributesNeeded();
+            }
+        }
+
+        return $object;
+    }
+
+    public function toJson ()
+    {
+        $object = new stdClass();
+        $object = $this->getAttributesNeeded();
+
+        return json_encode($object);
     }
 }
