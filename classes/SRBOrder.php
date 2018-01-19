@@ -86,20 +86,8 @@ class SRBOrder extends SRBObject
             SRBShipback::getTableName(),
             SRBShipback::getTableName() . '.id_order = ' . self::getTableName() . '.' . self::getIdColumnName()
         );
-        $sql->leftJoin( // We use leftJoin because orders may not have an history associated
-            'order_history',
-            'oh',
-            'oh.id_order = ' . self::getTableName() . '.' . self::getIdColumnName() . ' AND oh.id_order_history IN (
-                SELECT MAX(oh.id_order_history)
-                FROM ps_order_history oh
-                GROUP BY id_order
-            )'
-        );
-        $sql->leftJoin( // Follows order_history
-            'order_state',
-            'os',
-            'os.id_order_state = oh.id_order_state'
-        );
+        $sql = self::getComponentsToFindOrderState($sql);
+
         $items = self::convertPSArrayToSRBObjects(Db::getInstance()->executeS($sql));
 
         foreach ($items as $key => $item) {
@@ -120,7 +108,7 @@ class SRBOrder extends SRBObject
 
     static public function addComponentsToQuery ($sql)
     {
-        $sql->select(self::getTableName() . '.*, c.*, a.*, s.name as stateName, co.*');
+        $sql->select(self::getTableName() . '.*, c.id_customer, c.firstname, c.lastname, c.email, a.id_address, a.address1, a.address2, a.postcode, a.city, a.phone, s.name as stateName, co.*');
         $sql->innerJoin('customer', 'c', self::getTableName() . '.id_customer = c.id_customer');
         $sql->innerJoin('address', 'a', 'c.id_customer = a.id_customer');
         $sql->innerJoin('country', 'co', 'a.id_country = co.id_country');
@@ -159,6 +147,7 @@ class SRBOrder extends SRBObject
             )'
         );
         $sql->groupBy(static::getTableName() . '.' . $identifier);
+        $sql->orderBy('o.date_add DESC');
         $sql->orderBy('srb.last_sent_at DESC');
         $sql = self::addLimitToQuery($sql, $limit, $offset);
 
@@ -168,7 +157,10 @@ class SRBOrder extends SRBObject
     // Returns the attribute "delivered" of an order
     public function isDelivered ()
     {
-        $sql = $this->getComponentsToFindOrderState();
+        $sql = new DbQuery();
+        $sql->from('orders', self::getTableName());
+        $sql = self::getComponentsToFindOrderState($sql);
+        $sql->where('oh.id_order = ' . $this->ps['id_order']);
         $sql->select('os.delivery');
 
         return Db::getInstance()->getRow($sql)['delivery'];
@@ -177,17 +169,18 @@ class SRBOrder extends SRBObject
     // Returns the attribute "shipped" of an order
     public function isShipped ()
     {
-        $sql = $this->getComponentsToFindOrderState();
+        $sql = new DbQuery();
+        $sql->from('orders', self::getTableName());
+        $sql = self::getComponentsToFindOrderState($sql);
+        $sql->where('oh.id_order = ' . $this->ps['id_order']);
         $sql->select('os.shipped');
 
         return Db::getInstance()->getRow($sql)['shipped'];
     }
 
     // Base query to get the order_state, available by passing through the order_history
-    public function getComponentsToFindOrderState ()
+    static public function getComponentsToFindOrderState ($sql)
     {
-        $sql = new DbQuery();
-        $sql->from('orders', self::getTableName());
         // LeftJoin because the order may have no history
         // id_order_history is the primary key of order_history
         // Each order can have many lines of history, so we catch the MAX id_order_history to have the most recent state of the order
@@ -206,7 +199,6 @@ class SRBOrder extends SRBObject
             'os',
             'os.id_order_state = oh.id_order_state'
         );
-        $sql->where('oh.id_order = ' . $this->ps['id_order']);
 
         return $sql;
     }
