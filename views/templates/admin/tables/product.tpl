@@ -45,8 +45,8 @@
                     {foreach from=$items key=id item=item}
                         <tr data-id="{$item->getDBId()}">
                             <td class="left" data-link="{$link->getAdminLink('AdminProducts', true, ['id_product' => $item->getDBId()])}"><b>{$item->getName()}</b></td>
-                            <td>{if $item->brand != ''}{$item->brand->getReference()}{/if}</td>
                             <td><b>{$item->getReference()}</b></td>
+                            <td>{if $item->brand != ''}{$item->brand->getName()}{/if}</td>
                             <td>
                                 {if $item->last_sent_at}
                                     {$item->last_sent_at}
