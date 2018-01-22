@@ -156,18 +156,6 @@ class SRBOrder extends SRBObject
         return $sql;
     }
 
-    // Returns the attribute "delivered" of an order
-    public function isDelivered ()
-    {
-        $sql = new DbQuery();
-        $sql->from('orders', self::getTableName());
-        $sql = self::getComponentsToFindOrderState($sql);
-        $sql->where('oh.id_order = ' . $this->ps['id_order']);
-        $sql->select('os.delivery');
-
-        return Db::getInstance()->getRow($sql)['delivery'];
-    }
-
     // Returns the attribute "shipped" of an order
     public function isShipped ()
     {
