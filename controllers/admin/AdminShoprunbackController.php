@@ -68,7 +68,6 @@ class AdminShoprunbackController extends ModuleAdminController
         $link = Context::getContext()->link;
         parent::initContent();
 
-        $pages = 1;
         $itemType = (isset($_GET['itemType'])) ? $_GET['itemType'] : '';
         $items = [];
         $template = 'srbManager';
