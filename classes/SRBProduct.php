@@ -208,13 +208,14 @@ class SRBProduct extends SRBObject
         return $sql;
     }
 
-    static protected function findAllQuery ()
+    static protected function findAllQuery ($limit = 0, $offset = 0)
     {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*, pl.*');
         $sql->from('product', self::getTableName());
         $sql->innerJoin('product_lang', 'pl', self::getTableName() . '.id_product = pl.id_product');
         $sql->where('pl.id_lang = ' . Configuration::get('PS_LANG_DEFAULT'));
+        $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
     }

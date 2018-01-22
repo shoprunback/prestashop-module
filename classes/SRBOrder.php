@@ -119,11 +119,12 @@ class SRBOrder extends SRBObject
         return $sql;
     }
 
-    static protected function findAllQuery ()
+    static protected function findAllQuery ($limit = 0, $offset = 0)
     {
         $sql = new DbQuery();
         $sql->from('orders', self::getTableName());
         $sql = self::addComponentsToQuery($sql);
+        $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
     }

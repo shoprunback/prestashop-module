@@ -35,12 +35,12 @@ abstract class SRBObject
 
     abstract public function sync();
 
-    abstract static protected function findAllQuery();
+    abstract static protected function findAllQuery($limit = 0, $offset = 0);
 
-    static public function getAll ()
+    static public function getAll ($limit = 0, $offset = 0)
     {
         $class = get_called_class();
-        return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS($class::findAllQuery()));
+        return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS($class::findAllQuery($limit, $offset)));
     }
 
     static public function getCountAll ()

@@ -264,13 +264,14 @@ class SRBShipback extends SRBObject
         return $shipbacks;
     }
 
-    static protected function findAllQuery ()
+    static protected function findAllQuery ($limit = 0, $offset = 0)
     {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*, ' . SRBOrder::getTableName() . '.*');
         $sql->from(self::SHIPBACK_TABLE_NAME_NO_PREFIX, self::getTableName());
         $sql->innerJoin('orders', SRBOrder::getTableName(), self::getTableName() . '.id_order = ' . SRBOrder::getTableName() . '.' . SRBOrder::getIdColumnName());
         $sql->groupBy(self::getTableName() . '.' . self::getIdColumnName());
+        $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
     }
