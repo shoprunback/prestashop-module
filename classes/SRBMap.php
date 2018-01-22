@@ -156,4 +156,10 @@ class SRBMap
 
         return $sql;
     }
+
+    static public function truncateTable ()
+    {
+        $sql = 'TRUNCATE TABLE ' . self::MAPPER_TABLE_NAME;
+        Db::getInstance()->execute($sql);
+    }
 }

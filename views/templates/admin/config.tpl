@@ -3,6 +3,12 @@
         <form action="{$formActionUrl}" method="POST">
             <h2>{l s="config.form.title" mod='shoprunback'}</h2>
 
+            {if $srbtoken != ''}
+                <div class="alert alert-warning">
+                    <p>{l s="config.form.reset_mapping" mod='shoprunback'}</p>
+                </div>
+            {/if}
+
             <div class="form-group">
                 <label for="srbtoken">{l s="config.form.token" mod='shoprunback'}</label>
                 <input type="text" name="srbtoken" value="{$srbtoken}" class="form-control" required />

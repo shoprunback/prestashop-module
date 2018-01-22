@@ -49,10 +49,22 @@ class AdminShoprunbackController extends ModuleAdminController
             return self::ERROR_NO_TOKEN;
         }
 
+        // If the user switches from a valid token to another valid token, the mapping table must be reset
+        if ($oldsrbToken != '' && $oldsrbToken != Configuration::get('srbtoken')) {
+            SRBMap::truncateTable();
+        }
+
         SRBLogger::addLog('API token saved: ' . substr($srbtoken, 0, 3) . '...' . substr($srbtoken, -3), SRBLogger::INFO, 'configuration');
 
         Synchronizer::APIcall('company', 'PUT', ['webhook_url' => $this->module->webhookUrl]);
 
+        // If the user switches from production to sandbox mode (or the opposite), the mapping table must be reset
+        $currentProductionMode = Configuration::get('production');
+        if ($currentProductionMode != Tools::getValue('production')) {
+            SRBMap::truncateTable();
+        }
+
+        // If the application goes to production mode, the PS returns' system must be turned off
         Configuration::updateValue('production', Tools::getValue('production'));
         if (Configuration::get('production') == 1) {
             Configuration::updateValue('PS_ORDER_RETURN', false);
