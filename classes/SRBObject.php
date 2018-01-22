@@ -246,7 +246,19 @@ abstract class SRBObject
         }
 
         if (isset($object->product)) {
-            $object->product = $object->product->getAttributesNeeded();
+            if (isset($object->product_id)) {
+                unset($object->product);
+            } else {
+                $object->product = $object->product->getAttributesNeeded();
+            }
+        }
+
+        if (isset($object->order)) {
+            if (isset($object->order_id)) {
+                unset($object->order);
+            } else {
+                $object->order = $object->order->getAttributesNeeded();
+            }
         }
 
         if (isset($object->brand)) {
