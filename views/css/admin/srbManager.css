@@ -85,22 +85,6 @@
   background-color: #0870E0;
 }
 
-#srb-manager table tbody tr .badge.started {
-  background-color: #FCDC12;
-}
-
-#srb-manager table tbody tr a .badge.started:hover {
-  background-color: #ECCC06;
-}
-
-#srb-manager table tbody tr .badge.paid {
-  background-color: #8FBEAC;
-}
-
-#srb-manager table tbody tr a .badge.paid:hover {
-  background-color: #7FAC9B;
-}
-
 #srb-manager table tbody tr .badge.transiting {
   background-color: #FFBC00;
 }
