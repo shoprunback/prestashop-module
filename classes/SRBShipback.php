@@ -164,7 +164,7 @@ class SRBShipback extends SRBObject
     static private function createReturnFromSyncResult ($item, $orderId)
     {
         $shipbackToInsert = [
-            'id_srb_shipback' => $item->id_srb_shipback,
+            'id_srb_shipback' => $item->id,
             'id_order' => $orderId,
             'state' => $item->state,
             'mode' => $item->mode,
@@ -174,7 +174,7 @@ class SRBShipback extends SRBObject
 
         $sql = Db::getInstance();
         $result = $sql->insert(self::SHIPBACK_TABLE_NAME_NO_PREFIX, $shipbackToInsert);
-        SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $item->id_srb_shipback . '" inserted', SRBLogger::INFO, self::getObjectTypeForMapping(), $item->id);
+        SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $item->id . '" inserted', SRBLogger::INFO, self::getObjectTypeForMapping(), $item->id);
 
         return self::getById($item->id);
     }
