@@ -25,9 +25,7 @@ class SRBProduct extends SRBObject
         $this->height_mm = intval($psProduct['height'] * 10);
         $this->length_mm = intval($psProduct['depth'] * 10);
 
-        if ($psProduct['id_manufacturer'] == 0) {
-            SRBLogger::addLog('The product "' . $this->getReference() . '" has no brand attached!', SRBLogger::WARNING);
-        } else {
+        if ($psProduct['id_manufacturer'] != 0) {
             $this->brand = SRBBrand::getById($psProduct['id_manufacturer']);
             $this->brand_id = $this->brand->reference;
         }
