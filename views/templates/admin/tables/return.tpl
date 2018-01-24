@@ -2,7 +2,7 @@
     <div class="col-md-10 col-md-offset-1">
         <div class="banner">
             <div class="top row">
-                <div class="title col-sm-4">
+                <div class="title col-sm-8">
                     <h1>{l s="return.my_returns" mod='shoprunback'}</h1>
                 </div>
 

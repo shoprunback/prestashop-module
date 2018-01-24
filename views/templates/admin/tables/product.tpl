@@ -10,7 +10,7 @@
             {/if}
 
             <div class="top row">
-                <div class="title col-sm-6">
+                <div class="title col-sm-8">
                     <h1>{l s="product.my_products" mod='shoprunback'}</h1>
 
                     {if $srbtoken != ''}
@@ -19,7 +19,7 @@
                     {/if}
                 </div>
 
-                <div class="external-link col-sm-2">
+                <div class="external-link col-sm-4">
                     <a href="{$shoprunbackURL}/products" target="_blank" class="srb-button">{l s="title.link_to_products" mod='shoprunback'}</a>
                 </div>
             </div>

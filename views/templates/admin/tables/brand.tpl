@@ -2,7 +2,7 @@
     <div class="col-md-10 col-md-offset-1">
         <div class="banner">
             <div class="top row">
-                <div class="title col-sm-6">
+                <div class="title col-sm-8">
                     <h1>{l s="brand.my_brands" mod='shoprunback'}</h1>
 
                     {if $srbtoken != ''}
@@ -11,7 +11,7 @@
                     {/if}
                 </div>
 
-                <div class="external-link col-sm-2">
+                <div class="external-link col-sm-4">
                     <a href="{$shoprunbackURL}/brands" target="_blank" class="srb-button external-link">{l s="title.link_to_brands" mod='shoprunback'}</a>
                 </div>
             </div>
