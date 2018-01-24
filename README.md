@@ -1,6 +1,6 @@
 # Module ShopRunBack for Prestashop
 
-We use the PSR-2
+We use the PHP norm PSR-2
 
 To install Prestashop:
 https://www.prestashop.com/fr/telecharger
