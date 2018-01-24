@@ -41,12 +41,12 @@ class SRBShipback extends SRBObject
 
     static public function getIdentifier ()
     {
-        return 'id_srb_shipback';
+        return self::getIdColumnName();
     }
 
     static public function getDisplayNameAttribute ()
     {
-        return 'id_srb_shipback';
+        return self::getIdColumnName();
     }
 
     static public function getTableName ()
