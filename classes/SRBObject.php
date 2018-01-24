@@ -225,8 +225,8 @@ abstract class SRBObject
             }
         }
 
-        if (isset($object->items)) {
-            $items = $object->items;
+        if (isset($this->items)) {
+            $items = $this->items;
 
             $itemsNeeded = [];
             foreach ($items as $key => $item) {
@@ -245,27 +245,27 @@ abstract class SRBObject
             }
         }
 
-        if (isset($object->product)) {
+        if (isset($this->product)) {
             if (isset($object->product_id)) {
                 unset($object->product);
             } else {
-                $object->product = $object->product->getAttributesNeeded();
+                $object->product = $this->product->getAttributesNeeded();
             }
         }
 
-        if (isset($object->order)) {
+        if (isset($this->order)) {
             if (isset($object->order_id)) {
                 unset($object->order);
             } else {
-                $object->order = $object->order->getAttributesNeeded();
+                $object->order = $this->order->getAttributesNeeded();
             }
         }
 
-        if (isset($object->brand)) {
+        if (isset($this->brand)) {
             if (isset($object->brand_id)) {
                 unset($object->brand);
             } else {
-                $object->brand = $object->brand->getAttributesNeeded();
+                $object->brand = $this->brand->getAttributesNeeded();
             }
         }
 
