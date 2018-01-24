@@ -56,7 +56,11 @@ class AdminShoprunbackController extends ModuleAdminController
 
         SRBLogger::addLog('API token saved: ' . substr($srbtoken, 0, 3) . '...' . substr($srbtoken, -3), SRBLogger::INFO, 'configuration');
 
-        Synchronizer::APIcall('company', 'PUT', ['webhook_url' => $this->module->webhookUrl]);
+        try {
+            Synchronizer::APIcall('company', 'PUT', ['webhook_url' => $this->module->webhookUrl]);
+        } catch (SynchronizerException $e) {
+            return $e;
+        }
 
         // If the user switches from production to sandbox mode (or the opposite), the mapping table must be reset
         $currentProductionMode = Configuration::get('production');

@@ -31,7 +31,7 @@ abstract class Synchronizer
             case 'POST':
             case 'PUT':
                 if (! $json) {
-                    return false;
+                    throw new SynchronizerException('Trying to do a ' . $type . ' with no json', SRBLogger::FATAL);
                 }
 
                 if (! is_string($json)) {
@@ -44,7 +44,7 @@ abstract class Synchronizer
             case 'GET':
                 break;
             default:
-                return false;
+                throw new SynchronizerException('Incorrect HTTP type', SRBLogger::FATAL);
         }
 
         $curl = curl_init();
@@ -77,11 +77,19 @@ abstract class Synchronizer
         // If we have a get result, we do a PUT, else we do a POST
         $postResult = '';
         if ($getResult == '') {
-            $postResult = self::APIcall($path, 'POST', $itemJson);
+            try {
+                $postResult = self::APIcall($path, 'POST', $itemJson);
+            } catch (SynchronizerException $e) {
+                return $e;
+            }
         } else {
             // Orders cannot be modified
             if ($path != 'orders') {
-                $postResult = self::APIcall($path . '/' . $reference, 'PUT', $itemJson);
+                try {
+                    $postResult = self::APIcall($path . '/' . $reference, 'PUT', $itemJson);
+                } catch (SynchronizerException $e) {
+                    return $e;
+                }
             } else {
                 // We still save the last sync call for orders (in case the user has installed the module, sync.ed some orders, uninstalled and reinstalled the module)
                 $item->id_item_srb = json_decode($getResult)->id;
