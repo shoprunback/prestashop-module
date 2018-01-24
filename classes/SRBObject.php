@@ -23,11 +23,11 @@ abstract class SRBObject
     abstract static public function getPathForAPICall();
 
     static public function syncAll ($newOnly = false) {
-        $brands = $newOnly ? self::getAllNotSync() : self::getAll();
+        $items = $newOnly ? self::getAllNotSync() : self::getAll();
 
         $responses = [];
-        foreach ($brands as $brand) {
-            $responses[] = $brand->sync();
+        foreach ($items as $item) {
+            $responses[] = $item->sync();
         }
 
         return $responses;
@@ -230,8 +230,10 @@ abstract class SRBObject
 
             $itemsNeeded = [];
             foreach ($items as $key => $item) {
-                $item->product = $item->product->getAttributesNeeded();
-                $itemsNeeded[] = $item;
+                if (get_class($item->product) == 'SRBProduct') {
+                    $item->product = $item->product->getAttributesNeeded();
+                    $itemsNeeded[] = $item;
+                }
             }
 
             $object->items = $itemsNeeded;
@@ -249,7 +251,9 @@ abstract class SRBObject
             if (isset($object->product_id)) {
                 unset($object->product);
             } else {
-                $object->product = $this->product->getAttributesNeeded();
+                if (get_class($item->product) == 'SRBProduct') {
+                    $object->product = $this->product->getAttributesNeeded();
+                }
             }
         }
 
@@ -265,7 +269,9 @@ abstract class SRBObject
             if (isset($object->brand_id)) {
                 unset($object->brand);
             } else {
-                $object->brand = $this->brand->getAttributesNeeded();
+                if (get_class($item->brand) == 'SRBBrand') {
+                    $object->brand = $this->brand->getAttributesNeeded();
+                }
             }
         }
 
