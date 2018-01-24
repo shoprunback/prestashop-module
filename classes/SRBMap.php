@@ -75,7 +75,7 @@ class SRBMap
             return $map->id_item_srb;
         }
 
-        return false;
+        return null;
     }
 
     static public function getById ($id)
