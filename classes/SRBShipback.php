@@ -108,7 +108,7 @@ class SRBShipback extends SRBObject
 
     static public function createShipbackFromOrderId ($orderId)
     {
-        if (self::getByOrderId($orderId)) {
+        if (self::getByOrderIdIfExists($orderId)) {
             return false;
         }
 
@@ -245,12 +245,21 @@ class SRBShipback extends SRBObject
         $shipbackFromDB = Db::getInstance()->getRow($sql);
 
         if (! $shipbackFromDB) {
-            return false;
+            throw new ShipbackException('No shipback found for order ' . $orderId, SRBLogger::ERROR);
         }
 
         $shipbackFromDB['order'] = SRBOrder::createFromShipback($shipbackFromDB);
 
         return new self($shipbackFromDB);
+    }
+
+    static public function getByOrderIdIfExists ($orderId)
+    {
+        try {
+            return self::getByOrderId($orderId);
+        } catch (ShipbackException $e) {
+            return false;
+        }
     }
 
     static private function generateReturnsFromDBResult ($shipbacksFromDB)

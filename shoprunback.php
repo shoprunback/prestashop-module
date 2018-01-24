@@ -261,7 +261,7 @@ class ShopRunBack extends Module
                 $this->context->smarty->assign('createReturnLink', $srbfcLink);
                 $this->context->smarty->assign('order', $order);
 
-                $shipback = SRBShipback::getByOrderId($_GET['id_order']);
+                $shipback = SRBShipback::getByOrderIdIfExists($_GET['id_order']);
                 $this->context->smarty->assign('shipback', $shipback);
 
                 $srbwebhookLink = $this->webhookUrl;
@@ -271,7 +271,7 @@ class ShopRunBack extends Module
                 $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/srbGlobal.css');
                 $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/front/orderDetail.css');
 
-                return $this->display(__FILE__, 'orderDetail.tpl');;
+                return $this->display(__FILE__, 'orderDetail.tpl');
             } catch (OrderException $e) {
                 return $e;
             }
