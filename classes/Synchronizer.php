@@ -1,34 +1,20 @@
 <?php
 
-include_once 'Formalizer.php';
+abstract class Synchronizer
+{
+    const SRB_DASHBOARD_URL = DASHBOARD_URL;
+    const SRB_API_URL = self::SRB_DASHBOARD_URL . '/api/v1';
 
-abstract class Synchronizer {
-    public $dirurl;
-    public $SRBModulePath;
-    public $SRBModuleURL;
-    public $url;
-    public $apiUrl;
-
-    public function __construct () {
-        // Custom parameters
-        $this->url = 'http://localhost:3000';
-        // $this->url = 'https://dashboard.shoprunback.com';
-        $this->apiUrl = $this->url . '/api/v1';
-        $this->dirurl = 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']);
-        $this->SRBModulePath = _PS_MODULE_DIR_ . $this->name;
-        $this->SRBModuleURL = $this->dirurl . '/modules/' . $this->name;
-        $this->bootstrap = true;
-    }
-
-    public function APIcall ($path, $type, $json = '') {
+    static public function APIcall ($path, $type, $json = '')
+    {
         $path = str_replace(' ', '%20', $path);
-        $url = $this->apiUrl . '/' . $path;
+        $url = self::SRB_API_URL . '/' . $path;
 
         $headers = ['accept: application/json'];
         $headers = ['Content-Type: application/json'];
 
-        if (Configuration::get('token')) {
-            $headers[] = 'Authorization: Token token=' . Configuration::get('token');
+        if (Configuration::get('srbtoken')) {
+            $headers[] = 'Authorization: Token token=' . Configuration::get('srbtoken');
         }
 
         $opts = [
@@ -45,7 +31,11 @@ abstract class Synchronizer {
             case 'POST':
             case 'PUT':
                 if (! $json) {
-                    return false;
+                    throw new SynchronizerException('Trying to do a ' . $type . ' with no json', SRBLogger::FATAL);
+                }
+
+                if (! is_string($json)) {
+                    $json = json_encode($json);
                 }
 
                 $opts[CURLOPT_POSTFIELDS] = $json;
@@ -54,7 +44,7 @@ abstract class Synchronizer {
             case 'GET':
                 break;
             default:
-                return false;
+                throw new SynchronizerException('Incorrect HTTP type', SRBLogger::FATAL);
         }
 
         $curl = curl_init();
@@ -65,35 +55,113 @@ abstract class Synchronizer {
         return $response;
     }
 
-    protected function insertApiCallLog ($item, $type) {
-        $dbName = str_replace(_DB_PREFIX_, '', ShopRunBack::API_CALLS_TABLE_NAME);
-        $idItem = 'id_' . $type;
-        if (! isset($item->$idItem)) {
-            if (isset($item->reference)) {
-                $idItem = 'reference';
+    static public function sync ($item)
+    {
+        if (! Configuration::get('srbtoken')) {
+            throw new ConfigurationException('No API token');
+        }
+
+        $identifier = $item::getIdentifier();
+        $itemType = $item::getObjectTypeForMapping();
+        $path = $item::getPathForAPICall();
+        $reference = $item->getItemReference();
+
+        // If we have a reference to use, we check if we have the item in the SRB DB (we check if we have a reference because of the shipback case)
+        $getResult = '';
+        if ($reference) {
+            $getResult = self::APIcall($path . '/' . $reference, 'GET');
+        }
+
+        $itemJson = $item->toJson();
+
+        // If we have a get result, we do a PUT, else we do a POST
+        $postResult = '';
+        if ($getResult == '') {
+            try {
+                $postResult = self::APIcall($path, 'POST', $itemJson);
+            } catch (SynchronizerException $e) {
+                return $e;
+            }
+        } else {
+            // Orders cannot be modified
+            if ($path != 'orders') {
+                try {
+                    $postResult = self::APIcall($path . '/' . $reference, 'PUT', $itemJson);
+                } catch (SynchronizerException $e) {
+                    return $e;
+                }
             } else {
-                $idItem = 'id';
+                // We still save the last sync call for orders (in case the user has installed the module, sync.ed some orders, uninstalled and reinstalled the module)
+                $item->id_item_srb = json_decode($getResult)->id;
+                self::mapApiCall($item, $itemType);
             }
         }
 
+        // We check if we did a POST or a PUT (because of order case)
+        if ($postResult) {
+            try {
+                $postResultDecoded = json_decode($postResult);
+                $class = get_class($item);
+
+                if (! $postResultDecoded) {
+                    throw new SynchronizerException('Can\'t decode postresult: ' . $postResult, 4);
+                }
+
+                // If the POST resulted in an error or not
+                if (isset($postResultDecoded->{$itemType}->errors)) {
+                    SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be synchronized! ' . $postResultDecoded->{$itemType}->errors[0], SRBLogger::FATAL, $itemType, $item->getDBId());
+                } elseif (isset($postResultDecoded->id)) {
+                    SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" synchronized', SRBLogger::INFO, $itemType, $item->getDBId());
+                    $item->id_item_srb = $postResultDecoded->id;
+                    self::mapApiCall($item, $itemType);
+                } else {
+                    SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be synchronized because of an unknown error!', SRBLogger::UNKNOWN, $itemType, $item->getDBId());
+                }
+            } catch (SynchronizerException $e) {
+                SRBLogger::addLog($e, 3, null, $itemType, $item->ps[$class::getIdColumnName()]);
+            }
+        }
+
+        return $postResult;
+    }
+
+    static public function delete ($item)
+    {
+        $identifier = $item::getIdentifier();
+        $reference = $item->getItemReference();
+        $itemType = $item::getObjectTypeForMapping();
+        $path = $item::getPathForAPICall();
+
+        $deleteResult = self::APIcall($path . '/' . $reference, 'DELETE');
+
+        $class = get_class($item);
+        $deleteResultDecoded = json_decode($deleteResult);
+        if (isset($deleteResultDecoded->errors)) {
+            SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be deleted! ' . $deleteResultDecoded->errors[0], SRBLogger::FATAL, $itemType, $item->ps[$class::getIdColumnName()]);
+            throw new SynchronizerException(ucfirst($itemType) . ' "' . $item->{$identifier} . '" couldn\'t be deleted!' . $deleteResultDecoded->errors[0]);
+        }
+
+        SRBLogger::addLog(ucfirst($itemType) . ' "' . $item->{$identifier} . '" has been deleted. ' . $deleteResult, SRBLogger::INFO, $itemType, $item->ps[$class::getIdColumnName()]);
+
+        return $deleteResult;
+    }
+
+    static private function mapApiCall ($item)
+    {
+        $itemType = $item::getObjectTypeForMapping();
+        $identifier = $item::getIdColumnName();
+        $itemId = isset($item->$identifier) ? $item->$identifier : $item->getDBId();
+
         $srbSql = Db::getInstance();
-        $srbSql->insert($dbName, [
-            'id_item' => $item->$idItem,
-            'type' => $type,
-            'last_sent' => date('Y-m-d H:i:s')
-        ]);
-    }
 
-    protected function getAll () {
-        $manufacturerSql = new DbQuery();
-        $manufacturerSql->select('m.*');
-        $manufacturerSql->from('manufacturer', 'm');
-        $manufacturerSql->where('m.id_manufacturer = ' . $manufacturer);
-        $manufacturerFromDB = Db::getInstance()->executeS($manufacturerSql)[0];
-        $manufacturer = $this->formalizer->arrayToObject($manufacturerFromDB);
-    }
-
-    public function postItem () {
-
+        SRBLogger::addLog('Saving map for ' . $itemType . ' with ID ' . $itemId, SRBLogger::INFO, $itemType);
+        $data = [
+            'id_item' => $itemId,
+            'id_item_srb' => $item->id_item_srb,
+            'type' => $itemType,
+            'last_sent_at' => date('Y-m-d H:i:s'),
+        ];
+        $map = new SRBMap($data);
+        $map->save();
     }
 }

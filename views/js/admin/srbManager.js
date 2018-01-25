@@ -1,4 +1,8 @@
 $(document).ready(function() {
+  function getSRBObjectName (string) {
+    return 'SRB' + string.charAt(0).toUpperCase() + string.slice(1).toLowerCase(); // Capitalize to have for example "SRBProduct"
+  }
+
   function ajaxAsyncCall(data) {
     $.ajax({
       url: asyncCall,
@@ -6,17 +10,13 @@ $(document).ready(function() {
       data: data,
       dataType: 'json',
       beforeSend: function () {
-        $('#srb-content .data').html('Sending...');
+        $('#srb-manager').html('Sending... You can go on another page while the process goes on.');
       },
       success: function (response) {
         window.location.reload();
-        // console.log('success');
-        // console.log(response);
       },
       error: function (response) {
         window.location.reload();
-        // console.log('error');
-        // console.log(response);
       }
     });
   }
@@ -25,7 +25,9 @@ $(document).ready(function() {
     e.preventDefault();
 
     var data = {
-      'action': 'postAll' + $(this).data('type').charAt(0).toUpperCase() + $(this).data('type').slice(1).toLowerCase()
+      'action': 'syncAll',
+      'className': getSRBObjectName($(this).data('type')),
+      'params': ''
     };
 
     ajaxAsyncCall(data);
@@ -35,22 +37,27 @@ $(document).ready(function() {
     e.preventDefault();
 
     var data = {
-      'action': 'postAllNew' + $(this).data('type').charAt(0).toUpperCase() + $(this).data('type').slice(1).toLowerCase(),
+      'action': 'syncAll',
+      'className': getSRBObjectName($(this).data('type')),
       'params': true
     };
 
     ajaxAsyncCall(data);
   });
 
-  $('#srb-content .sync-item').on('click', function () {
-    var object = $(this).data('type').charAt(0).toUpperCase() + $(this).data('type').slice(1).toLowerCase(); // Capitalize to have for example "Products"
-    object = object.slice(0, -1); // Removes the "s" to have for example "Product"
+  $('#srb-content .sync-item').on('click', function (e) {
+    e.preventDefault();
 
     var data = {
-      'action': 'post' + object,
+      'action': 'sync',
+      'className': getSRBObjectName($(this).data('type')),
       'params': parseInt($(this).parent().parent().data('id'))
     };
 
     ajaxAsyncCall(data);
+  });
+
+  $('#srb-content td[data-link][data-link!=""]').on('click', function (e) {
+    window.open($(this).data('link'), '_blank');
   });
 });
