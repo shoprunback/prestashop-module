@@ -18,7 +18,7 @@ class SRBMap
         $this->id_item = $psMap['id_item'];
         $this->id_item_srb = $psMap['id_item_srb'];
         $this->type = $psMap['type'];
-        $this->last_sent_at = $psMap['last_sent_at'];
+        $this->last_sent_at = SRBObject::convertDateFormatForDB($psMap['last_sent_at']);
     }
 
     static public function getTableName ()

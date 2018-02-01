@@ -60,7 +60,7 @@ abstract class Synchronizer
         if (! Configuration::get('srbtoken')) {
             throw new ConfigurationException('No API token');
         }
-
+        
         $identifier = $item::getIdentifier();
         $itemType = $item::getObjectTypeForMapping();
         $path = $item::getPathForAPICall();

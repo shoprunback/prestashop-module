@@ -36,6 +36,10 @@ class ShopRunBackShipbackModuleFrontController extends ModuleFrontController
         $this->context->smarty->assign('newTabUrl', $shipback->public_url);
         $this->context->smarty->assign('redirectUrl', $redirectUrl);
         parent::initContent();
-        $this->setTemplate('module:' . $this->module->name . '/views/templates/front/redirect.tpl');
+        if (version_compare(_PS_VERSION_, '1.7', '>=') == true) {
+            $this->setTemplate('module:' . $this->module->name . '/views/templates/front/redirect.tpl');
+        } else {
+            $this->setTemplate('redirect.tpl');
+        }
     }
 }
