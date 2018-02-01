@@ -163,6 +163,10 @@ class SRBShipback extends SRBObject
 
     static private function createReturnFromSyncResult ($item, $orderId)
     {
+        if (substr($item->public_url, 0, 7) != 'http://' && substr($item->public_url, 0, 8) != 'https://') {
+            $item->public_url = 'http://' . $item->public_url;
+        }
+        
         $shipbackToInsert = [
             'id_srb_shipback' => $item->id,
             'id_order' => $orderId,
