@@ -73,7 +73,7 @@ class ShopRunBack extends Module
         }
 
         $tab->id_parent = 0;
-        if (version_compare(_PS_VERSION_, '1.7', '>=') == true && isset($tabConf['parent'])) {
+        if (version_compare(_PS_VERSION_, '1.7', '>=') && isset($tabConf['parent'])) {
             $tab->id_parent = (int) Tab::getIdFromClassName($tabConf['parent']);
         }
 
