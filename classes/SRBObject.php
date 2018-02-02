@@ -107,7 +107,7 @@ abstract class SRBObject
         return $this->{$reference};
     }
 
-    protected function convertPSArrayToSRBObjects ($PSArray)
+    static protected function convertPSArrayToSRBObjects ($PSArray)
     {
         $class = get_called_class();
         $SRBObjects = [];
@@ -122,7 +122,7 @@ abstract class SRBObject
         return $SRBObjects;
     }
 
-    public function getTableIdentifier ()
+    static public function getTableIdentifier ()
     {
         return static::getTableName() . '.' . static::getIdColumnName();
     }
@@ -136,7 +136,7 @@ abstract class SRBObject
         return static::findAllQuery()->where(static::getTableName() . '.' . static::getIdColumnName() . ' NOT IN (' . $mapQuery . ')');
     }
 
-    protected function findAllWithMappingQuery ($onlySyncItems = false, $limit = 0, $offset = 0)
+    static protected function findAllWithMappingQuery ($onlySyncItems = false, $limit = 0, $offset = 0)
     {
         $identifier = static::getIdColumnName();
 
@@ -163,7 +163,7 @@ abstract class SRBObject
         return $sql;
     }
 
-    protected function findCountAllWithMappingQuery ($onlySyncItems = false)
+    static protected function findCountAllWithMappingQuery ($onlySyncItems = false)
     {
         $sql = self::getComponentsToFindAllWithMappingQuery($onlySyncItems);
         $sql = self::addCountToQuery($sql);

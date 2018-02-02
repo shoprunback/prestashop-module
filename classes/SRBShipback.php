@@ -183,7 +183,7 @@ class SRBShipback extends SRBObject
         return self::getById($item->id);
     }
 
-    private function findAllByCreateDateQuery ($limit = 0, $offset = 0)
+    static private function findAllByCreateDateQuery ($limit = 0, $offset = 0)
     {
         $sql = self::findAllQuery();
         $sql = SRBOrder::addComponentsToQuery($sql);
@@ -287,5 +287,11 @@ class SRBShipback extends SRBObject
         $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
+    }
+
+    static public function truncateTable ()
+    {
+        $sql = 'TRUNCATE TABLE ' . self::SHIPBACK_TABLE_NAME;
+        Db::getInstance()->execute($sql);
     }
 }
