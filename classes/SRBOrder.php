@@ -129,7 +129,7 @@ class SRBOrder extends SRBObject
         return $sql;
     }
 
-    protected function findAllWithMappingQuery ($onlySyncItems = false, $limit = 0, $offset = 0)
+    static protected function findAllWithMappingQuery ($onlySyncItems = false, $limit = 0, $offset = 0)
     {
         $identifier = static::getIdColumnName();
         $type = static::getObjectTypeForMapping();
