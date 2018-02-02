@@ -52,6 +52,7 @@ class AdminShoprunbackController extends ModuleAdminController
         // If the user switches from a valid token to another valid token, the mapping table must be reset
         if ($oldsrbToken != '' && $oldsrbToken != Configuration::get('srbtoken')) {
             SRBMap::truncateTable();
+            SRBShipback::truncateTable();
         }
 
         SRBLogger::addLog('API token saved: ' . substr($srbtoken, 0, 3) . '...' . substr($srbtoken, -3), SRBLogger::INFO, 'configuration');
