@@ -66,6 +66,7 @@ class AdminShoprunbackController extends ModuleAdminController
         $currentProductionMode = Configuration::get('production');
         if ($currentProductionMode != Tools::getValue('production')) {
             SRBMap::truncateTable();
+            SRBShipback::truncateTable();
         }
 
         // If the application goes to production mode, the PS returns' system must be turned off
