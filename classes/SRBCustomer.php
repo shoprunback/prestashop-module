@@ -16,6 +16,7 @@ class SRBCustomer
         $this->first_name = $customer['firstname'];
         $this->last_name = $customer['lastname'];
         $this->email = $customer['email'];
+        $this->locale = Configuration::get('PS_LANG_DEFAULT');
     }
 
     static public function getTableName ()

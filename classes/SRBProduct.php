@@ -30,7 +30,7 @@ class SRBProduct extends SRBObject
             $this->brand_id = $this->brand->reference;
         }
 
-        $this->attributesToSend = ['label', 'reference', 'weight_grams', 'width_mm', 'height_mm', 'length_mm', 'brand', 'brand_id'];
+        $this->attributesToSend = ['label', 'reference', 'weight_grams', 'width_mm', 'height_mm', 'length_mm', 'brand', 'brand_id', 'picture_file_url', 'picture_file_base64'];
     }
 
     static public function getObjectTypeForMapping ()

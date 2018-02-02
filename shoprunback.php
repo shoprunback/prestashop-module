@@ -267,7 +267,6 @@ class ShopRunBack extends Module
                 $srbwebhookLink = $this->webhookUrl;
                 $this->context->smarty->assign('webhookLink', $srbwebhookLink);
 
-                $this->context->controller->addJs(_PS_MODULE_DIR_ . $this->name . '/views/js/front/orderDetail.js');
                 $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/srbGlobal.css');
                 $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/front/orderDetail.css');
 
