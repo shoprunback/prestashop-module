@@ -15,7 +15,7 @@ class SRBOrder extends SRBObject
     {
         $this->ps = $psOrder;
         $this->order_number = $this->extractOrderNumberFromPSArray($psOrder);
-        $this->ordered_at = $psOrder['date_add'];
+        $this->ordered_at = $this->convertDateFormatForDB($psOrder['date_add']);
         $this->customer = SRBCustomer::createFromOrder($psOrder);
         $this->items = SRBItem::createItemsFromOrderId($this->getDBId());
 

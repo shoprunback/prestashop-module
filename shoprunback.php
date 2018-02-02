@@ -7,6 +7,10 @@ define ('PRODUCTION_MODE', Configuration::get('production'));
 define ('DASHBOARD_URL', getenv('DASHBOARD_URL') ? getenv('DASHBOARD_URL') : (PRODUCTION_MODE ? 'https://dashboard.shoprunback.com' : 'https://sandbox.dashboard.shoprunback.com'));
 define ('DASHBOARD_PROD_URL', 'https://dashboard.shoprunback.com');
 
+if (getenv('DASHBOARD_URL')) {
+    error_reporting(E_ALL ^ E_DEPRECATED);
+}
+
 include_once 'classes/Synchronizer.php';
 include_once 'classes/SRBShipback.php';
 include_once 'classes/SRBLogger.php';
@@ -30,7 +34,7 @@ class ShopRunBack extends Module
         $this->name = 'shoprunback';
         $this->author = 'ShopRunBack';
         $this->version = '1.0.0';
-        $this->ps_versions_compliancy = array('min' => '1.7.2', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = array('min' => '1.6.1.0');
         $this->tab = 'administration';
         $this->tabs = [
             'AdminShoprunback' => ['name' => 'ShopRunBack', 'parent' => 'SELL']
@@ -57,7 +61,7 @@ class ShopRunBack extends Module
         }
     }
 
-    private function installTab ($controllerClassName, $tabName, $tabParentControllerName = false)
+    private function installTab ($controllerClassName, $tabConf)
     {
         $tab = new Tab();
         $tab->active = 1;
@@ -65,12 +69,12 @@ class ShopRunBack extends Module
 
         $tab->name = array();
         foreach (Language::getLanguages(true) as $lang) {
-            $tab->name[$lang['id_lang']] = $tabName;
+            $tab->name[$lang['id_lang']] = $tabConf['name'];
         }
 
         $tab->id_parent = 0;
-        if ($tabParentControllerName) {
-            $tab->id_parent = (int) Tab::getIdFromClassName($tabParentControllerName);
+        if (version_compare(_PS_VERSION_, '1.7', '>=') && isset($tabConf['parent'])) {
+            $tab->id_parent = (int) Tab::getIdFromClassName($tabConf['parent']);
         }
 
         $tab->module = $this->name;
@@ -87,7 +91,7 @@ class ShopRunBack extends Module
     public function install ()
     {
         foreach ($this->tabs as $index => $tab) {
-            if (! $this->installTab($index, $tab['name'], $tab['parent'])) {
+            if (! $this->installTab($index, $tab)) {
                 return false;
             }
         }
@@ -100,7 +104,7 @@ class ShopRunBack extends Module
             || ! $this->registerHook('actionProductDelete')
             || ! $this->registerHook('actionProductUpdate')
             || ! $this->registerHook('actionOrderStatusPostUpdate')
-            || ! $this->registerHook('displayAdminProductsMainStepLeftColumnMiddle')
+            || ! $this->registerHook('displayHeader')
             || ! $this->registerHook('displayOrderDetail')
             || ! $this->registerHook('newOrder')
         ) {
@@ -115,7 +119,7 @@ class ShopRunBack extends Module
 
     public function uninstall ()
     {
-        foreach ($this->tabs as $index => $tab) {
+        foreach ($this->tabs as $index => $name) {
             if (! $this->uninstallTab($index)) {
                 return false;
             }
@@ -129,7 +133,7 @@ class ShopRunBack extends Module
             || ! $this->unregisterHook('actionProductDelete')
             || ! $this->unregisterHook('actionProductUpdate')
             || ! $this->unregisterHook('actionOrderStatusPostUpdate')
-            || ! $this->unregisterHook('displayAdminProductsMainStepLeftColumnMiddle')
+            || ! $this->unregisterHook('displayHeader')
             || ! $this->unregisterHook('displayOrderDetail')
             || ! $this->unregisterHook('newOrder')
         ) {
@@ -242,11 +246,6 @@ class ShopRunBack extends Module
         }
     }
 
-    public function hookDisplayAdminProductsMainStepLeftColumnMiddle ()
-    {
-        return $this->display(__FILE__, 'views/templates/admin/product/productMainLeftMiddle.tpl');
-    }
-
     public function hookDisplayOrderDetail ($params)
     {
         if (Configuration::get('srbtoken')) {
@@ -259,7 +258,7 @@ class ShopRunBack extends Module
 
                 $srbfcLink = $this->context->link->getModuleLink('shoprunback', 'shipback', []);
                 $this->context->smarty->assign('createReturnLink', $srbfcLink);
-                $this->context->smarty->assign('order', $order);
+                $this->context->smarty->assign('srborder', $order);
 
                 $shipback = SRBShipback::getByOrderIdIfExists($_GET['id_order']);
                 $this->context->smarty->assign('shipback', $shipback);
@@ -267,13 +266,16 @@ class ShopRunBack extends Module
                 $srbwebhookLink = $this->webhookUrl;
                 $this->context->smarty->assign('webhookLink', $srbwebhookLink);
 
-                $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/srbGlobal.css');
-                $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/front/orderDetail.css');
-
                 return $this->display(__FILE__, 'orderDetail.tpl');
             } catch (OrderException $e) {
                 return $e;
             }
         }
     }
+
+    public function hookDisplayHeader()
+    {
+        $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/srbGlobal.css');
+        $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/front/orderDetail.css');
+    } 
 }

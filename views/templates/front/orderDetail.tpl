@@ -3,7 +3,7 @@
         {if ! $shipback}
             {l s='front.order.detail.title' mod='shoprunback'}<br>
 
-            {l s='front.order.detail.content' mod='shoprunback'} <a href="{$createReturnLink}&orderId={$order->getDBId()}">{l s='front.order.detail.link' mod='shoprunback'}</a>
+            {l s='front.order.detail.content' mod='shoprunback'} <a href="{$createReturnLink}&orderId={$srborder->getDBId()}">{l s='front.order.detail.link' mod='shoprunback'}</a>
         {else}
             <a href="{$shipback->public_url}" target="_blank">{l s='front.order.detail.returned' mod='shoprunback'}</a>
         {/if}

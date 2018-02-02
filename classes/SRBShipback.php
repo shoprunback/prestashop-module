@@ -23,7 +23,7 @@ class SRBShipback extends SRBObject
         $this->order_id = $this->order->order_number;
         $this->mode = $psReturn['mode'];
         $this->state = $psReturn['state'];
-        $this->created_at = $psReturn['created_at'];
+        $this->created_at = $this->convertDateFormatForDB($psReturn['created_at']);
         $this->public_url = $psReturn['public_url'];
 
         $this->attributesToSend = ['order', 'order_id'];
@@ -168,7 +168,7 @@ class SRBShipback extends SRBObject
             'id_order' => $orderId,
             'state' => $item->state,
             'mode' => $item->mode,
-            'created_at' => $item->created_at,
+            'created_at' => self::convertDateFormatForDB($item->created_at),
             'public_url' => $item->public_url
         ];
 
