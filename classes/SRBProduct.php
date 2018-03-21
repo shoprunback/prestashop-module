@@ -208,7 +208,7 @@ class SRBProduct extends SRBObject
         return $sql;
     }
 
-    static protected function findAllQuery ($limit = 0, $offset = 0)
+    static public function findAllQuery ($limit = 0, $offset = 0)
     {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*, pl.*');

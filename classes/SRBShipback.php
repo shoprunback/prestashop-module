@@ -277,7 +277,7 @@ class SRBShipback extends SRBObject
         return $shipbacks;
     }
 
-    static protected function findAllQuery ($limit = 0, $offset = 0)
+    static public function findAllQuery ($limit = 0, $offset = 0)
     {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*, ' . SRBOrder::getTableName() . '.*');

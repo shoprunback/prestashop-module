@@ -124,7 +124,7 @@ class SRBMap
         return $shipbacks;
     }
 
-    static protected function findAllQuery ()
+    static public function findAllQuery ()
     {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*');

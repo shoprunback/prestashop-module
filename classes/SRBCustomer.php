@@ -39,7 +39,7 @@ class SRBCustomer
         return isset($psCustomerArrayName['id_customer']) ? $psCustomerArrayName['id_customer'] : $psCustomerArrayName['id'];
     }
 
-    static protected function findAllQuery ()
+    static public function findAllQuery ()
     {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*');

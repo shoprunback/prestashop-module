@@ -52,7 +52,7 @@ class SRBBrand extends SRBObject
         return Synchronizer::sync($this);
     }
 
-    static protected function findAllQuery ($limit = 0, $offset = 0)
+    static public function findAllQuery ($limit = 0, $offset = 0)
     {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*');
