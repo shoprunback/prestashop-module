@@ -150,7 +150,6 @@ class SRBOrder extends SRBObject
             )'
         );
         $sql->groupBy(static::getTableName() . '.' . $identifier);
-        $sql->orderBy('o.date_add DESC');
         $sql->orderBy('srb.last_sent_at DESC');
         $sql = self::addLimitToQuery($sql, $limit, $offset);
 
