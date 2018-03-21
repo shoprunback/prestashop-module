@@ -144,7 +144,7 @@ class SRBOrder extends SRBObject
                 AND srb.type = "' . $type . '"
                 AND srb.last_sent_at IN (
                     SELECT MAX(srb.last_sent_at)
-                    FROM ' . SRBMap::MAPPER_TABLE_NAME . ' srb
+                    FROM ' . SRBMap::getMapperTableName() . ' srb
                     WHERE srb.type = "' . $type . '"
                     GROUP BY srb.id_item
             )'

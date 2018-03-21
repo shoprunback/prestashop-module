@@ -3,12 +3,16 @@
 abstract class Synchronizer
 {
     const SRB_DASHBOARD_URL = DASHBOARD_URL;
-    const SRB_API_URL = self::SRB_DASHBOARD_URL . '/api/v1';
+
+    static public function getApiUrl()
+    {
+        return self::SRB_DASHBOARD_URL . '/api/v1';
+    }
 
     static public function APIcall ($path, $type, $json = '')
     {
         $path = str_replace(' ', '%20', $path);
-        $url = self::SRB_API_URL . '/' . $path;
+        $url = self::getApiUrl() . '/' . $path;
 
         $headers = ['accept: application/json'];
         $headers = ['Content-Type: application/json'];
