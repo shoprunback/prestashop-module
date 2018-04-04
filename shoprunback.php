@@ -21,6 +21,8 @@ include_once 'exceptions/ShipbackException.php';
 include_once 'exceptions/SynchronizerException.php';
 include_once 'sqlQueries.php';
 
+include_once 'lib/shoprunback-php/init.php';
+
 class ShopRunBack extends Module
 {
     public $formalizer;
@@ -196,7 +198,7 @@ class ShopRunBack extends Module
 
     public function hookNewOrder ($params)
     {
-        if (Configuration::get('srbtoken')) {
+        if (RestClient::getClient()->getToken()) {
             try {
                 $order = SRBOrder::getById($params['order']->id);
                 $order->sync();
@@ -208,7 +210,7 @@ class ShopRunBack extends Module
 
     public function hookActionProductAdd ($params)
     {
-        if (Configuration::get('srbtoken')) {
+        if (RestClient::getClient()->getToken()) {
             try {
                 $product = SRBProduct::getById($params['product']->id);
                 $product->sync();
@@ -220,7 +222,7 @@ class ShopRunBack extends Module
 
     public function hookActionProductUpdate ($params)
     {
-        if (Configuration::get('srbtoken')) {
+        if (RestClient::getClient()->getToken()) {
             try {
                 $product = SRBProduct::getById($params['product']->id);
                 $product->sync();
@@ -232,7 +234,7 @@ class ShopRunBack extends Module
 
     public function hookActionProductDelete ($params)
     {
-        if (Configuration::get('srbtoken')) {
+        if (RestClient::getClient()->getToken()) {
             $productParam = $params['product'];
 
             $productArray = ['id_product' => $params['id_product']];
@@ -250,7 +252,7 @@ class ShopRunBack extends Module
 
     public function hookActionOrderStatusPostUpdate ($params)
     {
-        if (Configuration::get('srbtoken')) {
+        if (RestClient::getClient()->getToken()) {
             try {
                 $order = SRBOrder::getById($params['id_order']);
                 $order->sync();
@@ -262,7 +264,7 @@ class ShopRunBack extends Module
 
     public function hookDisplayOrderDetail ($params)
     {
-        if (Configuration::get('srbtoken')) {
+        if (RestClient::getClient()->getToken()) {
             try {
                 $order = SRBOrder::getById($_GET['id_order']);
 

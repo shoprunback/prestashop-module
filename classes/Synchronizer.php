@@ -17,8 +17,8 @@ abstract class Synchronizer
         $headers = ['accept: application/json'];
         $headers = ['Content-Type: application/json'];
 
-        if (Configuration::get('srbtoken')) {
-            $headers[] = 'Authorization: Token token=' . Configuration::get('srbtoken');
+        if (RestClient::getClient()->getToken()) {
+            $headers[] = 'Authorization: Token token=' . RestClient::getClient()->getToken();
         }
 
         $opts = [
@@ -61,7 +61,7 @@ abstract class Synchronizer
 
     static public function sync ($item)
     {
-        if (! Configuration::get('srbtoken')) {
+        if (! RestClient::getClient()->getToken()) {
             throw new ConfigurationException('No API token');
         }
 

@@ -1,4 +1,8 @@
 <?php
+use Shoprunback\RestClient;
+use Shoprunback\Elements\Account;
+use Shoprunback\Elements\Company;
+
 class AdminShoprunbackController extends ModuleAdminController
 {
     const SUCCESS_CONFIG = 'success.config';
@@ -34,34 +38,27 @@ class AdminShoprunbackController extends ModuleAdminController
             return false;
         }
 
-        $oldsrbToken = '';
-        if (Configuration::get('srbtoken')) {
-            $oldsrbToken = Configuration::get('srbtoken');
-        }
+        $oldSrbToken = RestClient::getClient()->getToken();
 
-        Configuration::updateValue('srbtoken', $srbtoken);
-
-        $user = json_decode(Synchronizer::APIcall('me', 'GET'));
-
-        if (! $user) {
+        RestClient::getClient()->setToken($srbtoken);
+        $user = Account::getOwn();
+        if (!$user) {
             SRBLogger::addLog('Invalid API token: ' . $srbtoken, SRBLogger::WARNING, 'configuration');
-            Configuration::updateValue('srbtoken', $oldsrbToken);
+            RestClient::getClient()->setToken($oldSrbToken);
             return self::ERROR_NO_TOKEN;
         }
 
         // If the user switches from a valid token to another valid token, the mapping table must be reset
-        if ($oldsrbToken != '' && $oldsrbToken != Configuration::get('srbtoken')) {
+        if ($oldSrbToken != '' && $oldSrbToken != RestClient::getClient()->getToken()) {
             SRBMap::truncateTable();
             SRBShipback::truncateTable();
         }
 
         SRBLogger::addLog('API token saved: ' . substr($srbtoken, 0, 3) . '...' . substr($srbtoken, -3), SRBLogger::INFO, 'configuration');
 
-        try {
-            Synchronizer::APIcall('company', 'PUT', ['webhook_url' => $this->module->webhookUrl]);
-        } catch (SynchronizerException $e) {
-            return $e;
-        }
+        $company = Company::getOwn();
+        $company->webhook_url = $this->module->webhookUrl;
+        $company->save();
 
         // If the user switches from production to sandbox mode (or the opposite), the mapping table must be reset
         $currentProductionMode = Configuration::get('production');
@@ -113,7 +110,7 @@ class AdminShoprunbackController extends ModuleAdminController
             $this->getItems($itemType);
         }
 
-        $this->context->smarty->assign('srbtoken', Configuration::get('srbtoken'));
+        $this->context->smarty->assign('srbtoken', RestClient::getClient()->getToken());
         $this->context->smarty->assign('shoprunbackURL', $this->module->url);
         $this->context->smarty->assign('shoprunbackURLProd', $this->module->urlProd);
         $this->context->smarty->assign('srbManager', $this->tabUrl);
