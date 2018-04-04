@@ -3,6 +3,10 @@
 include_once 'SRBObject.php';
 include_once 'SRBOrder.php';
 
+use Shoprunback\Elements\Shipback;
+use Shoprunback\Error\NotFoundError;
+use Shoprunback\Error\RestClientError;
+
 class SRBShipback extends SRBObject
 {
     const SHIPBACK_TABLE_NAME_NO_PREFIX = 'shoprunback_shipbacks';
@@ -61,6 +65,11 @@ class SRBShipback extends SRBObject
     static public function getIdColumnName ()
     {
         return 'id_srb_shipback';
+    }
+
+    public function createLibElementFromSRBObject()
+    {
+        return Shipback::retrieve($this->id);
     }
 
     public function getShipbackDetails ()

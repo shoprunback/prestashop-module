@@ -24,6 +24,8 @@ abstract class SRBObject implements Resource
 
     abstract public function sync();
 
+    abstract public function createLibElementFromSRBObject();
+
     static public function getAll ($limit = 0, $offset = 0)
     {
         $class = get_called_class();
@@ -282,5 +284,22 @@ abstract class SRBObject implements Resource
         $object = $this->getAttributesNeeded();
 
         return json_encode($object);
+    }
+
+    public function mapApiCall ($itemSrbId)
+    {
+        $itemType = static::getObjectTypeForMapping();
+        $identifier = static::getIdColumnName();
+        $itemId = isset($this->$identifier) ? $this->$identifier : $this->getDBId();
+
+        SRBLogger::addLog('Saving map for ' . $itemType . ' with ID ' . $itemId, SRBLogger::INFO, $itemType);
+        $data = [
+            'id_item' => $itemId,
+            'id_item_srb' => $itemSrbId,
+            'type' => $itemType,
+            'last_sent_at' => date('Y-m-d H:i:s'),
+        ];
+        $map = new SRBMap($data);
+        $map->save();
     }
 }

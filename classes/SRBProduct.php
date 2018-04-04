@@ -3,6 +3,10 @@
 include_once 'SRBObject.php';
 include_once 'SRBBrand.php';
 
+use Shoprunback\Elements\Product;
+use Shoprunback\Error\NotFoundError;
+use Shoprunback\Error\RestClientError;
+
 class SRBProduct extends SRBObject
 {
     public $label;
@@ -63,6 +67,44 @@ class SRBProduct extends SRBObject
         return 'id_product';
     }
 
+    public function createLibElementFromSRBObject()
+    {
+        $product = false;
+        if ($mapId = SRBMap::getMappingIdIfExists($this->getDBId(), self::getObjectTypeForMapping())) {
+            try {
+                $product = Product::retrieve($mapId);
+                return $product;
+            } catch (NotFoundError $e) {
+
+            }
+        }
+
+        try {
+            $product = Product::retrieve($this->getIdentifier());
+            return $product;
+        } catch (NotFoundError $e) {
+
+        }
+
+        $product = new Product();
+        $product->label = $this->label;
+        $product->reference = $this->reference;
+        $product->weight_grams = $this->weight_grams;
+        $product->width_mm = $this->width_mm;
+        $product->height_mm = $this->height_mm;
+        $product->length_mm = $this->length_mm;
+        $product->brand = $this->brand;
+        $product->brand_id = $this->brand_id;
+
+        $this->addCoverPictureToProduct($product);
+
+        // TODO delete product image
+        // SRBLogger::addLog('DELETING IMAGE OF ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
+        // $product->;
+
+        return $product;
+    }
+
     static public function getOrderProducts ($orderId)
     {
         return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS(self::findOrderProductsQuery($orderId)));
@@ -116,44 +158,29 @@ class SRBProduct extends SRBObject
         return false;
     }
 
-    private function addCoverPictureToSync ()
+    private function addCoverPictureToProduct ($product)
     {
         $coverPicture = $this->getCoverPicture();
 
         if ($coverPicture) {
-            $this->picture_file_url = 'ps-' . $this->label;
-            $this->picture_file_base64 = 'data:image/png;base64,' . base64_encode($coverPicture);
-        } else {
-            $this->syncDeleteProductImage();
+            $product->picture_file_url = 'ps-' . $this->label;
+            $product->picture_file_base64 = 'data:image/png;base64,' . base64_encode($coverPicture);
         }
 
-        return $coverPicture;
+        return $product;
     }
 
     public function sync ($brandChecked = false)
     {
-        if (! isset($this->brand)) {
-            SRBLogger::addLog('The product "' . $this->getReference() . '" has no brand attached!', SRBLogger::WARNING);
-        } elseif (! $brandChecked) {
-            $postBrandResult = $this->brand->sync();
-        }
-
-        $this->addCoverPictureToSync();
-
         SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
+        $product = $this->createLibElementFromSRBObject();
 
-        if (isset($this->brand_id) && $this->brand_id != '') {
-            $brand = $this->brand;
-            unset($this->brand);
+        try {
+            $product->save();
+            $this->mapApiCall($product->id);
+        } catch (RestClientError $e) {
+            SRBLogger::addLog(json_encode($e), SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
         }
-
-        $result = Synchronizer::sync($this);
-
-        if (isset($this->brand_id) && $this->brand_id != '') {
-            $this->brand = $brand;
-        }
-
-        return $result;
     }
 
     public function deleteWithCheck ()
@@ -189,7 +216,8 @@ class SRBProduct extends SRBObject
     public function syncDelete ()
     {
         SRBLogger::addLog('DELETING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
-        return Synchronizer::delete($this);
+        $product = Product::retrieve($this->id);
+        return $product->remove();
     }
 
     static protected function findOrderProductsQuery ($orderId)
@@ -218,11 +246,5 @@ class SRBProduct extends SRBObject
         $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
-    }
-
-    public function syncDeleteProductImage ()
-    {
-        SRBLogger::addLog('DELETING IMAGE OF ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
-        return Synchronizer::APIcall(self::getPathForAPICall() . '/' . $this->getReference() . '/image', 'DELETE');
     }
 }

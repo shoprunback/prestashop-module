@@ -4,6 +4,10 @@ include_once 'SRBObject.php';
 include_once 'SRBCustomer.php';
 include_once 'SRBItem.php';
 
+use Shoprunback\Elements\Order;
+use Shoprunback\Error\NotFoundError;
+use Shoprunback\Error\RestClientError;
+
 class SRBOrder extends SRBObject
 {
     public $ordered_at;
@@ -52,6 +56,34 @@ class SRBOrder extends SRBObject
         return 'id_order';
     }
 
+    public function createLibElementFromSRBObject()
+    {
+        $order = false;
+        if ($mapId = SRBMap::getMappingIdIfExists($this->getDBId(), self::getObjectTypeForMapping())) {
+            try {
+                $order = Order::retrieve($mapId);
+                return $order;
+            } catch (NotFoundError $e) {
+
+            }
+        }
+
+        try {
+            $order = Order::retrieve($this->getIdentifier());
+            return $order;
+        } catch (NotFoundError $e) {
+
+        }
+
+        $order = new Order();
+        $order->order_number = $this->order_number;
+        $order->ordered_at = $this->ordered_at;
+        $order->customer = $this->customer;
+        $order->items = $this->items;
+
+        return $order;
+    }
+
     public function getProducts ()
     {
         $products = [];
@@ -65,7 +97,8 @@ class SRBOrder extends SRBObject
     public function sync ()
     {
         SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
-        return Synchronizer::sync($this);
+        $order = $this->createLibElementFromSRBObject();
+        return $order->save();
     }
 
     static private function extractOrderNumberFromPSArray ($psOrderArrayName)
