@@ -22,6 +22,7 @@ class SRBBrand extends LibBrand implements PSElementInterface
         }
     }
 
+    // Inherited functions
     public static function getTableName()
     {
         return 'm';

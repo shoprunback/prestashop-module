@@ -183,6 +183,9 @@ class AdminShoprunbackController extends ModuleAdminController
             $class::$function(Tools::getValue($searchCondition), false, self::ITEMS_BY_PAGE, $itemMin) :
             $class::$function(false, self::ITEMS_BY_PAGE, $itemMin);
 
+        // SRBBrand::syncAll(true);
+        // die;
+
         // var_dump($items[0]);
         // $items[0]->sync();
         // var_dump($items[0]);

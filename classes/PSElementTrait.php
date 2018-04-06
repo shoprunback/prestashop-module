@@ -52,7 +52,7 @@ trait PSElementTrait
     {
         $identifier = static::getIdColumnName();
         $type = static::getObjectTypeForMapping();
-        $mapQuery = SRBMap::findOnlyIdItemByTypeQuery($type);
+        $mapQuery = ElementMapper::findOnlyIdItemByTypeQuery($type);
 
         return static::findAllQuery()->where(static::getTableName() . '.' . static::getIdColumnName() . ' NOT IN (' . $mapQuery . ')');
     }
@@ -153,6 +153,24 @@ trait PSElementTrait
         return $this->{$name};
     }
 
+    static public function getAll ($limit = 0, $offset = 0)
+    {
+        $class = get_called_class();
+        return self::convertPSArrayToElements(Db::getInstance()->executeS($class::findAllQuery($limit, $offset)));
+    }
+
+    static public function getCountAll ()
+    {
+        $class = get_called_class();
+        return self::getCountOfQuery($class::findAllQuery());
+    }
+
+    static public function getAllNotSync ()
+    {
+        $class = get_called_class();
+        return self::convertPSArrayToElements(Db::getInstance()->executeS($class::findNotSyncQuery()));
+    }
+
     public function mapApiCall ($itemSrbId)
     {
         $itemType = static::getObjectTypeForMapping();
@@ -168,5 +186,16 @@ trait PSElementTrait
         ];
         $map = new ElementMapper($data);
         $map->save();
+    }
+
+    static public function syncAll ($newOnly = false) {
+        $items = $newOnly ? self::getAllNotSync() : self::getAll();
+
+        $responses = [];
+        foreach ($items as $item) {
+            $responses[] = $item->sync();
+        }
+
+        return $responses;
     }
 }

@@ -1,24 +1,15 @@
 <?php
 
-include_once 'SRBObject.php';
-include_once 'SRBBrand.php';
-
 use Shoprunback\Elements\Product as LibProduct;
+use Shoprunback\Elements\Brand as LibBrand;
 use Shoprunback\Error\NotFoundError;
 use Shoprunback\Error\RestClientError;
 
-class SRBProduct extends SRBObject
+class SRBProduct extends LibProduct implements PSElementInterface
 {
-    public $label;
-    public $reference;
-    public $weight_grams;
-    public $width_mm;
-    public $height_mm;
-    public $length_mm;
-    public $brand_id;
-    public $brand;
+    use PSElementTrait;
 
-    public function __construct ($psProduct)
+    public function __construct($psProduct)
     {
         $this->ps = $psProduct;
         $this->label = $this->extractNameFromPSArray($psProduct['name']);
@@ -28,23 +19,30 @@ class SRBProduct extends SRBObject
         $this->width_mm = intval($psProduct['width'] * 10);
         $this->height_mm = intval($psProduct['height'] * 10);
         $this->length_mm = intval($psProduct['depth'] * 10);
+        $this->addCoverPicture();
 
         if ($psProduct['id_manufacturer'] != 0) {
             $this->brand = SRBBrand::getById($psProduct['id_manufacturer']);
             $this->brand_id = $this->brand->reference;
         }
 
-        $this->attributesToSend = ['label', 'reference', 'weight_grams', 'width_mm', 'height_mm', 'length_mm', 'brand', 'brand_id', 'picture_file_url', 'picture_file_base64'];
+        if ($srbId = $this->getMapId()) {
+            parent::__construct($srbId);
+            $this->copyValues($this);
+        } else {
+            parent::__construct();
+        }
     }
 
-    static public function getObjectTypeForMapping ()
+    // Inherited functions
+    public static function getTableName()
     {
-        return 'product';
+        return 'p';
     }
 
-    static public function getPathForAPICall ()
+    static public function getIdColumnName ()
     {
-        return 'products';
+        return 'id_product';
     }
 
     static public function getIdentifier ()
@@ -57,94 +55,51 @@ class SRBProduct extends SRBObject
         return 'label';
     }
 
-    static public function getTableName ()
+    static public function getObjectTypeForMapping ()
     {
-        return 'p';
+        return 'product';
     }
 
-    static public function getIdColumnName ()
+    static public function getPathForAPICall ()
     {
-        return 'id_product';
+        return 'products';
     }
 
-    public function createLibElementFromSRBObject()
+    static public function findAllQuery ($limit = 0, $offset = 0)
     {
-        $product = false;
-        if ($mapId = SRBMap::getMappingIdIfExists($this->getDBId(), self::getObjectTypeForMapping())) {
-            try {
-                $product = LibProduct::retrieve($mapId);
-                $this->addCoverPictureToProduct($product);
-                return $product;
-            } catch (NotFoundError $e) {
+        $sql = new DbQuery();
+        $sql->select(self::getTableName() . '.*, pl.*');
+        $sql->from('product', self::getTableName());
+        $sql->innerJoin('product_lang', 'pl', self::getTableName() . '.id_product = pl.id_product');
+        $sql->where('pl.id_lang = ' . Configuration::get('PS_LANG_DEFAULT'));
+        $sql = self::addLimitToQuery($sql, $limit, $offset);
 
-            }
-        }
+        return $sql;
+    }
+
+    public function sync ()
+    {
+        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
 
         try {
-            $product = LibProduct::retrieve($this->getReference());
-            $this->addCoverPictureToProduct($product);
-            return $product;
-        } catch (NotFoundError $e) {
-
+            $result = $this->save();
+            $this->mapApiCall($this->id);
+            return $result;
+        } catch (RestClientError $e) {
+            SRBLogger::addLog(json_encode($e), SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
         }
-
-        $product = new LibProduct();
-        $product->label = $this->label;
-        $product->reference = $this->reference;
-        $product->weight_grams = $this->weight_grams;
-        $product->width_mm = $this->width_mm;
-        $product->height_mm = $this->height_mm;
-        $product->length_mm = $this->length_mm;
-        $product->brand = $this->brand;
-        $product->brand_id = $this->brand_id;
-
-        $this->addCoverPictureToProduct($product);
-
-        // TODO delete product image
-        // SRBLogger::addLog('DELETING IMAGE OF ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
-        // $product->;
-
-        return $product;
     }
 
-    static public function getOrderProducts ($orderId)
-    {
-        return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS(self::findOrderProductsQuery($orderId)));
-    }
 
+    // Own functions
     static private function extractNameFromPSArray ($psProductArrayName)
     {
         return is_array($psProductArrayName) ? $psProductArrayName[1] : $psProductArrayName;
     }
 
-    static public function syncAll ($newOnly = false)
+    static public function getOrderProducts ($orderId)
     {
-        $products = $newOnly ? self::getAllNotSync() : self::getAll();
-
-        $responses = [
-            'brand' => [],
-            'product' => []
-        ];
-        $brands = [];
-        foreach ($products as $product) {
-            if (isset($product->brand_id) && ! isset($brands[$product->brand_id])) {
-                $brands[$product->brand_id] = $product->brand;
-            }
-        }
-
-        foreach ($brands as $brand) {
-            $responses['brand'][] = $brand->sync();
-        }
-
-        foreach ($products as $product) {
-            try {
-                $responses['product'][] = $product->sync(true);
-            } catch (ProductException $e) {
-
-            }
-        }
-
-        return $responses;
+        return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS(self::findOrderProductsQuery($orderId)));
     }
 
     public function getCoverPicture ()
@@ -160,30 +115,28 @@ class SRBProduct extends SRBObject
         return false;
     }
 
-    private function addCoverPictureToProduct ($product)
+    private function addCoverPicture ()
     {
         $coverPicture = $this->getCoverPicture();
 
         if ($coverPicture) {
-            $product->picture_file_url = 'ps-' . $this->label;
-            $product->picture_file_base64 = 'data:image/png;base64,' . base64_encode($coverPicture);
+            $this->picture_file_url = 'ps-' . $this->label;
+            $this->picture_file_base64 = 'data:image/png;base64,' . base64_encode($coverPicture);
         }
-
-        return $product;
     }
 
-    public function sync ($brandChecked = false)
+    // Check if product has NEVER been ordered
+    public function canBeDeleted ()
     {
-        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
-        $product = $this->createLibElementFromSRBObject();
+        $sql = new DbQuery();
+        $sql->select('COUNT(' . SRBOrder::getTableName() . '.id_order)');
+        $sql->from('product', self::getTableName());
+        $sql->innerJoin('cart_product', 'cp', self::getTableName() . '.' . self::getIdColumnName() . ' = cp.id_product');
+        $sql->innerJoin('cart', 'ca', 'cp.id_cart = ca.id_cart');
+        $sql->innerJoin('orders', SRBOrder::getTableName(), 'ca.id_cart = ' . SRBOrder::getTableName() . '.id_cart');
+        $sql->where(self::getTableName() . '.' . self::getIdColumnName() . ' = ' . $this->getDBId());
 
-        try {
-            $result = $product->save();
-            $this->mapApiCall($product->id);
-            return $result;
-        } catch (RestClientError $e) {
-            SRBLogger::addLog(json_encode($e), SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
-        }
+        return (Db::getInstance()->getValue($sql) == 0);
     }
 
     public function deleteWithCheck ()
@@ -200,20 +153,6 @@ class SRBProduct extends SRBObject
 
         SRBLogger::addLog('Product "' . $this->getReference() . '" deleted', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
         return true;
-    }
-
-    // Check if product has NEVER been ordered
-    public function canBeDeleted ()
-    {
-        $sql = new DbQuery();
-        $sql->select('COUNT(' . SRBOrder::getTableName() . '.id_order)');
-        $sql->from('product', self::getTableName());
-        $sql->innerJoin('cart_product', 'cp', self::getTableName() . '.' . self::getIdColumnName() . ' = cp.id_product');
-        $sql->innerJoin('cart', 'ca', 'cp.id_cart = ca.id_cart');
-        $sql->innerJoin('orders', SRBOrder::getTableName(), 'ca.id_cart = ' . SRBOrder::getTableName() . '.id_cart');
-        $sql->where(self::getTableName() . '.' . self::getIdColumnName() . ' = ' . $this->getDBId());
-
-        return (Db::getInstance()->getValue($sql) == 0);
     }
 
     public function syncDelete ()
@@ -235,18 +174,6 @@ class SRBProduct extends SRBObject
         $sql->innerJoin('currency', 'cu', 'cu.id_currency = ' . SRBOrder::getTableName() . '.id_currency');
         $sql->where('pl.id_lang = ' . Configuration::get('PS_LANG_DEFAULT'));
         $sql->where(SRBOrder::getTableName() . '.id_order = ' . pSQL($orderId));
-
-        return $sql;
-    }
-
-    static public function findAllQuery ($limit = 0, $offset = 0)
-    {
-        $sql = new DbQuery();
-        $sql->select(self::getTableName() . '.*, pl.*');
-        $sql->from('product', self::getTableName());
-        $sql->innerJoin('product_lang', 'pl', self::getTableName() . '.id_product = pl.id_product');
-        $sql->where('pl.id_lang = ' . Configuration::get('PS_LANG_DEFAULT'));
-        $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
     }
