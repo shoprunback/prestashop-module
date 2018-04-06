@@ -19,7 +19,7 @@ include_once 'classes/Util.php';
 include_once 'classes/PSElementInterface.php';
 include_once 'classes/PSElementTrait.php';
 
-include_once 'classes/NewBrand.php';
+include_once 'classes/SRBBrand.php';
 
 // include_once 'classes/Synchronizer.php';
 // include_once 'classes/SRBShipback.php';

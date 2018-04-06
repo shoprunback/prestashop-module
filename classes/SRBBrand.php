@@ -1,33 +1,35 @@
 <?php
 
-include_once 'SRBObject.php';
-
-use Shoprunback\Elements\Brand;
+use Shoprunback\Elements\Brand as LibBrand;
 use Shoprunback\Error\NotFoundError;
 use Shoprunback\Error\RestClientError;
 
-class SRBBrand extends SRBObject
+class SRBBrand extends LibBrand implements PSElementInterface
 {
-    public $name;
-    public $reference;
+    use PSElementTrait;
 
-    public function __construct ($manufacturer)
+    public function __construct($manufacturer)
     {
         $this->ps = $manufacturer;
         $this->name = $manufacturer['name'];
         $this->reference = str_replace(' ', '-', $manufacturer['name']);
 
-        $this->attributesToSend = ['name', 'reference'];
+        if ($srbId = $this->getMapId()) {
+            parent::__construct($srbId);
+            $this->copyValues($this);
+        } else {
+            parent::__construct();
+        }
     }
 
-    static public function getObjectTypeForMapping ()
+    public static function getTableName()
     {
-        return 'brand';
+        return 'm';
     }
 
-    static public function getPathForAPICall ()
+    static public function getIdColumnName ()
     {
-        return 'brands';
+        return 'id_manufacturer';
     }
 
     static public function getIdentifier ()
@@ -40,57 +42,14 @@ class SRBBrand extends SRBObject
         return 'name';
     }
 
-    static public function getTableName ()
+    static public function getObjectTypeForMapping ()
     {
-        return 'm';
+        return 'brand';
     }
 
-    static public function getIdColumnName ()
+    static public function getPathForAPICall ()
     {
-        return 'id_manufacturer';
-    }
-
-    public function createLibElementFromSRBObject()
-    {
-        $brand = false;
-        if ($mapId = SRBMap::getMappingIdIfExists($this->getDBId(), self::getObjectTypeForMapping())) {
-            try {
-                $brand = Brand::retrieve($mapId);
-                return $brand;
-            } catch (NotFoundError $e) {
-
-            }
-        }
-
-        try {
-            $brand = Brand::retrieve($this->getReference());
-            return $brand;
-        } catch (NotFoundError $e) {
-            var_dump($e);
-        }
-
-        $brand = new Brand();
-        $brand->name = $this->name;
-        $brand->reference = $this->reference;
-
-        if (isset($this->id)) {
-            $brand->id = $this->id;
-        }
-
-        return $brand;
-    }
-
-    public function sync ()
-    {
-        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
-        $brand = $this->createLibElementFromSRBObject();
-        try {
-            $result = $brand->save();
-            $this->mapApiCall($brand->id);
-            return $result;
-        } catch (RestClientError $e) {
-            SRBLogger::addLog(json_encode($e), SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
-        }
+        return 'brands';
     }
 
     static public function findAllQuery ($limit = 0, $offset = 0)
@@ -101,5 +60,18 @@ class SRBBrand extends SRBObject
         $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
+    }
+
+    public function sync ()
+    {
+        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
+
+        try {
+            $result = $this->save();
+            $this->mapApiCall($this->id);
+            return $result;
+        } catch (RestClientError $e) {
+            SRBLogger::addLog(json_encode($e), SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
+        }
     }
 }

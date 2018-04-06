@@ -153,14 +153,9 @@ class AdminShoprunbackController extends ModuleAdminController
                 }
                 break;
             case 'brand':
-                // $externalLink .= '/brands/';
-                // $countItems = SRBBrand::getCountAllWithMapping();
-                // $class = 'SRBBrand';
-                // $function = 'getAllWithMapping';
-
-                $externalLink = '/brands/';
-                $countItems = NewBrand::getCountAllWithMapping();
-                $class = 'NewBrand';
+                $externalLink .= '/brands/';
+                $countItems = SRBBrand::getCountAllWithMapping();
+                $class = 'SRBBrand';
                 $function = 'getAllWithMapping';
                 break;
             case 'product':
@@ -193,7 +188,7 @@ class AdminShoprunbackController extends ModuleAdminController
         // var_dump($items[0]);
         // die;
 
-        // $_POST['className'] = 'NewBrand';
+        // $_POST['className'] = 'SRBBrand';
         // $_POST['action'] = 'sync';
         // $_POST['params'] = '2';
         // $this->asyncCall();
