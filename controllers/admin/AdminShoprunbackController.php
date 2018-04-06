@@ -1,4 +1,5 @@
 <?php
+
 use Shoprunback\RestClient;
 use Shoprunback\Elements\Account;
 use Shoprunback\Elements\Company;
@@ -152,9 +153,14 @@ class AdminShoprunbackController extends ModuleAdminController
                 }
                 break;
             case 'brand':
-                $externalLink .= '/brands/';
-                $countItems = SRBBrand::getCountAllWithMapping();
-                $class = 'SRBBrand';
+                // $externalLink .= '/brands/';
+                // $countItems = SRBBrand::getCountAllWithMapping();
+                // $class = 'SRBBrand';
+                // $function = 'getAllWithMapping';
+
+                $externalLink = '/brands/';
+                $countItems = NewBrand::getCountAllWithMapping();
+                $class = 'NewBrand';
                 $function = 'getAllWithMapping';
                 break;
             case 'product':
@@ -182,6 +188,17 @@ class AdminShoprunbackController extends ModuleAdminController
             $class::$function(Tools::getValue($searchCondition), false, self::ITEMS_BY_PAGE, $itemMin) :
             $class::$function(false, self::ITEMS_BY_PAGE, $itemMin);
 
+        // var_dump($items[0]);
+        // $items[0]->sync();
+        // var_dump($items[0]);
+        // die;
+
+        // $_POST['className'] = 'NewBrand';
+        // $_POST['action'] = 'sync';
+        // $_POST['params'] = '2';
+        // $this->asyncCall();
+        // die;
+
         if ($itemType == 'product') {
             $noBrand = [];
             foreach ($items as $product) {
@@ -192,9 +209,6 @@ class AdminShoprunbackController extends ModuleAdminController
 
             $this->context->smarty->assign('noBrand', $noBrand);
         }
-
-        // var_dump($items[0]->sync());
-        // die;
 
         $this->context->smarty->assign('pages', $pages);
         $this->context->smarty->assign('currentPage', $currentPage);

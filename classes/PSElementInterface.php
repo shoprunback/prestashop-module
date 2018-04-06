@@ -1,6 +1,8 @@
 <?php
 
-interface Resource
+include_once _PS_MODULE_DIR_ . '/shoprunback/lib/shoprunback-php/init.php';
+
+interface PSElementInterface
 {
     static function getTableName();
     static function getIdColumnName();

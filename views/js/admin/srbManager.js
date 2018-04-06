@@ -1,6 +1,10 @@
 $(document).ready(function() {
-  function getSRBObjectName (string) {
-    return 'SRB' + string.charAt(0).toUpperCase() + string.slice(1).toLowerCase(); // Capitalize to have for example "SRBProduct"
+  // function getSRBObjectName (string) {
+  //   return 'SRB' + string.charAt(0).toUpperCase() + string.slice(1).toLowerCase(); // Capitalize to have for example "SRBProduct"
+  // }
+
+  function getNewObjectName (string) {
+    return 'New' + string.charAt(0).toUpperCase() + string.slice(1).toLowerCase(); // Capitalize to have for example "NewProduct"
   }
 
   function ajaxAsyncCall(data) {
@@ -26,7 +30,7 @@ $(document).ready(function() {
 
     var data = {
       'action': 'syncAll',
-      'className': getSRBObjectName($(this).data('type')),
+      'className': getNewObjectName($(this).data('type')),
       'params': ''
     };
 
@@ -38,7 +42,7 @@ $(document).ready(function() {
 
     var data = {
       'action': 'syncAll',
-      'className': getSRBObjectName($(this).data('type')),
+      'className': getNewObjectName($(this).data('type')),
       'params': true
     };
 
@@ -50,7 +54,7 @@ $(document).ready(function() {
 
     var data = {
       'action': 'sync',
-      'className': getSRBObjectName($(this).data('type')),
+      'className': getNewObjectName($(this).data('type')),
       'params': parseInt($(this).parent().parent().data('id'))
     };
 

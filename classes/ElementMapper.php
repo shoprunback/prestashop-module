@@ -1,5 +1,5 @@
 <?php
-class SRBMap
+class ElementMapper
 {
     const MAPPER_TABLE_NAME_NO_PREFIX = 'shoprunback_mapper';
     const MAPPER_INDEX_NAME = 'index_type_id_item';
@@ -17,7 +17,7 @@ class SRBMap
         $this->id_item = $psMap['id_item'];
         $this->id_item_srb = $psMap['id_item_srb'];
         $this->type = $psMap['type'];
-        $this->last_sent_at = SRBObject::convertDateFormatForDB($psMap['last_sent_at']);
+        $this->last_sent_at = Util::convertDateFormatForDB($psMap['last_sent_at']);
     }
 
     static public function getMapperTableName()
@@ -46,7 +46,7 @@ class SRBMap
         unset($mapArray['id_srb_map']);
 
         if (! isset($this->id_srb_map) || $this->id_srb_map == 0) {
-            $mapFromDB = SRBMap::getByIdItemAndIdType($this->id_item, $this->type);
+            $mapFromDB = ElementMapper::getByIdItemAndIdType($this->id_item, $this->type);
 
             if ($mapFromDB) {
                 $this->id_srb_map = $mapFromDB->id_srb_map;
@@ -56,10 +56,10 @@ class SRBMap
         $result = '';
         $sql = Db::getInstance();
         if (isset($this->id_srb_map) && $this->id_srb_map != 0) {
-            $result = $sql->update(SRBMap::MAPPER_TABLE_NAME_NO_PREFIX, $mapArray, 'id_item_srb = "' . pSQL($this->id_item_srb) . '"');
+            $result = $sql->update(ElementMapper::MAPPER_TABLE_NAME_NO_PREFIX, $mapArray, 'id_item_srb = "' . pSQL($this->id_item_srb) . '"');
             SRBLogger::addLog('Map of ' . ucfirst($this->type) . ' ' . $this->id_item . ' updated', SRBLogger::INFO, $this->type, $this->id_item);
         } else {
-            $result = $sql->insert(SRBMap::MAPPER_TABLE_NAME_NO_PREFIX, $mapArray);
+            $result = $sql->insert(ElementMapper::MAPPER_TABLE_NAME_NO_PREFIX, $mapArray);
             SRBLogger::addLog(ucfirst($this->type) . ' ' . $this->id_item . ' mapped', SRBLogger::INFO, $this->type, $this->id_item);
         }
 

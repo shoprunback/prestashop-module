@@ -11,8 +11,18 @@ if (getenv('DASHBOARD_URL')) {
     error_reporting(E_ALL ^ E_DEPRECATED);
 }
 
-include_once 'classes/Synchronizer.php';
-include_once 'classes/SRBShipback.php';
+include_once 'lib/shoprunback-php/init.php';
+
+include_once 'classes/ElementMapper.php';
+include_once 'classes/Util.php';
+
+include_once 'classes/PSElementInterface.php';
+include_once 'classes/PSElementTrait.php';
+
+include_once 'classes/NewBrand.php';
+
+// include_once 'classes/Synchronizer.php';
+// include_once 'classes/SRBShipback.php';
 include_once 'classes/SRBLogger.php';
 include_once 'exceptions/ConfigurationException.php';
 include_once 'exceptions/OrderException.php';
@@ -20,8 +30,6 @@ include_once 'exceptions/ProductException.php';
 include_once 'exceptions/ShipbackException.php';
 include_once 'exceptions/SynchronizerException.php';
 include_once 'sqlQueries.php';
-
-include_once 'lib/shoprunback-php/init.php';
 
 class ShopRunBack extends Module
 {

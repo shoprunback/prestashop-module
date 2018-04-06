@@ -63,10 +63,10 @@ class SRBBrand extends SRBObject
         }
 
         try {
-            $brand = Brand::retrieve($this->getIdentifier());
+            $brand = Brand::retrieve($this->getReference());
             return $brand;
         } catch (NotFoundError $e) {
-
+            var_dump($e);
         }
 
         $brand = new Brand();
@@ -85,8 +85,9 @@ class SRBBrand extends SRBObject
         SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
         $brand = $this->createLibElementFromSRBObject();
         try {
-            $brand->save();
+            $result = $brand->save();
             $this->mapApiCall($brand->id);
+            return $result;
         } catch (RestClientError $e) {
             SRBLogger::addLog(json_encode($e), SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
         }

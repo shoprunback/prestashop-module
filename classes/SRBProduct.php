@@ -3,7 +3,7 @@
 include_once 'SRBObject.php';
 include_once 'SRBBrand.php';
 
-use Shoprunback\Elements\Product;
+use Shoprunback\Elements\Product as LibProduct;
 use Shoprunback\Error\NotFoundError;
 use Shoprunback\Error\RestClientError;
 
@@ -72,7 +72,8 @@ class SRBProduct extends SRBObject
         $product = false;
         if ($mapId = SRBMap::getMappingIdIfExists($this->getDBId(), self::getObjectTypeForMapping())) {
             try {
-                $product = Product::retrieve($mapId);
+                $product = LibProduct::retrieve($mapId);
+                $this->addCoverPictureToProduct($product);
                 return $product;
             } catch (NotFoundError $e) {
 
@@ -80,13 +81,14 @@ class SRBProduct extends SRBObject
         }
 
         try {
-            $product = Product::retrieve($this->getIdentifier());
+            $product = LibProduct::retrieve($this->getReference());
+            $this->addCoverPictureToProduct($product);
             return $product;
         } catch (NotFoundError $e) {
 
         }
 
-        $product = new Product();
+        $product = new LibProduct();
         $product->label = $this->label;
         $product->reference = $this->reference;
         $product->weight_grams = $this->weight_grams;
@@ -176,8 +178,9 @@ class SRBProduct extends SRBObject
         $product = $this->createLibElementFromSRBObject();
 
         try {
-            $product->save();
+            $result = $product->save();
             $this->mapApiCall($product->id);
+            return $result;
         } catch (RestClientError $e) {
             SRBLogger::addLog(json_encode($e), SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
         }

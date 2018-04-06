@@ -69,7 +69,7 @@ class SRBOrder extends SRBObject
         }
 
         try {
-            $order = Order::retrieve($this->getIdentifier());
+            $order = Order::retrieve($this->getReference());
             return $order;
         } catch (NotFoundError $e) {
 
