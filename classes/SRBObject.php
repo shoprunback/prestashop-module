@@ -133,7 +133,7 @@ abstract class SRBObject implements Resource
         $type = static::getObjectTypeForMapping();
         $mapQuery = SRBMap::findOnlyIdItemByTypeQuery($type);
 
-        return static::findAllQuery()->where(static::getTableName() . '.' . static::getIdColumnName() . ' NOT IN (' . $mapQuery . ')');
+        return static::findAllQuery()->where(static::getTableIdentifier() . ' NOT IN (' . $mapQuery . ')');
     }
 
     static protected function findAllWithMappingQuery ($onlySyncItems = false, $limit = 0, $offset = 0)
@@ -151,7 +151,7 @@ abstract class SRBObject implements Resource
 
     static protected function addCountToQuery ($sql)
     {
-        return $sql->select('COUNT(DISTINCT ' . static::getTableName() . '.' . static::getIdColumnName() . ') as count');
+        return $sql->select('COUNT(DISTINCT ' . static::getTableIdentifier() . ') as count');
     }
 
     static protected function addLimitToQuery ($sql, $limit = 0, $offset = 0)

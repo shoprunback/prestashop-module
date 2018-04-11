@@ -28,7 +28,6 @@ class SRBProduct extends LibProduct implements PSElementInterface
 
         if ($srbId = $this->getMapId()) {
             parent::__construct($srbId);
-            $this->copyValues($this);
         } else {
             parent::__construct();
         }
@@ -77,20 +76,6 @@ class SRBProduct extends LibProduct implements PSElementInterface
         return $sql;
     }
 
-    public function sync ()
-    {
-        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
-
-        try {
-            $result = $this->save();
-            $this->mapApiCall($this->id);
-            return $result;
-        } catch (RestClientError $e) {
-            SRBLogger::addLog(json_encode($e), SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
-        }
-    }
-
-
     // Own functions
     static private function extractNameFromPSArray ($psProductArrayName)
     {
@@ -131,10 +116,10 @@ class SRBProduct extends LibProduct implements PSElementInterface
         $sql = new DbQuery();
         $sql->select('COUNT(' . SRBOrder::getTableName() . '.id_order)');
         $sql->from('product', self::getTableName());
-        $sql->innerJoin('cart_product', 'cp', self::getTableName() . '.' . self::getIdColumnName() . ' = cp.id_product');
+        $sql->innerJoin('cart_product', 'cp', self::getTableIdentifier() . ' = cp.id_product');
         $sql->innerJoin('cart', 'ca', 'cp.id_cart = ca.id_cart');
         $sql->innerJoin('orders', SRBOrder::getTableName(), 'ca.id_cart = ' . SRBOrder::getTableName() . '.id_cart');
-        $sql->where(self::getTableName() . '.' . self::getIdColumnName() . ' = ' . $this->getDBId());
+        $sql->where(self::getTableIdentifier() . ' = ' . $this->getDBId());
 
         return (Db::getInstance()->getValue($sql) == 0);
     }

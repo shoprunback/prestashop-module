@@ -179,16 +179,29 @@ class AdminShoprunbackController extends ModuleAdminController
         $currentPage = ($currentPage <= $pages) ? $currentPage : 1;
         $itemMin = ($currentPage - 1) * self::ITEMS_BY_PAGE;
 
-        $items = $searchCondition != '' ?
+        $items = $searchCondition ?
             $class::$function(Tools::getValue($searchCondition), false, self::ITEMS_BY_PAGE, $itemMin) :
             $class::$function(false, self::ITEMS_BY_PAGE, $itemMin);
 
         // SRBBrand::syncAll(true);
         // die;
+        // foreach ($items as $key => $item) {
+        //     var_dump($item->ps['id_order']);
+        // }
 
-        // var_dump($items[0]);
-        // $items[0]->sync();
-        // var_dump($items[0]);
+        // foreach ($items as $key => $item) {
+        //     if ($item->ps['id_order'] == 1) {
+        //         var_dump($key);
+        //         var_dump($item);
+        //         die;
+        //     }
+        // }
+
+        // var_dump($items[9]->items);
+        // $items[1]->sync();
+        // var_dump($items[4]);
+
+        // var_dump($items[9]);
         // die;
 
         // $_POST['className'] = 'SRBBrand';

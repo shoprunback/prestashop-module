@@ -13,17 +13,24 @@ if (getenv('DASHBOARD_URL')) {
 
 include_once 'lib/shoprunback-php/init.php';
 
+use \Shoprunback\RestClient;
+
 include_once 'classes/ElementMapper.php';
 include_once 'classes/Util.php';
 
 include_once 'classes/PSElementInterface.php';
 include_once 'classes/PSElementTrait.php';
+include_once 'classes/PSInterface.php';
 
+include_once 'classes/SRBAddress.php';
 include_once 'classes/SRBBrand.php';
+include_once 'classes/SRBCustomer.php';
+include_once 'classes/SRBItem.php';
+include_once 'classes/SRBOrder.php';
 include_once 'classes/SRBProduct.php';
+include_once 'classes/SRBShipback.php';
 
 // include_once 'classes/Synchronizer.php';
-// include_once 'classes/SRBShipback.php';
 include_once 'classes/SRBLogger.php';
 include_once 'exceptions/ConfigurationException.php';
 include_once 'exceptions/OrderException.php';
@@ -209,7 +216,21 @@ class ShopRunBack extends Module
     {
         if (RestClient::getClient()->getToken()) {
             try {
-                $order = SRBOrder::getById($params['order']->id);
+                $order = SRBOrder::getNotSyncById($params['order']->id);
+                var_dump($order->getElementBody()->items);
+                $order->sync();
+            } catch (OrderException $e) {
+                return $e;
+            }
+        }
+    }
+
+    public function hookActionOrderStatusPostUpdate ($params)
+    {
+        if (RestClient::getClient()->getToken()) {
+            try {
+                $order = SRBOrder::getById($params['id_order']);
+                // var_dump($order);die;
                 $order->sync();
             } catch (OrderException $e) {
                 return $e;
@@ -255,18 +276,6 @@ class ShopRunBack extends Module
 
             if ($product) {
                 $product->deleteWithCheck();
-            }
-        }
-    }
-
-    public function hookActionOrderStatusPostUpdate ($params)
-    {
-        if (RestClient::getClient()->getToken()) {
-            try {
-                $order = SRBOrder::getById($params['id_order']);
-                $order->sync();
-            } catch (OrderException $e) {
-                return $e;
             }
         }
     }

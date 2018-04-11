@@ -15,15 +15,16 @@ class ShopRunBackShipbackModuleFrontController extends ModuleFrontController
 
     public function initContent ()
     {
-        $redirectUrl = $this->context->link->getPageLink('index') . '?controller=order-detail&id_order=' . $_GET['orderId'];
+        $redirectUrl = $this->context->link->getPageLink('index') . '?controller=order-detail';
 
-        if (! isset($_GET['orderId'])) {
+        if (!isset($_GET['orderId'])) {
             Tools::redirect($redirectUrl);
         }
 
+        $redirectUrl .= '&id_order=' . $_GET['orderId'];
         $shipback = SRBShipback::createShipbackFromOrderId($_GET['orderId']);
 
-        if (! $shipback || isset($shipback->shipback)) {
+        if (!$shipback || isset($shipback->shipback)) {
             Tools::redirect($redirectUrl);
         }
 

@@ -1,39 +1,37 @@
 <?php
 
-include_once 'SRBObject.php';
-include_once 'SRBCustomer.php';
-include_once 'SRBItem.php';
-
-use Shoprunback\Elements\Order;
+use Shoprunback\Elements\Order as LibOrder;
 use Shoprunback\Error\NotFoundError;
 use Shoprunback\Error\RestClientError;
 
-class SRBOrder extends SRBObject
+class SRBOrder extends LibOrder implements PSElementInterface
 {
-    public $ordered_at;
-    public $customer;
-    public $order_number;
-    public $items;
+    use PSElementTrait;
 
-    public function __construct ($psOrder)
+    public function __construct($psOrder)
     {
         $this->ps = $psOrder;
         $this->order_number = $this->extractOrderNumberFromPSArray($psOrder);
-        $this->ordered_at = $this->convertDateFormatForDB($psOrder['date_add']);
+        $this->ordered_at = Util::convertDateFormatForDB($psOrder['date_add']);
         $this->customer = SRBCustomer::createFromOrder($psOrder);
         $this->items = SRBItem::createItemsFromOrderId($this->getDBId());
 
-        $this->attributesToSend = ['order_number', 'ordered_at', 'customer', 'items'];
+        if ($srbId = $this->getMapId()) {
+            parent::__construct($srbId);
+        } else {
+            parent::__construct();
+        }
     }
 
-    static public function getObjectTypeForMapping ()
+    // Inherited functions
+    public static function getTableName()
     {
-        return 'order';
+        return 'o';
     }
 
-    static public function getPathForAPICall ()
+    static public function getIdColumnName ()
     {
-        return 'orders';
+        return 'id_order';
     }
 
     static public function getIdentifier ()
@@ -46,61 +44,51 @@ class SRBOrder extends SRBObject
         return 'order_number';
     }
 
-    static public function getTableName ()
+    static public function getObjectTypeForMapping ()
     {
-        return 'o';
+        return 'order';
     }
 
-    static public function getIdColumnName ()
+    static public function getPathForAPICall ()
     {
-        return 'id_order';
+        return 'orders';
     }
 
-    public function createLibElementFromSRBObject()
+    static public function findAllQuery ($limit = 0, $offset = 0)
     {
-        $order = false;
-        if ($mapId = SRBMap::getMappingIdIfExists($this->getDBId(), self::getObjectTypeForMapping())) {
-            try {
-                $order = Order::retrieve($mapId);
-                return $order;
-            } catch (NotFoundError $e) {
+        $sql = new DbQuery();
+        $sql->from('orders', self::getTableName());
+        $sql = self::addComponentsToQuery($sql);
+        $sql = self::addLimitToQuery($sql, $limit, $offset);
 
-            }
+        return $sql;
+    }
+
+    static public function getAllWithMapping ($onlySyncItems = false, $limit = 0, $offset = 0)
+    {
+        $sql = self::findAllWithMappingQuery($onlySyncItems, $limit, $offset);
+        $sql->select(SRBShipback::getTableName() . '.' . SRBShipback::getIdColumnName() . ', ' . SRBShipback::getTableName() . '.state, os.delivery');
+        $sql->leftJoin( // We use leftJoin because orders may not have a return associated
+            SRBShipback::SHIPBACK_TABLE_NAME_NO_PREFIX,
+            SRBShipback::getTableName(),
+            SRBShipback::getTableName() . '.id_order = ' . self::getTableIdentifier()
+        );
+        $sql = self::getComponentsToFindOrderState($sql);
+
+        $items = self::convertPSArrayToElements(Db::getInstance()->executeS($sql));
+
+        foreach ($items as $key => $item) {
+            $items[$key]->id_item_srb = $item->ps['id_item_srb'];
+            $items[$key]->last_sent_at = $item->ps['last_sent_at'];
+            $items[$key]->id_srb_shipback = $item->ps['id_srb_shipback'];
+            $items[$key]->state = $item->ps['state'];
+            $items[$key]->delivery = $item->ps['delivery'];
         }
 
-        try {
-            $order = Order::retrieve($this->getReference());
-            return $order;
-        } catch (NotFoundError $e) {
-
-        }
-
-        $order = new Order();
-        $order->order_number = $this->order_number;
-        $order->ordered_at = $this->ordered_at;
-        $order->customer = $this->customer;
-        $order->items = $this->items;
-
-        return $order;
+        return $items;
     }
 
-    public function getProducts ()
-    {
-        $products = [];
-        foreach ($this->items as $item) {
-            $products[] = $item->product;
-        }
-
-        return $products;
-    }
-
-    public function sync ()
-    {
-        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
-        $order = $this->createLibElementFromSRBObject();
-        return $order->save();
-    }
-
+    // Own functions
     static private function extractOrderNumberFromPSArray ($psOrderArrayName)
     {
         if (isset($psOrderArrayName['reference'])){
@@ -112,28 +100,14 @@ class SRBOrder extends SRBObject
         }
     }
 
-    static public function getAllWithMapping ($onlySyncItems = false, $limit = 0, $offset = 0)
+    public function getProducts ()
     {
-        $sql = self::findAllWithMappingQuery($onlySyncItems, $limit, $offset);
-        $sql->select(SRBShipback::getTableName() . '.' . SRBShipback::getIdColumnName() . ', ' . SRBShipback::getTableName() . '.state, os.delivery');
-        $sql->leftJoin( // We use leftJoin because orders may not have a return associated
-            SRBShipback::SHIPBACK_TABLE_NAME_NO_PREFIX,
-            SRBShipback::getTableName(),
-            SRBShipback::getTableName() . '.id_order = ' . self::getTableName() . '.' . self::getIdColumnName()
-        );
-        $sql = self::getComponentsToFindOrderState($sql);
-
-        $items = self::convertPSArrayToSRBObjects(Db::getInstance()->executeS($sql));
-
-        foreach ($items as $key => $item) {
-            $items[$key]->id_item_srb = $item->ps['id_item_srb'];
-            $items[$key]->last_sent_at = $item->ps['last_sent_at'];
-            $items[$key]->id_srb_shipback = $item->ps['id_srb_shipback'];
-            $items[$key]->state = $item->ps['state'];
-            $items[$key]->delivery = $item->ps['delivery'];
+        $products = [];
+        foreach ($this->items as $item) {
+            $products[] = $item->product;
         }
 
-        return $items;
+        return $products;
     }
 
     static public function createFromShipback ($shipback)
@@ -148,43 +122,6 @@ class SRBOrder extends SRBObject
         $sql->innerJoin('address', 'a', 'c.id_customer = a.id_customer');
         $sql->innerJoin('country', 'co', 'a.id_country = co.id_country');
         $sql->leftJoin('state', 's', 'a.id_state = s.id_state');
-
-        return $sql;
-    }
-
-    static public function findAllQuery ($limit = 0, $offset = 0)
-    {
-        $sql = new DbQuery();
-        $sql->from('orders', self::getTableName());
-        $sql = self::addComponentsToQuery($sql);
-        $sql = self::addLimitToQuery($sql, $limit, $offset);
-
-        return $sql;
-    }
-
-    static protected function findAllWithMappingQuery ($onlySyncItems = false, $limit = 0, $offset = 0)
-    {
-        $identifier = static::getIdColumnName();
-        $type = static::getObjectTypeForMapping();
-        $joinType = $onlySyncItems ? 'innerJoin' : 'leftJoin';
-
-        $sql = static::findAllQuery();
-        $sql->select('srb.*');
-        $sql->{$joinType}(
-            SRBMap::MAPPER_TABLE_NAME_NO_PREFIX,
-            'srb',
-            'srb.id_item = ' . static::getTableName() . '.' . $identifier . '
-                AND srb.type = "' . $type . '"
-                AND srb.last_sent_at IN (
-                    SELECT MAX(srb.last_sent_at)
-                    FROM ' . SRBMap::getMapperTableName() . ' srb
-                    WHERE srb.type = "' . $type . '"
-                    GROUP BY srb.id_item
-            )'
-        );
-        $sql->groupBy(static::getTableName() . '.' . $identifier);
-        $sql->orderBy('srb.last_sent_at DESC');
-        $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
     }
@@ -210,7 +147,7 @@ class SRBOrder extends SRBObject
         $sql->leftJoin(
             'order_history',
             'oh',
-            'oh.id_order = ' . self::getTableName() . '.' . self::getIdColumnName() . ' AND oh.id_order_history IN (
+            'oh.id_order = ' . self::getTableIdentifier() . ' AND oh.id_order_history IN (
                 SELECT MAX(oh.id_order_history)
                 FROM ps_order_history oh
                 GROUP BY id_order

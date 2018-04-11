@@ -1,12 +1,14 @@
 <?php
 
-use Shoprunback\Elements\Item as LibItem;
-use Shoprunback\Error\NotFoundError;
-use Shoprunback\Error\RestClientError;
+include_once 'SRBProduct.php';
 
-class SRBItem extends LibItem
+class SRBItem
 {
-    use PSElementTrait;
+    public $label;
+    public $reference;
+    public $price_cents;
+    public $currency;
+    public $product;
 
     public function __construct ($psProduct)
     {

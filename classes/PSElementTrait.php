@@ -37,13 +37,15 @@ trait PSElementTrait
         $mapQuery = ElementMapper::findOnlyLastSentByTypeQuery($type);
 
         $sql = static::findAllQuery();
+        $sql->select(ElementMapper::getTableName() . '.id_item_srb');
         $sql->{$joinType}(
             ElementMapper::MAPPER_TABLE_NAME_NO_PREFIX,
-            'srb',
-            'srb.id_item = ' . static::getTableName() . '.' . $identifier . '
-                AND srb.type = "' . $type . '"
-                AND srb.last_sent_at IN (' . $mapQuery . ')'
+            ElementMapper::getTableName(),
+            ElementMapper::getTableName() . '.id_item = ' . static::getTableName() . '.' . $identifier . '
+                AND ' . ElementMapper::getTableName() . '.type = "' . $type . '"
+                AND ' . ElementMapper::getTableName() . '.last_sent_at IN (' . $mapQuery . ')'
         );
+        // echo($sql->__toString());
 
         return $sql;
     }
@@ -54,7 +56,7 @@ trait PSElementTrait
         $type = static::getObjectTypeForMapping();
         $mapQuery = ElementMapper::findOnlyIdItemByTypeQuery($type);
 
-        return static::findAllQuery()->where(static::getTableName() . '.' . static::getIdColumnName() . ' NOT IN (' . $mapQuery . ')');
+        return static::findAllQuery()->where(static::getTableIdentifier() . ' NOT IN (' . $mapQuery . ')');
     }
 
     static protected function findAllWithMappingQuery ($onlySyncItems = false, $limit = 0, $offset = 0)
@@ -62,9 +64,9 @@ trait PSElementTrait
         $identifier = static::getIdColumnName();
 
         $sql = self::getComponentsToFindAllWithMappingQuery($onlySyncItems);
-        $sql->select('srb.*');
+        $sql->select(ElementMapper::getTableName() . '.*');
         $sql->groupBy(static::getTableName() . '.' . $identifier);
-        $sql->orderBy('srb.last_sent_at DESC');
+        $sql->orderBy(ElementMapper::getTableName() . '.last_sent_at DESC');
         $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
@@ -99,24 +101,60 @@ trait PSElementTrait
 
     static protected function addCountToQuery ($sql)
     {
-        return $sql->select('COUNT(DISTINCT ' . static::getTableName() . '.' . static::getIdColumnName() . ') as count');
+        return $sql->select('COUNT(DISTINCT ' . static::getTableIdentifier() . ') as count');
     }
 
     static protected function findOneQuery ($id)
     {
-        return static::findAllQuery()->where(self::getTableIdentifier() . ' = "' . pSQL($id) . '"');
+        return static::addWhereId(static::getComponentsToFindAllWithMappingQuery(true), $id);
+    }
+
+    static protected function findOneNotSyncQuery ($id)
+    {
+        return static::addWhereId(static::findAllQuery(), $id);
+    }
+
+    static protected function addWhereId ($sql, $id)
+    {
+        $sql->where(self::getTableIdentifier() . ' = "' . pSQL($id) . '"');
+        return $sql;
+    }
+
+    static public function checkResultOfGetById ($result)
+    {
+        if (!$result) {
+            $class = get_called_class();
+            $exceptionName = ucfirst($class::getObjectTypeForMapping()) . 'Exception';
+            throw new $exceptionName('No ' . $class::getObjectTypeForMapping() . ' found with id ' . $id, 1);
+        }
     }
 
     static public function getById ($id)
     {
-        $class = get_called_class();
+        SRBLogger::addLog(static::findOneQuery($id)->__toString());
         $result = Db::getInstance()->getRow(static::findOneQuery($id));
+        // var_dump($result);
+        // die;
 
-        if (! $result) {
-            $exceptionName = ucfirst($class::getObjectTypeForMapping()) . 'Exception';
-            throw new $exceptionName('No ' . $class::getObjectTypeForMapping() . ' found with id ' . $id, 1);
-        }
+        static::checkResultOfGetById($result);
 
+        return static::createNewFromGetByIdQuery($result);
+    }
+
+    static public function getNotSyncById ($id)
+    {
+        $result = Db::getInstance()->getRow(static::findOneNotSyncQuery($id));
+        // var_dump($result);
+        // die;
+
+        static::checkResultOfGetById($result);
+
+        return static::createNewFromGetByIdQuery($result);
+    }
+
+    static public function createNewFromGetByIdQuery ($result)
+    {
+        $class = get_called_class();
         return new $class($result);
     }
 
@@ -173,22 +211,38 @@ trait PSElementTrait
 
     public function mapApiCall ($itemSrbId)
     {
-        $itemType = static::getObjectTypeForMapping();
         $identifier = static::getIdColumnName();
         $itemId = isset($this->$identifier) ? $this->$identifier : $this->getDBId();
 
-        SRBLogger::addLog('Saving map for ' . $itemType . ' with ID ' . $itemId, SRBLogger::INFO, $itemType);
+        SRBLogger::addLog('Saving map for ' . static::getObjectTypeForMapping() . ' with ID ' . $itemId, SRBLogger::INFO, static::getObjectTypeForMapping());
         $data = [
             'id_item' => $itemId,
             'id_item_srb' => $itemSrbId,
-            'type' => $itemType,
+            'type' => static::getObjectTypeForMapping(),
             'last_sent_at' => date('Y-m-d H:i:s'),
         ];
+        if (static::getObjectTypeForMapping() == 'shipback') {
+            SRBLogger::addLog('data: ' . json_encode($data), SRBLogger::INFO, static::getObjectTypeForMapping());
+        }
         $map = new ElementMapper($data);
         $map->save();
     }
 
-    static public function syncAll ($newOnly = false) {
+    public function sync ()
+    {
+        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
+
+        try {
+            $result = $this->save();
+            $this->mapApiCall($this->id);
+            return $result;
+        } catch (\Shoprunback\Error $e) {
+            SRBLogger::addLog(json_encode($e), SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
+        }
+    }
+
+    static public function syncAll ($newOnly = false)
+    {
         $items = $newOnly ? self::getAllNotSync() : self::getAll();
 
         $responses = [];

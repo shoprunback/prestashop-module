@@ -45,12 +45,15 @@ class ElementMapper
 
         unset($mapArray['id_srb_map']);
 
-        if (! isset($this->id_srb_map) || $this->id_srb_map == 0) {
+        if (!isset($this->id_srb_map) || $this->id_srb_map == 0) {
             $mapFromDB = ElementMapper::getByIdItemAndIdType($this->id_item, $this->type);
 
             if ($mapFromDB) {
                 $this->id_srb_map = $mapFromDB->id_srb_map;
             }
+        }
+        if ($this->type == 'shipback') {
+            SRBLogger::addLog(json_encode($mapArray), SRBLogger::INFO, $this->type);
         }
 
         $result = '';
@@ -85,7 +88,7 @@ class ElementMapper
     static public function getById ($id)
     {
         $sql = self::findAllQuery();
-        $sql->where(self::getTableName() . '.' . self::getIdColumnName() . ' = ' . pSQL($id));
+        $sql->where(self::getTableIdentifier() . ' = ' . pSQL($id));
         $result = Db::getInstance()->getRow($sql);
 
         return self::returnResult($result);
@@ -105,8 +108,19 @@ class ElementMapper
 
     static public function getByIdItemAndIdType ($idItem, $type)
     {
+        if (is_string($idItem) && !is_numeric($idItem)) return static::getByIdItemSRBAndIdType($idItem, $type);
+
         $sql = self::findAllQuery();
         $sql->where(self::getTableName() . '.id_item = ' . pSQL($idItem) . ' AND ' . pSQL(self::getTableName()) . '.type = "' . pSQL($type) . '"');
+        $result = Db::getInstance()->getRow($sql);
+
+        return self::returnResult($result);
+    }
+
+    static public function getByIdItemSRBAndIdType ($idItemSrb, $type)
+    {
+        $sql = self::findAllQuery();
+        $sql->where(self::getTableName() . '.id_item_srb = "' . pSQL($idItemSrb) . '" AND ' . pSQL(self::getTableName()) . '.type = "' . pSQL($type) . '"');
         $result = Db::getInstance()->getRow($sql);
 
         return self::returnResult($result);

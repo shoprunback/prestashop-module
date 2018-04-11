@@ -16,7 +16,6 @@ class SRBBrand extends LibBrand implements PSElementInterface
 
         if ($srbId = $this->getMapId()) {
             parent::__construct($srbId);
-            $this->copyValues($this);
         } else {
             parent::__construct();
         }
@@ -61,18 +60,5 @@ class SRBBrand extends LibBrand implements PSElementInterface
         $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
-    }
-
-    public function sync ()
-    {
-        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
-
-        try {
-            $result = $this->save();
-            $this->mapApiCall($this->id);
-            return $result;
-        } catch (RestClientError $e) {
-            SRBLogger::addLog(json_encode($e), SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
-        }
     }
 }
