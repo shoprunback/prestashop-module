@@ -2,8 +2,6 @@
 
 use Shoprunback\Elements\Product as LibProduct;
 use Shoprunback\Elements\Brand as LibBrand;
-use Shoprunback\Error\NotFoundError;
-use Shoprunback\Error\RestClientError;
 
 class SRBProduct extends LibProduct implements PSElementInterface
 {

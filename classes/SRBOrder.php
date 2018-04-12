@@ -1,8 +1,6 @@
 <?php
 
 use Shoprunback\Elements\Order as LibOrder;
-use Shoprunback\Error\NotFoundError;
-use Shoprunback\Error\RestClientError;
 
 class SRBOrder extends LibOrder implements PSElementInterface
 {

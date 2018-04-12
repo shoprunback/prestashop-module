@@ -1,8 +1,6 @@
 <?php
 
 use Shoprunback\Elements\Item as LibItem;
-use Shoprunback\Error\NotFoundError;
-use Shoprunback\Error\RestClientError;
 
 class SRBItem extends LibItem
 {

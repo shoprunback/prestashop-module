@@ -1,8 +1,6 @@
 <?php
 
 use Shoprunback\Elements\Brand as LibBrand;
-use Shoprunback\Error\NotFoundError;
-use Shoprunback\Error\RestClientError;
 
 class SRBBrand extends LibBrand implements PSElementInterface
 {

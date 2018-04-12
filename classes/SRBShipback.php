@@ -1,8 +1,6 @@
 <?php
 
 use Shoprunback\Elements\Shipback as LibShipback;
-use Shoprunback\Error\NotFoundError;
-use Shoprunback\Error\RestClientError;
 
 class SRBShipback extends LibShipback implements PSElementInterface
 {

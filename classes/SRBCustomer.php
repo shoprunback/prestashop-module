@@ -1,8 +1,6 @@
 <?php
 
 use Shoprunback\Elements\Customer as LibCustomer;
-use Shoprunback\Error\NotFoundError;
-use Shoprunback\Error\RestClientError;
 
 class SRBCustomer extends LibCustomer implements PSInterface
 {

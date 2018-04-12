@@ -1,8 +1,6 @@
 <?php
 
 use Shoprunback\Elements\Address as LibAddress;
-use Shoprunback\Error\NotFoundError;
-use Shoprunback\Error\RestClientError;
 
 class SRBAddress extends LibAddress implements PSInterface
 {
