@@ -152,8 +152,7 @@ trait PSElementTrait
 
     static public function getCountOfQuery ($sql)
     {
-        $sql = self::addCountToQuery($sql);
-        return Db::getInstance()->getRow($sql)['count'];
+        return Db::getInstance()->getRow(self::addCountToQuery($sql))['count'];
     }
 
     static protected function addLimitToQuery ($sql, $limit = 0, $offset = 0)
