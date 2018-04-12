@@ -45,7 +45,6 @@ trait PSElementTrait
                 AND ' . ElementMapper::getTableName() . '.type = "' . $type . '"
                 AND ' . ElementMapper::getTableName() . '.last_sent_at IN (' . $mapQuery . ')'
         );
-        // echo($sql->__toString());
 
         return $sql;
     }
@@ -129,27 +128,20 @@ trait PSElementTrait
         }
     }
 
+    static public function extractNewItemFromGetByIdQuery($result)
+    {
+        static::checkResultOfGetById($result);
+        return static::createNewFromGetByIdQuery($result);
+    }
+
     static public function getById ($id)
     {
-        SRBLogger::addLog(static::findOneQuery($id)->__toString());
-        $result = Db::getInstance()->getRow(static::findOneQuery($id));
-        // var_dump($result);
-        // die;
-
-        static::checkResultOfGetById($result);
-
-        return static::createNewFromGetByIdQuery($result);
+        return static::extractNewItemFromGetByIdQuery(Db::getInstance()->getRow(static::findOneQuery($id)));
     }
 
     static public function getNotSyncById ($id)
     {
-        $result = Db::getInstance()->getRow(static::findOneNotSyncQuery($id));
-        // var_dump($result);
-        // die;
-
-        static::checkResultOfGetById($result);
-
-        return static::createNewFromGetByIdQuery($result);
+        return static::extractNewItemFromGetByIdQuery(Db::getInstance()->getRow(static::findOneNotSyncQuery($id)));
     }
 
     static public function createNewFromGetByIdQuery ($result)
@@ -182,7 +174,7 @@ trait PSElementTrait
 
     public function getMapId()
     {
-        return ElementMapper::getMappingIdIfExists($this->getDBId(), static::getObjectTypeForMapping());
+        return isset($this->id) ? $this->id : ElementMapper::getMappingIdIfExists($this->getDBId(), static::getObjectTypeForMapping());
     }
 
     public function getName ()
@@ -209,7 +201,7 @@ trait PSElementTrait
         return self::convertPSArrayToElements(Db::getInstance()->executeS($class::findNotSyncQuery()));
     }
 
-    public function mapApiCall ($itemSrbId)
+    public function mapApiCall ()
     {
         $identifier = static::getIdColumnName();
         $itemId = isset($this->$identifier) ? $this->$identifier : $this->getDBId();
@@ -217,7 +209,7 @@ trait PSElementTrait
         SRBLogger::addLog('Saving map for ' . static::getObjectTypeForMapping() . ' with ID ' . $itemId, SRBLogger::INFO, static::getObjectTypeForMapping());
         $data = [
             'id_item' => $itemId,
-            'id_item_srb' => $itemSrbId,
+            'id_item_srb' => $this->getMapId(),
             'type' => static::getObjectTypeForMapping(),
             'last_sent_at' => date('Y-m-d H:i:s'),
         ];
@@ -234,7 +226,7 @@ trait PSElementTrait
 
         try {
             $result = $this->save();
-            $this->mapApiCall($this->id);
+            $this->mapApiCall();
             return $result;
         } catch (\Shoprunback\Error $e) {
             SRBLogger::addLog(json_encode($e), SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());

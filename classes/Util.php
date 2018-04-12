@@ -2,7 +2,7 @@
 
 class Util
 {
-    public function convertDateFormatForDB ($date)
+    public static function convertDateFormatForDB ($date)
     {
         $dateTime = DateTime::createFromFormat('Y-m-d*H:i:s.???P', $date);
 

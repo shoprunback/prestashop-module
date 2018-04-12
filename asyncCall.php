@@ -16,7 +16,7 @@ if (isset($_POST['params'])) {
     if ($action == 'sync') {
         SRBLogger::addLog('AsyncCall sync ' . $class . ' ' . $_POST['params'], SRBLogger::INFO);
         try {
-            $item = $class::getById($_POST['params']);
+            $item = $class::getNotSyncById($_POST['params']);
             $result = $item->sync();
         } catch (SRBException $e) {
             SRBLogger::addLog($e, SRBLogger::FATAL, $class);

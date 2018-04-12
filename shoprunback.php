@@ -217,7 +217,6 @@ class ShopRunBack extends Module
         if (RestClient::getClient()->getToken()) {
             try {
                 $order = SRBOrder::getNotSyncById($params['order']->id);
-                var_dump($order->getElementBody()->items);
                 $order->sync();
             } catch (OrderException $e) {
                 return $e;
@@ -230,7 +229,6 @@ class ShopRunBack extends Module
         if (RestClient::getClient()->getToken()) {
             try {
                 $order = SRBOrder::getById($params['id_order']);
-                // var_dump($order);die;
                 $order->sync();
             } catch (OrderException $e) {
                 return $e;
@@ -242,7 +240,7 @@ class ShopRunBack extends Module
     {
         if (RestClient::getClient()->getToken()) {
             try {
-                $product = SRBProduct::getById($params['product']->id);
+                $product = SRBProduct::getNotSyncById($params['product']->id);
                 $product->sync();
             } catch (ProductException $e) {
                 return $e;

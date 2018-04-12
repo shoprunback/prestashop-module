@@ -157,7 +157,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
         $sql = Db::getInstance();
         $sql->insert(self::SHIPBACK_TABLE_NAME_NO_PREFIX, $shipbackToInsert);
 
-        $this->mapApiCall($this->getMapId());
+        $this->mapApiCall();
 
         SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $this->id . '" inserted', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->id);
     }
@@ -176,7 +176,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
 
         SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $this->getReference() . '" updated', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
 
-        $this->mapApiCall($this->getMapId());
+        $this->mapApiCall();
 
         return $result;
     }

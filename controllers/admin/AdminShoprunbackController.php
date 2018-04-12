@@ -154,19 +154,19 @@ class AdminShoprunbackController extends ModuleAdminController
                 break;
             case 'brand':
                 $externalLink .= '/brands/';
-                $countItems = SRBBrand::getCountAllWithMapping();
+                $countItems = SRBBrand::getCountAll();
                 $class = 'SRBBrand';
                 $function = 'getAllWithMapping';
                 break;
             case 'product':
                 $externalLink .= '/products/';
-                $countItems = SRBProduct::getCountAllWithMapping();
+                $countItems = SRBProduct::getCountAll();
                 $class = 'SRBProduct';
                 $function = 'getAllWithMapping';
                 break;
             case 'order':
                 $externalLink .= '/orders/';
-                $countItems = SRBOrder::getCountAllWithMapping();
+                $countItems = SRBOrder::getCountAll();
                 $class = 'SRBOrder';
                 $function = 'getAllWithMapping';
                 break;
@@ -182,33 +182,6 @@ class AdminShoprunbackController extends ModuleAdminController
         $items = $searchCondition ?
             $class::$function(Tools::getValue($searchCondition), false, self::ITEMS_BY_PAGE, $itemMin) :
             $class::$function(false, self::ITEMS_BY_PAGE, $itemMin);
-
-        // SRBBrand::syncAll(true);
-        // die;
-        // foreach ($items as $key => $item) {
-        //     var_dump($item->ps['id_order']);
-        // }
-
-        // foreach ($items as $key => $item) {
-        //     if ($item->ps['id_order'] == 1) {
-        //         var_dump($key);
-        //         var_dump($item);
-        //         die;
-        //     }
-        // }
-
-        // var_dump($items[9]->items);
-        // $items[1]->sync();
-        // var_dump($items[4]);
-
-        // var_dump($items[9]);
-        // die;
-
-        // $_POST['className'] = 'SRBBrand';
-        // $_POST['action'] = 'sync';
-        // $_POST['params'] = '2';
-        // $this->asyncCall();
-        // die;
 
         if ($itemType == 'product') {
             $noBrand = [];
