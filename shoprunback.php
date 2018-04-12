@@ -13,8 +13,6 @@ if (getenv('DASHBOARD_URL')) {
 
 include_once 'lib/shoprunback-php/init.php';
 
-use \Shoprunback\RestClient;
-
 include_once 'classes/ElementMapper.php';
 include_once 'classes/Util.php';
 
@@ -131,6 +129,7 @@ class ShopRunBack extends Module
 
         Configuration::updateValue('production', false);
 
+        \Shoprunback\RestClient::getClient()->setToken('');
         SRBLogger::addLog('Module installed', SRBLogger::INFO);
         return true;
     }
@@ -159,7 +158,7 @@ class ShopRunBack extends Module
             return false;
         }
 
-        Configuration::updateValue('srbtoken', '');
+        \Shoprunback\RestClient::getClient()->setToken('');
 
         SRBLogger::addLog('Module uninstalled', SRBLogger::INFO);
         return true;
@@ -213,7 +212,7 @@ class ShopRunBack extends Module
 
     public function hookNewOrder ($params)
     {
-        if (RestClient::getClient()->getToken()) {
+        if (\Shoprunback\RestClient::getClient()->getToken()) {
             try {
                 $order = SRBOrder::getNotSyncById($params['order']->id);
                 $order->sync();
@@ -225,7 +224,7 @@ class ShopRunBack extends Module
 
     public function hookActionOrderStatusPostUpdate ($params)
     {
-        if (RestClient::getClient()->getToken()) {
+        if (\Shoprunback\RestClient::getClient()->getToken()) {
             try {
                 $order = SRBOrder::getById($params['id_order']);
                 $order->sync();
@@ -237,7 +236,7 @@ class ShopRunBack extends Module
 
     public function hookActionProductAdd ($params)
     {
-        if (RestClient::getClient()->getToken()) {
+        if (\Shoprunback\RestClient::getClient()->getToken()) {
             try {
                 $product = SRBProduct::getNotSyncById($params['product']->id);
                 $product->sync();
@@ -249,7 +248,7 @@ class ShopRunBack extends Module
 
     public function hookActionProductUpdate ($params)
     {
-        if (RestClient::getClient()->getToken()) {
+        if (\Shoprunback\RestClient::getClient()->getToken()) {
             try {
                 $product = SRBProduct::getById($params['product']->id);
                 $product->sync();
@@ -261,7 +260,7 @@ class ShopRunBack extends Module
 
     public function hookActionProductDelete ($params)
     {
-        if (RestClient::getClient()->getToken()) {
+        if (\Shoprunback\RestClient::getClient()->getToken()) {
             $productParam = $params['product'];
 
             $productArray = ['id_product' => $params['id_product']];
@@ -279,7 +278,7 @@ class ShopRunBack extends Module
 
     public function hookDisplayOrderDetail ($params)
     {
-        if (RestClient::getClient()->getToken()) {
+        if (\Shoprunback\RestClient::getClient()->getToken()) {
             try {
                 $order = SRBOrder::getById($_GET['id_order']);
 
