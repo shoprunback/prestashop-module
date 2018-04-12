@@ -30,7 +30,6 @@ include_once 'classes/SRBOrder.php';
 include_once 'classes/SRBProduct.php';
 include_once 'classes/SRBShipback.php';
 
-// include_once 'classes/Synchronizer.php';
 include_once 'classes/SRBLogger.php';
 include_once 'exceptions/ConfigurationException.php';
 include_once 'exceptions/OrderException.php';
