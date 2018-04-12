@@ -108,34 +108,10 @@ class SRBShipback extends LibShipback implements PSElementInterface
         $result = $srbShipback->sync();
 
         if (!is_null($result)) {
-            // $id = explode('(', $result->shipback->errors[0])[1];
-            // $id = str_replace(')', '', $id);
-
-            // try {
-            //     $shipbackById = self::getById($id);
-
-            //     if (isset($shipbackById->shipback) && isset($shipbackById->shipback->errors)) {
-            //         return $shipbackById;
-            //     }
-
-            //     if (! $shipbackById && strpos($result->shipback->errors[0], 'Order already\'s got return associated') !== false) {
-            //         $shipbackGet = json_decode(Synchronizer::APICall('shipbacks/' . $id, 'GET'));
-            //         self::createReturnFromSyncResult($shipbackGet, $orderId);
-            //         try {
-            //             $shipbackById = self::getById($id);
-            //         } catch (ShipbackException $e) {
-            //             SRBLogger::addLog($e, 'order', $orderId);
-            //         }
-            //     }
-
-            //     $result = $shipbackById;
-            // } catch (ShipbackException $e) {
-            //     SRBLogger::addLog($e, SRBLogger::ERROR, 'order', $orderId);
-            // }
+            SRBLogger::addLog('Could not create Shipback on ShopRunBack for order ' . $orderId . '. Response: ' . json_encode($result), SRBLogger::FATAL, self::getObjectTypeForMapping());
         } else {
             $srbShipback->id_srb_shipback = $srbShipback->id;
             $srbShipback->insertOnPS();
-            // $result = self::createReturnFromSyncResult($result, $orderId);
         }
 
         return $result;
@@ -184,11 +160,15 @@ class SRBShipback extends LibShipback implements PSElementInterface
         return $this->id_srb_shipback;
     }
 
-    static private function findAllByCreateDateQuery ($limit = 0, $offset = 0)
+    static private function findAllByCreateDateQuery ($limit = 0, $offset = 0, $byAsc = false)
     {
         $sql = self::findAllQuery();
         $sql = SRBOrder::addComponentsToQuery($sql);
-        $sql->orderBy('created_at DESC');
+        if ($byAsc) {
+            $sql->orderBy('created_at ASC');
+        } else {
+            $sql->orderBy('created_at DESC');
+        }
         $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
@@ -211,8 +191,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
 
     static public function getAllByCreateDate ($byAsc = false, $limit = 0, $offset = 0)
     {
-        // TODO byAsc
-        return self::generateReturnsFromDBResult(Db::getInstance()->executeS(self::findAllByCreateDateQuery($limit, $offset)));
+        return self::generateReturnsFromDBResult(Db::getInstance()->executeS(self::findAllByCreateDateQuery($limit, $offset, $byAsc)));
     }
 
     static public function getLikeOrderReferenceByCreateDate ($orderReference, $limit = 0, $offset = 0)
