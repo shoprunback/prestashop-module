@@ -31,3 +31,4 @@ download/
 /img/*
 upload/
 psysh
+/lib/*

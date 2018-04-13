@@ -91,10 +91,7 @@ trait PSElementTrait
 
     static protected function findCountAllWithMappingQuery ($onlySyncItems = false)
     {
-        $sql = self::getComponentsToFindAllWithMappingQuery($onlySyncItems);
-        $sql = self::addCountToQuery($sql);
-
-        return $sql;
+        return self::addCountToQuery(self::getComponentsToFindAllWithMappingQuery($onlySyncItems));
     }
 
     static protected function addCountToQuery ($sql)
@@ -213,6 +210,8 @@ trait PSElementTrait
         ];
         $map = new ElementMapper($data);
         $map->save();
+
+        // TODO recursive mapApiCall()
     }
 
     public function sync ()

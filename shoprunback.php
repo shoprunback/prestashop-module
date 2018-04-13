@@ -11,7 +11,7 @@ if (getenv('DASHBOARD_URL')) {
     error_reporting(E_ALL ^ E_DEPRECATED);
 }
 
-include_once 'lib/shoprunback-php/init.php';
+include_once 'lib/shoprunback/shoprunback-php/init.php';
 
 include_once 'classes/ElementMapper.php';
 include_once 'classes/Util.php';
