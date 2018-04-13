@@ -37,6 +37,7 @@ include_once 'exceptions/ShipbackException.php';
 include_once 'sqlQueries.php';
 
 \Shoprunback\RestClient::getClient()->setToken(Configuration::get('srbtoken'));
+\Shoprunback\RestClient::getClient()->setApiBaseUrl(DASHBOARD_URL);
 
 class ShopRunBack extends Module
 {
