@@ -4,7 +4,6 @@ require_once(_PS_MODULE_DIR_ . '../config/config.inc.php');
 require_once(_PS_MODULE_DIR_ . '../init.php');
 
 require_once 'shoprunback.php';
-include_once 'classes/Synchronizer.php';
 include_once 'classes/SRBLogger.php';
 
 $class = $_POST['className'] ? $_POST['className'] : 'ShopRunBack';

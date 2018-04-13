@@ -51,7 +51,7 @@ class AdminShoprunbackController extends ModuleAdminController
 
         // If the user switches from a valid token to another valid token, the mapping table must be reset
         if ($oldSrbToken != '' && $oldSrbToken != RestClient::getClient()->getToken()) {
-            SRBMap::truncateTable();
+            ElementMapper::truncateTable();
             SRBShipback::truncateTable();
         }
 
@@ -64,7 +64,7 @@ class AdminShoprunbackController extends ModuleAdminController
         // If the user switches from production to sandbox mode (or the opposite), the mapping table must be reset
         $currentProductionMode = Configuration::get('production');
         if ($currentProductionMode != Tools::getValue('production')) {
-            SRBMap::truncateTable();
+            ElementMapper::truncateTable();
             SRBShipback::truncateTable();
         }
 

@@ -20,7 +20,7 @@ class SRBProduct extends LibProduct implements PSElementInterface
         $this->addCoverPicture();
 
         if ($psProduct['id_manufacturer'] != 0) {
-            $this->brand = SRBBrand::getById($psProduct['id_manufacturer']);
+            $this->brand = SRBBrand::getNotSyncById($psProduct['id_manufacturer']);
             $this->brand_id = $this->brand->reference;
         }
 

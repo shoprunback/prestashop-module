@@ -31,10 +31,12 @@ include_once 'classes/SRBShipback.php';
 include_once 'classes/SRBLogger.php';
 include_once 'exceptions/ConfigurationException.php';
 include_once 'exceptions/OrderException.php';
+include_once 'exceptions/BrandException.php';
 include_once 'exceptions/ProductException.php';
 include_once 'exceptions/ShipbackException.php';
-include_once 'exceptions/SynchronizerException.php';
 include_once 'sqlQueries.php';
+
+\Shoprunback\RestClient::getClient()->setToken(Configuration::get('srbtoken'));
 
 class ShopRunBack extends Module
 {
@@ -249,11 +251,17 @@ class ShopRunBack extends Module
     public function hookActionProductUpdate ($params)
     {
         if (\Shoprunback\RestClient::getClient()->getToken()) {
+            // In 1.7 the productAdd hook doesn't exist, so it's productUpdate that must manage the adding
             try {
                 $product = SRBProduct::getById($params['product']->id);
                 $product->sync();
             } catch (ProductException $e) {
-                return $e;
+                try {
+                    $product = SRBProduct::getNotSyncById($params['product']->id);
+                    $product->sync();
+                } catch (ProductException $e) {
+                    return $e;
+                }
             }
         }
     }

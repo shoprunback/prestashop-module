@@ -51,7 +51,6 @@ trait PSElementTrait
 
     protected function findNotSyncQuery ()
     {
-        $identifier = static::getIdColumnName();
         $type = static::getObjectTypeForMapping();
         $mapQuery = ElementMapper::findOnlyIdItemByTypeQuery($type);
 
@@ -119,7 +118,7 @@ trait PSElementTrait
         return $sql;
     }
 
-    static public function checkResultOfGetById ($result)
+    static public function checkResultOfGetById ($result, $id)
     {
         if (!$result) {
             $class = get_called_class();
@@ -128,20 +127,20 @@ trait PSElementTrait
         }
     }
 
-    static public function extractNewItemFromGetByIdQuery($result)
+    static public function extractNewItemFromGetByIdResult($result, $id)
     {
-        static::checkResultOfGetById($result);
+        static::checkResultOfGetById($result, $id);
         return static::createNewFromGetByIdQuery($result);
     }
 
     static public function getById ($id)
     {
-        return static::extractNewItemFromGetByIdQuery(Db::getInstance()->getRow(static::findOneQuery($id)));
+        return static::extractNewItemFromGetByIdResult(Db::getInstance()->getRow(static::findOneQuery($id)), $id);
     }
 
     static public function getNotSyncById ($id)
     {
-        return static::extractNewItemFromGetByIdQuery(Db::getInstance()->getRow(static::findOneNotSyncQuery($id)));
+        return static::extractNewItemFromGetByIdResult(Db::getInstance()->getRow(static::findOneNotSyncQuery($id)), $id);
     }
 
     static public function createNewFromGetByIdQuery ($result)
