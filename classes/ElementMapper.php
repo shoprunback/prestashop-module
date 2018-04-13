@@ -52,9 +52,6 @@ class ElementMapper
                 $this->id_srb_map = $mapFromDB->id_srb_map;
             }
         }
-        if ($this->type == 'shipback') {
-            SRBLogger::addLog(json_encode($mapArray), SRBLogger::INFO, $this->type);
-        }
 
         $result = '';
         $sql = Db::getInstance();
