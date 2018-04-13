@@ -5,7 +5,7 @@ mkdir shoprunback
 cp -r ./prestashop-module/* ./shoprunback
 cd shoprunback
 composer install
-rm -r .gitignore .git README.md zip.sh lib/composer
+rm -r .gitignore .git README.md zip.sh lib/composer lib/autoload.php
 cd ..
 zip -r $filename shoprunback
 rm -rf shoprunback/
