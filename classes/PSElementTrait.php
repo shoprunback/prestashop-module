@@ -211,9 +211,6 @@ trait PSElementTrait
             'type' => static::getObjectTypeForMapping(),
             'last_sent_at' => date('Y-m-d H:i:s'),
         ];
-        if (static::getObjectTypeForMapping() == 'shipback') {
-            SRBLogger::addLog('data: ' . json_encode($data), SRBLogger::INFO, static::getObjectTypeForMapping());
-        }
         $map = new ElementMapper($data);
         $map->save();
     }

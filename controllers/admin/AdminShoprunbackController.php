@@ -55,6 +55,7 @@ class AdminShoprunbackController extends ModuleAdminController
             SRBShipback::truncateTable();
         }
 
+        Configuration::updateValue('srbtoken', $srbtoken);
         SRBLogger::addLog('API token saved: ' . substr($srbtoken, 0, 3) . '...' . substr($srbtoken, -3), SRBLogger::INFO, 'configuration');
 
         $company = Company::getOwn();
