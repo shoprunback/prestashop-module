@@ -27,32 +27,32 @@ class SRBOrder extends LibOrder implements PSElementInterface
         return 'o';
     }
 
-    static public function getIdColumnName ()
+    static public function getIdColumnName()
     {
         return 'id_order';
     }
 
-    static public function getIdentifier ()
+    static public function getIdentifier()
     {
         return 'order_number';
     }
 
-    static public function getDisplayNameAttribute ()
+    static public function getDisplayNameAttribute()
     {
         return 'order_number';
     }
 
-    static public function getObjectTypeForMapping ()
+    static public function getObjectTypeForMapping()
     {
         return 'order';
     }
 
-    static public function getPathForAPICall ()
+    static public function getPathForAPICall()
     {
         return 'orders';
     }
 
-    static public function findAllQuery ($limit = 0, $offset = 0)
+    static public function findAllQuery($limit = 0, $offset = 0)
     {
         $sql = new DbQuery();
         $sql->from('orders', self::getTableName());
@@ -62,7 +62,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
         return $sql;
     }
 
-    static public function getAllWithMapping ($onlySyncItems = false, $limit = 0, $offset = 0)
+    static public function getAllWithMapping($onlySyncItems = false, $limit = 0, $offset = 0)
     {
         $sql = self::findAllWithMappingQuery($onlySyncItems, $limit, $offset);
         $sql->select(SRBShipback::getTableName() . '.' . SRBShipback::getIdColumnName() . ', ' . SRBShipback::getTableName() . '.state, os.delivery');
@@ -87,7 +87,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
     }
 
     // Own functions
-    static private function extractOrderNumberFromPSArray ($psOrderArrayName)
+    static private function extractOrderNumberFromPSArray($psOrderArrayName)
     {
         if (isset($psOrderArrayName['reference'])){
             return $psOrderArrayName['reference'];
@@ -98,7 +98,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
         }
     }
 
-    public function getProducts ()
+    public function getProducts()
     {
         $products = [];
         foreach ($this->items as $item) {
@@ -108,12 +108,12 @@ class SRBOrder extends LibOrder implements PSElementInterface
         return $products;
     }
 
-    static public function createFromShipback ($shipback)
+    static public function createFromShipback($shipback)
     {
         return new self($shipback);
     }
 
-    static public function addComponentsToQuery ($sql)
+    static public function addComponentsToQuery($sql)
     {
         $sql->select(self::getTableName() . '.*, c.id_customer, c.firstname, c.lastname, c.email, a.id_address, a.address1, a.address2, a.postcode, a.city, a.phone, s.name as stateName, co.*');
         $sql->innerJoin('customer', 'c', self::getTableName() . '.id_customer = c.id_customer');
@@ -125,7 +125,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
     }
 
     // Returns the attribute "shipped" of an order
-    public function isShipped ()
+    public function isShipped()
     {
         $sql = new DbQuery();
         $sql->from('orders', self::getTableName());
@@ -137,7 +137,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
     }
 
     // Base query to get the order_state, available by passing through the order_history
-    static public function getComponentsToFindOrderState ($sql)
+    static public function getComponentsToFindOrderState($sql)
     {
         // LeftJoin because the order may have no history
         // id_order_history is the primary key of order_history

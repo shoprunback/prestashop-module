@@ -31,3 +31,5 @@ download/
 /img/*
 upload/
 psysh
+/lib/*
+composer.lock

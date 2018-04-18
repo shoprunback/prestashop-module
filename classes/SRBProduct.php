@@ -37,32 +37,32 @@ class SRBProduct extends LibProduct implements PSElementInterface
         return 'p';
     }
 
-    static public function getIdColumnName ()
+    static public function getIdColumnName()
     {
         return 'id_product';
     }
 
-    static public function getIdentifier ()
+    static public function getIdentifier()
     {
         return 'reference';
     }
 
-    static public function getDisplayNameAttribute ()
+    static public function getDisplayNameAttribute()
     {
         return 'label';
     }
 
-    static public function getObjectTypeForMapping ()
+    static public function getObjectTypeForMapping()
     {
         return 'product';
     }
 
-    static public function getPathForAPICall ()
+    static public function getPathForAPICall()
     {
         return 'products';
     }
 
-    static public function findAllQuery ($limit = 0, $offset = 0)
+    static public function findAllQuery($limit = 0, $offset = 0)
     {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*, pl.*');
@@ -75,17 +75,17 @@ class SRBProduct extends LibProduct implements PSElementInterface
     }
 
     // Own functions
-    static private function extractNameFromPSArray ($psProductArrayName)
+    static private function extractNameFromPSArray($psProductArrayName)
     {
         return is_array($psProductArrayName) ? $psProductArrayName[1] : $psProductArrayName;
     }
 
-    static public function getOrderProducts ($orderId)
+    static public function getOrderProducts($orderId)
     {
         return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS(self::findOrderProductsQuery($orderId)));
     }
 
-    public function getCoverPicture ()
+    public function getCoverPicture()
     {
         $productCover = Product::getCover($this->getDBId());
         $image = new Image($productCover['id_image']);
@@ -98,7 +98,7 @@ class SRBProduct extends LibProduct implements PSElementInterface
         return false;
     }
 
-    private function addCoverPicture ()
+    private function addCoverPicture()
     {
         $coverPicture = $this->getCoverPicture();
 
@@ -109,7 +109,7 @@ class SRBProduct extends LibProduct implements PSElementInterface
     }
 
     // Check if product has NEVER been ordered
-    public function canBeDeleted ()
+    public static function canBeDeleted($dbId)
     {
         $sql = new DbQuery();
         $sql->select('COUNT(' . SRBOrder::getTableName() . '.id_order)');
@@ -117,14 +117,14 @@ class SRBProduct extends LibProduct implements PSElementInterface
         $sql->innerJoin('cart_product', 'cp', self::getTableIdentifier() . ' = cp.id_product');
         $sql->innerJoin('cart', 'ca', 'cp.id_cart = ca.id_cart');
         $sql->innerJoin('orders', SRBOrder::getTableName(), 'ca.id_cart = ' . SRBOrder::getTableName() . '.id_cart');
-        $sql->where(self::getTableIdentifier() . ' = ' . $this->getDBId());
+        $sql->where(self::getTableIdentifier() . ' = ' . $dbId);
 
         return (Db::getInstance()->getValue($sql) == 0);
     }
 
-    public function deleteWithCheck ()
+    public function deleteWithCheck()
     {
-        if (! $this->canBeDeleted()) {
+        if (!static::canBeDeleted($this->getDBId())) {
             SRBLogger::addLog('Product "' . $this->getReference() . '" couldn\'t be deleted because it has already been ordered', SRBLogger::WARNING, self::getObjectTypeForMapping(), $this->getDBId());
             return false;
         }
@@ -138,14 +138,14 @@ class SRBProduct extends LibProduct implements PSElementInterface
         return true;
     }
 
-    public function syncDelete ()
+    public function syncDelete()
     {
         SRBLogger::addLog('DELETING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
         $product = Product::retrieve($this->id);
         return $product->remove();
     }
 
-    static protected function findOrderProductsQuery ($orderId)
+    static protected function findOrderProductsQuery($orderId)
     {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*, pl.name, cu.iso_code');
