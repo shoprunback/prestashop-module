@@ -46,7 +46,7 @@ class ShopRunBack extends Module
     public $url;
     public $webhookUrl;
 
-    public function __construct ()
+    public function __construct()
     {
         // Mandatory parameters
         $this->name = 'shoprunback';
@@ -79,7 +79,7 @@ class ShopRunBack extends Module
         }
     }
 
-    private function installTab ($controllerClassName, $tabConf)
+    private function installTab($controllerClassName, $tabConf)
     {
         $tab = new Tab();
         $tab->active = 1;
@@ -100,13 +100,13 @@ class ShopRunBack extends Module
         return $tab->add();
     }
 
-    private function uninstallTab ($controllerClassName)
+    private function uninstallTab($controllerClassName)
     {
         $tab = new Tab((int)Tab::getIdFromClassName($controllerClassName));
         return $tab->delete();
     }
 
-    public function install ()
+    public function install()
     {
         foreach ($this->tabs as $index => $tab) {
             if (! $this->installTab($index, $tab)) {
@@ -133,11 +133,12 @@ class ShopRunBack extends Module
         Configuration::updateValue('production', false);
 
         \Shoprunback\RestClient::getClient()->setToken('');
+        Configuration::updateValue('srbtoken', '');
         SRBLogger::addLog('Module installed', SRBLogger::INFO);
         return true;
     }
 
-    public function uninstall ()
+    public function uninstall()
     {
         foreach ($this->tabs as $index => $name) {
             if (! $this->uninstallTab($index)) {
@@ -167,7 +168,7 @@ class ShopRunBack extends Module
         return true;
     }
 
-    private function executeQueries ($queries)
+    private function executeQueries($queries)
     {
         foreach ($queries as $key => $query) {
             if (! Db::getInstance()->execute($query)) {
@@ -179,7 +180,7 @@ class ShopRunBack extends Module
         return true;
     }
 
-    private function installSQL ()
+    private function installSQL()
     {
         $queries = [];
 
@@ -197,7 +198,7 @@ class ShopRunBack extends Module
         return $this->executeQueries($queries);
     }
 
-    private function uninstallSQL ()
+    private function uninstallSQL()
     {
         $queries = [];
 
@@ -208,7 +209,7 @@ class ShopRunBack extends Module
     }
 
     // Redirect to configuration page
-    public function getContent ()
+    public function getContent()
     {
         Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminShoprunback') . '&itemType=config');
     }
@@ -225,7 +226,7 @@ class ShopRunBack extends Module
         }
     }
 
-    public function hookActionOrderStatusPostUpdate ($params)
+    public function hookActionOrderStatusPostUpdate($params)
     {
         if (\Shoprunback\RestClient::getClient()->getToken()) {
             try {
@@ -237,7 +238,7 @@ class ShopRunBack extends Module
         }
     }
 
-    public function hookActionProductAdd ($params)
+    public function hookActionProductAdd($params)
     {
         if (\Shoprunback\RestClient::getClient()->getToken()) {
             try {
@@ -249,7 +250,7 @@ class ShopRunBack extends Module
         }
     }
 
-    public function hookActionProductUpdate ($params)
+    public function hookActionProductUpdate($params)
     {
         if (\Shoprunback\RestClient::getClient()->getToken()) {
             // In 1.7 the productAdd hook doesn't exist, so it's productUpdate that must manage the adding
@@ -267,36 +268,56 @@ class ShopRunBack extends Module
         }
     }
 
-    public function hookActionProductDelete ($params)
+    public function hookActionProductDelete($params)
     {
+        if (!SRBProduct::canBeDeleted($params['product']->id)) {
+            SRBLogger::addLog($this->l('module.product.ordered'), SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $params['product']->id);
+            return;
+        }
+
         if (\Shoprunback\RestClient::getClient()->getToken()) {
-            $productParam = $params['product'];
+            try {
+                \Shoprunback\Elements\Product::delete(
+                    ElementMapper::getMappingIdIfExists($params['product']->id,
+                    SRBProduct::getObjectTypeForMapping())
+                );
+            } catch (Exception $e) {
+                if (is_a($e, 'Shoprunback\Error\RestClientError')) {
+                    switch ($e->getCode()) {
+                        case 403:
+                            SRBLogger::addLog($this->l('module.product.ordered'), SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $params['product']->id);
+                            break;
+                        case 404:
+                            SRBLogger::addLog($this->l('module.product.unknown'), SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $params['product']->id);
+                            break;
+                        default:
+                            SRBLogger::addLog($e->message, SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $params['product']->id);
+                            break;
+                    }
+                } else {
+                    SRBLogger::addLog(json_encode($e), SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $params['product']->id);
+                }
 
-            $productArray = ['id_product' => $params['id_product']];
-            foreach ($productParam as $key => $value) {
-                $productArray[$key] = $value;
-            }
-
-            $product = new SRBProduct($productArray);
-
-            if ($product) {
-                $product->deleteWithCheck();
+                return;
             }
         }
     }
 
-    public function hookDisplayOrderDetail ($params)
+    public function hookDisplayOrderDetail($params)
     {
         if (\Shoprunback\RestClient::getClient()->getToken()) {
             try {
                 $order = SRBOrder::getById($_GET['id_order']);
 
-                if (! $order->isShipped()) {
+                if (!$order->isShipped()) {
                     return false;
                 }
 
-                $srbfcLink = $this->context->link->getModuleLink('shoprunback', 'shipback', []);
-                $this->context->smarty->assign('createReturnLink', $srbfcLink);
+                // To work everywhere, we must have something like 'shipback?orderId=ID', and not 'shipback&orderId=ID'
+                $this->context->smarty->assign(
+                    'createReturnLink',
+                    str_replace('shipback', 'shipback?orderId=' . $order->getDBId(), $this->context->link->getModuleLink('shoprunback', 'shipback', []))
+                );
                 $this->context->smarty->assign('srborder', $order);
 
                 $shipback = SRBShipback::getByOrderIdIfExists($_GET['id_order']);

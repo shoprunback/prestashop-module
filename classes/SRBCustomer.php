@@ -22,23 +22,23 @@ class SRBCustomer extends LibCustomer implements PSInterface
         return 'c';
     }
 
-    static public function getIdColumnName ()
+    static public function getIdColumnName()
     {
         return 'id_customer';
     }
 
-    static public function getIdentifier ()
+    static public function getIdentifier()
     {
         return 'id';
     }
 
     // Own functions
-    static private function extractIdFromPSArray ($psCustomerArrayName)
+    static private function extractIdFromPSArray($psCustomerArrayName)
     {
         return isset($psCustomerArrayName['id_customer']) ? $psCustomerArrayName['id_customer'] : $psCustomerArrayName['id'];
     }
 
-    static public function createFromOrder ($psOrderArray)
+    static public function createFromOrder($psOrderArray)
     {
         $customer = new self($psOrderArray);
         $customer->address = SRBAddress::createFromOrder($psOrderArray);

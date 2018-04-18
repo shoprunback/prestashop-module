@@ -5,7 +5,7 @@ if (! defined('_PS_VERSION_')) {
 
 class ShopRunBackWebhookModuleFrontController extends ModuleFrontController
 {
-    public function initContent ()
+    public function initContent()
     {
         parent::initContent();
 
@@ -13,7 +13,7 @@ class ShopRunBackWebhookModuleFrontController extends ModuleFrontController
         exit;
     }
 
-    private function executeWebhook ()
+    private function executeWebhook()
     {
         SRBLogger::addLog('WEBHOOK CALLED');
 
@@ -72,7 +72,7 @@ class ShopRunBackWebhookModuleFrontController extends ModuleFrontController
         return self::returnHeaderHTTP(200);
     }
 
-    static private function returnHeaderHTTP ($httpCode)
+    static private function returnHeaderHTTP($httpCode)
     {
         switch ($httpCode) {
             case 403:

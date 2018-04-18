@@ -4,7 +4,7 @@ use \Shoprunback\ElementManager;
 
 trait PSElementTrait
 {
-    static protected function convertPSArrayToElements ($PSArray)
+    static protected function convertPSArrayToElements($PSArray)
     {
         $class = get_called_class();
         $elements = [];
@@ -19,17 +19,17 @@ trait PSElementTrait
         return $elements;
     }
 
-    static public function getTableIdentifier ()
+    static public function getTableIdentifier()
     {
         return static::getTableName() . '.' . static::getIdColumnName();
     }
 
-    public function getDBId ()
+    public function getDBId()
     {
         return $this->ps[static::getIdColumnName()];
     }
 
-    static public function getComponentsToFindAllWithMappingQuery ($onlySyncItems = false)
+    static public function getComponentsToFindAllWithMappingQuery($onlySyncItems = false)
     {
         $identifier = static::getIdColumnName();
         $type = static::getObjectTypeForMapping();
@@ -49,7 +49,7 @@ trait PSElementTrait
         return $sql;
     }
 
-    protected function findNotSyncQuery ()
+    protected function findNotSyncQuery()
     {
         $type = static::getObjectTypeForMapping();
         $mapQuery = ElementMapper::findOnlyIdItemByTypeQuery($type);
@@ -57,7 +57,7 @@ trait PSElementTrait
         return static::findAllQuery()->where(static::getTableIdentifier() . ' NOT IN (' . $mapQuery . ')');
     }
 
-    static protected function findAllWithMappingQuery ($onlySyncItems = false, $limit = 0, $offset = 0)
+    static protected function findAllWithMappingQuery($onlySyncItems = false, $limit = 0, $offset = 0)
     {
         $identifier = static::getIdColumnName();
 
@@ -70,7 +70,7 @@ trait PSElementTrait
         return $sql;
     }
 
-    static public function getAllWithMapping ($onlySyncItems = false, $limit = 0, $offset = 0)
+    static public function getAllWithMapping($onlySyncItems = false, $limit = 0, $offset = 0)
     {
         $class = get_called_class();
         $items = self::convertPSArrayToElements(Db::getInstance()->executeS($class::findAllWithMappingQuery($onlySyncItems, $limit, $offset)));
@@ -83,42 +83,39 @@ trait PSElementTrait
         return $items;
     }
 
-    static public function getCountAllWithMapping ($onlySyncItems = false)
+    static public function getCountAllWithMapping($onlySyncItems = false)
     {
         $class = get_called_class();
         return self::getCountOfQuery($class::findCountAllWithMappingQuery($onlySyncItems));
     }
 
-    static protected function findCountAllWithMappingQuery ($onlySyncItems = false)
+    static protected function findCountAllWithMappingQuery($onlySyncItems = false)
     {
-        $sql = self::getComponentsToFindAllWithMappingQuery($onlySyncItems);
-        $sql = self::addCountToQuery($sql);
-
-        return $sql;
+        return self::addCountToQuery(self::getComponentsToFindAllWithMappingQuery($onlySyncItems));
     }
 
-    static protected function addCountToQuery ($sql)
+    static protected function addCountToQuery($sql)
     {
         return $sql->select('COUNT(DISTINCT ' . static::getTableIdentifier() . ') as count');
     }
 
-    static protected function findOneQuery ($id)
+    static protected function findOneQuery($id)
     {
         return static::addWhereId(static::getComponentsToFindAllWithMappingQuery(true), $id);
     }
 
-    static protected function findOneNotSyncQuery ($id)
+    static protected function findOneNotSyncQuery($id)
     {
         return static::addWhereId(static::findAllQuery(), $id);
     }
 
-    static protected function addWhereId ($sql, $id)
+    static protected function addWhereId($sql, $id)
     {
         $sql->where(self::getTableIdentifier() . ' = "' . pSQL($id) . '"');
         return $sql;
     }
 
-    static public function checkResultOfGetById ($result, $id)
+    static public function checkResultOfGetById($result, $id)
     {
         if (!$result) {
             $class = get_called_class();
@@ -133,28 +130,28 @@ trait PSElementTrait
         return static::createNewFromGetByIdQuery($result);
     }
 
-    static public function getById ($id)
+    static public function getById($id)
     {
         return static::extractNewItemFromGetByIdResult(Db::getInstance()->getRow(static::findOneQuery($id)), $id);
     }
 
-    static public function getNotSyncById ($id)
+    static public function getNotSyncById($id)
     {
         return static::extractNewItemFromGetByIdResult(Db::getInstance()->getRow(static::findOneNotSyncQuery($id)), $id);
     }
 
-    static public function createNewFromGetByIdQuery ($result)
+    static public function createNewFromGetByIdQuery($result)
     {
         $class = get_called_class();
         return new $class($result);
     }
 
-    static public function getCountOfQuery ($sql)
+    static public function getCountOfQuery($sql)
     {
         return Db::getInstance()->getRow(self::addCountToQuery($sql))['count'];
     }
 
-    static protected function addLimitToQuery ($sql, $limit = 0, $offset = 0)
+    static protected function addLimitToQuery($sql, $limit = 0, $offset = 0)
     {
         if ($limit > 0) {
             $sql->limit($limit, $offset);
@@ -175,31 +172,31 @@ trait PSElementTrait
         return isset($this->id) ? $this->id : ElementMapper::getMappingIdIfExists($this->getDBId(), static::getObjectTypeForMapping());
     }
 
-    public function getName ()
+    public function getName()
     {
         $name = static::getDisplayNameAttribute();
         return $this->{$name};
     }
 
-    static public function getAll ($limit = 0, $offset = 0)
+    static public function getAll($limit = 0, $offset = 0)
     {
         $class = get_called_class();
         return self::convertPSArrayToElements(Db::getInstance()->executeS($class::findAllQuery($limit, $offset)));
     }
 
-    static public function getCountAll ()
+    static public function getCountAll()
     {
         $class = get_called_class();
         return self::getCountOfQuery($class::findAllQuery());
     }
 
-    static public function getAllNotSync ()
+    static public function getAllNotSync()
     {
         $class = get_called_class();
         return self::convertPSArrayToElements(Db::getInstance()->executeS($class::findNotSyncQuery()));
     }
 
-    public function mapApiCall ()
+    public function mapApiCall()
     {
         $identifier = static::getIdColumnName();
         $itemId = isset($this->$identifier) ? $this->$identifier : $this->getDBId();
@@ -213,9 +210,11 @@ trait PSElementTrait
         ];
         $map = new ElementMapper($data);
         $map->save();
+
+        // TODO recursive mapApiCall()
     }
 
-    public function sync ()
+    public function sync()
     {
         SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
 
@@ -228,7 +227,7 @@ trait PSElementTrait
         }
     }
 
-    static public function syncAll ($newOnly = false)
+    static public function syncAll($newOnly = false)
     {
         $items = $newOnly ? self::getAllNotSync() : self::getAll();
 

@@ -23,38 +23,38 @@ class SRBAddress extends LibAddress implements PSInterface
         return 'a';
     }
 
-    static public function getIdColumnName ()
+    static public function getIdColumnName()
     {
         return 'id_address';
     }
 
-    static public function getIdentifier ()
+    static public function getIdentifier()
     {
         return 'id';
     }
 
     // Own functions
-    static public function getByCustomerId ($customerId)
+    static public function getByCustomerId($customerId)
     {
         return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS(self::findByCustomerIdQuery($customerId)));
     }
 
-    static public function getByOrderId ($orderId)
+    static public function getByOrderId($orderId)
     {
         return self::convertPSArrayToSRBObjects(Db::getInstance()->getRow(self::findByOrderIdQuery($orderId)));
     }
 
-    static public function createFromOrder ($psOrder)
+    static public function createFromOrder($psOrder)
     {
         return new self($psOrder);
     }
 
-    static protected function findByCustomerIdQuery ($customerId)
+    static protected function findByCustomerIdQuery($customerId)
     {
         return self::findAllQuery()->where('id_customer = ' . pSQL($customerId));
     }
 
-    static protected function findByOrderIdQuery ($orderId)
+    static protected function findByOrderIdQuery($orderId)
     {
         return self::findAllQuery()->innerJoin('orders', SRBOrder::getTableName(), SRBOrder::getTableName() . '.id_address_delivery = ' . self::getTableName() . '.id_address')->where(SRBOrder::getTableName() . '.id_order = ' . pSQL($orderId));
     }

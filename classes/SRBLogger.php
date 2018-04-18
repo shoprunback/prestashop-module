@@ -7,7 +7,7 @@ class SRBLogger
     const FATAL = 3;
     const UNKNOWN = 4;
 
-    static public function addLog ($message, $severity = self::INFO, $objectType = null, $objectId = 0)
+    static public function addLog($message, $severity = self::INFO, $objectType = null, $objectId = 0)
     {
         if (substr($message, 0, 13) !== '[ShopRunBack]') {
             $message = '[ShopRunBack] ' . $message;
