@@ -63,6 +63,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
         $sql->select(self::getTableName() . '.*, ' . SRBOrder::getTableName() . '.*');
         $sql->from(self::SHIPBACK_TABLE_NAME_NO_PREFIX, self::getTableName());
         $sql->innerJoin('orders', SRBOrder::getTableName(), self::getTableName() . '.id_order = ' . SRBOrder::getTableName() . '.' . SRBOrder::getIdColumnName());
+        $sql->groupBy(static::getTableIdentifier());
         $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
