@@ -187,7 +187,7 @@ class AdminShoprunbackController extends ModuleAdminController
         if ($itemType == 'product') {
             $noBrand = [];
             foreach ($items as $product) {
-                if (! isset($product->brand) || $product->brand == '') {
+                if (is_null($product->brand)) {
                     $noBrand[] = $product->getDBId();
                 }
             }
