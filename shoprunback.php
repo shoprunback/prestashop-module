@@ -133,6 +133,7 @@ class ShopRunBack extends Module
         Configuration::updateValue('production', false);
 
         \Shoprunback\RestClient::getClient()->setToken('');
+        Configuration::updateValue('srbtoken', '');
         SRBLogger::addLog('Module installed', SRBLogger::INFO);
         return true;
     }
