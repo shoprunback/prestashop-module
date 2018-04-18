@@ -25,32 +25,32 @@ class SRBBrand extends LibBrand implements PSElementInterface
         return 'm';
     }
 
-    static public function getIdColumnName ()
+    static public function getIdColumnName()
     {
         return 'id_manufacturer';
     }
 
-    static public function getIdentifier ()
+    static public function getIdentifier()
     {
         return 'reference';
     }
 
-    static public function getDisplayNameAttribute ()
+    static public function getDisplayNameAttribute()
     {
         return 'name';
     }
 
-    static public function getObjectTypeForMapping ()
+    static public function getObjectTypeForMapping()
     {
         return 'brand';
     }
 
-    static public function getPathForAPICall ()
+    static public function getPathForAPICall()
     {
         return 'brands';
     }
 
-    static public function findAllQuery ($limit = 0, $offset = 0)
+    static public function findAllQuery($limit = 0, $offset = 0)
     {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*');

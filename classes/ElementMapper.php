@@ -11,7 +11,7 @@ class ElementMapper
     public $type;
     public $last_sent_at;
 
-    public function __construct ($psMap)
+    public function __construct($psMap)
     {
         $this->id_srb_map = isset($psMap[self::getIdColumnName()]) ? $psMap[self::getIdColumnName()] : 0;
         $this->id_item = $psMap['id_item'];
@@ -25,17 +25,17 @@ class ElementMapper
         return _DB_PREFIX_ . self::MAPPER_TABLE_NAME_NO_PREFIX;
     }
 
-    static public function getTableName ()
+    static public function getTableName()
     {
         return 'srbm';
     }
 
-    static public function getIdColumnName ()
+    static public function getIdColumnName()
     {
         return 'id_srb_map';
     }
 
-    public function save ()
+    public function save()
     {
         $mapArray = [];
 
@@ -66,12 +66,12 @@ class ElementMapper
         return $result;
     }
 
-    static private function returnResult ($result)
+    static private function returnResult($result)
     {
         return $result ? new self($result) : false;
     }
 
-    static public function getMappingIdIfExists ($itemId, $itemType)
+    static public function getMappingIdIfExists($itemId, $itemType)
     {
         $map = self::getByIdItemAndIdType($itemId, $itemType);
 
@@ -82,7 +82,7 @@ class ElementMapper
         return null;
     }
 
-    static public function getById ($id)
+    static public function getById($id)
     {
         $sql = self::findAllQuery();
         $sql->where(self::getTableIdentifier() . ' = ' . pSQL($id));
@@ -91,7 +91,7 @@ class ElementMapper
         return self::returnResult($result);
     }
 
-    static public function getByType ($type)
+    static public function getByType($type)
     {
         $shipbacksFromDB = Db::getInstance()->executeS(self::findByTypeQuery($type));
 
@@ -103,7 +103,7 @@ class ElementMapper
         return $shipbacks;
     }
 
-    static public function getByIdItemAndIdType ($idItem, $type)
+    static public function getByIdItemAndIdType($idItem, $type)
     {
         if (is_string($idItem) && !is_numeric($idItem)) return static::getByIdItemSRBAndIdType($idItem, $type);
 
@@ -114,7 +114,7 @@ class ElementMapper
         return self::returnResult($result);
     }
 
-    static public function getByIdItemSRBAndIdType ($idItemSrb, $type)
+    static public function getByIdItemSRBAndIdType($idItemSrb, $type)
     {
         $sql = self::findAllQuery();
         $sql->where(self::getTableName() . '.id_item_srb = "' . pSQL($idItemSrb) . '" AND ' . pSQL(self::getTableName()) . '.type = "' . pSQL($type) . '"');
@@ -123,7 +123,7 @@ class ElementMapper
         return self::returnResult($result);
     }
 
-    static public function getAll ()
+    static public function getAll()
     {
         $shipbacksFromDB = Db::getInstance()->executeS(self::findAllQuery());
 
@@ -135,7 +135,7 @@ class ElementMapper
         return $shipbacks;
     }
 
-    static public function findAllQuery ()
+    static public function findAllQuery()
     {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*');
@@ -144,7 +144,7 @@ class ElementMapper
         return $sql;
     }
 
-    static public function findByTypeQuery ($type)
+    static public function findByTypeQuery($type)
     {
         $sql = self::findAllQuery();
         $sql->where(self::getTableName() . '.type = "' . $type . '"');
@@ -152,7 +152,7 @@ class ElementMapper
         return $sql;
     }
 
-    static public function findOnlyIdItemByTypeQuery ($type)
+    static public function findOnlyIdItemByTypeQuery($type)
     {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.id_item');
@@ -162,7 +162,7 @@ class ElementMapper
         return $sql;
     }
 
-    static public function findOnlyLastSentByTypeQuery ($type)
+    static public function findOnlyLastSentByTypeQuery($type)
     {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.last_sent_at');
@@ -172,7 +172,7 @@ class ElementMapper
         return $sql;
     }
 
-    static public function truncateTable ()
+    static public function truncateTable()
     {
         $sql = 'TRUNCATE TABLE ' . self::getMapperTableName();
         Db::getInstance()->execute($sql);

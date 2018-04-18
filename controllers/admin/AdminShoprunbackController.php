@@ -31,7 +31,7 @@ class AdminShoprunbackController extends ModuleAdminController
         }
     }
 
-    private function handleConfig ()
+    private function handleConfig()
     {
         $srbtoken = Tools::getValue('srbtoken');
 
@@ -80,7 +80,7 @@ class AdminShoprunbackController extends ModuleAdminController
         return self::SUCCESS_CONFIG;
     }
 
-    public function initContent ()
+    public function initContent()
     {
         $link = Context::getContext()->link;
         parent::initContent();
@@ -123,7 +123,7 @@ class AdminShoprunbackController extends ModuleAdminController
         $this->setTemplate('../../../../modules/' . $this->module->name . '/views/templates/admin/layout.tpl');
     }
 
-    private function getItems ($itemType = 'return')
+    private function getItems($itemType = 'return')
     {
         $externalLink = $this->module->url;
         $countItems = 0;
@@ -204,14 +204,14 @@ class AdminShoprunbackController extends ModuleAdminController
         $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin/srbManager.css');
     }
 
-    private function getConfigFormValues ()
+    private function getConfigFormValues()
     {
         $this->context->smarty->assign('PSOrderReturn', Configuration::get('PS_ORDER_RETURN'));
         $this->context->smarty->assign('formActionUrl', $this->tabUrl . '&itemType=config');
         $this->context->smarty->assign('production', Configuration::get('production'));
     }
 
-    public function asyncCall ()
+    public function asyncCall()
     {
         require_once($this->module->SRBModulePath . '/asyncCall.php');
     }

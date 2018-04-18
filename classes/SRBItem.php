@@ -6,7 +6,7 @@ class SRBItem extends LibItem
 {
     use PSElementTrait;
 
-    public function __construct ($psProduct)
+    public function __construct($psProduct)
     {
         $this->price_cents = intval($psProduct['price'] * 100);
         $this->currency = $psProduct['iso_code'];
@@ -15,7 +15,7 @@ class SRBItem extends LibItem
         $this->reference = $this->product->getReference();
     }
 
-    static public function createItemsFromOrderId ($orderId)
+    static public function createItemsFromOrderId($orderId)
     {
         $sql = self::findProductsForItems();
         $sql->where('o.' . SRBOrder::getIdColumnName() . ' = "' . pSQL($orderId) . '"');
@@ -24,7 +24,7 @@ class SRBItem extends LibItem
         return self::generateItemsWithProducts($productsFromDB);
     }
 
-    static public function createItemsFromOrderDetail ($orderDetailId)
+    static public function createItemsFromOrderDetail($orderDetailId)
     {
         $sql = self::findProductsForItems();
         $sql->innerJoin('order_detail', 'od', 'od.id_order = ' . SRBOrder::getTableName() . '.id_order');
@@ -34,7 +34,7 @@ class SRBItem extends LibItem
         return self::generateItemsWithProducts($productsFromDB);
     }
 
-    static private function findProductsForItems ()
+    static private function findProductsForItems()
     {
         $sql = new DbQuery();
         $sql->select(SRBProduct::getTableName() . '.*, pl.name, cu.iso_code, cp.quantity');
@@ -49,7 +49,7 @@ class SRBItem extends LibItem
         return $sql;
     }
 
-    static private function generateItemsWithProducts ($products)
+    static private function generateItemsWithProducts($products)
     {
         $items = [];
         foreach ($products as $product) {

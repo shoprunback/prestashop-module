@@ -32,32 +32,32 @@ class SRBShipback extends LibShipback implements PSElementInterface
         return 'srbr';
     }
 
-    static public function getIdColumnName ()
+    static public function getIdColumnName()
     {
         return 'id_srb_shipback';
     }
 
-    static public function getIdentifier ()
+    static public function getIdentifier()
     {
         return self::getIdColumnName();
     }
 
-    static public function getDisplayNameAttribute ()
+    static public function getDisplayNameAttribute()
     {
         return self::getIdColumnName();
     }
 
-    static public function getObjectTypeForMapping ()
+    static public function getObjectTypeForMapping()
     {
         return 'shipback';
     }
 
-    static public function getPathForAPICall ()
+    static public function getPathForAPICall()
     {
         return 'shipbacks';
     }
 
-    static public function findAllQuery ($limit = 0, $offset = 0)
+    static public function findAllQuery($limit = 0, $offset = 0)
     {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*, ' . SRBOrder::getTableName() . '.*');
@@ -74,7 +74,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
         return _DB_PREFIX_ . self::SHIPBACK_TABLE_NAME_NO_PREFIX;
     }
 
-    public function getShipbackDetails ()
+    public function getShipbackDetails()
     {
         $sql = self::findAllQuery();
         $sql->innerJoin('order_detail', 'od', 'ord.id_order_detail = od.id_order_detail');
@@ -84,7 +84,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
         return Db::getInstance()->executeS($sql);
     }
 
-    static public function createShipbackFromOrderId ($orderId)
+    static public function createShipbackFromOrderId($orderId)
     {
         if (self::getByOrderIdIfExists($orderId)) {
             return false;
@@ -136,7 +136,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
         SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $this->id . '" inserted', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->id);
     }
 
-    public function updateOnPS ()
+    public function updateOnPS()
     {
         $shipbackToUpdate = [
             'state' => $this->state,
@@ -174,7 +174,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
         return $sql;
     }
 
-    static public function getComponentsToFindAllWithMappingQuery ($onlySyncItems = false)
+    static public function getComponentsToFindAllWithMappingQuery($onlySyncItems = false)
     {
         $sql = static::findAllQuery();
         $sql->select(ElementMapper::getTableName() . '.id_item_srb');
@@ -189,32 +189,32 @@ class SRBShipback extends LibShipback implements PSElementInterface
         return $sql;
     }
 
-    static public function getAllByCreateDate ($byAsc = false, $limit = 0, $offset = 0)
+    static public function getAllByCreateDate($byAsc = false, $limit = 0, $offset = 0)
     {
         return self::generateReturnsFromDBResult(Db::getInstance()->executeS(self::findAllByCreateDateQuery($limit, $offset, $byAsc)));
     }
 
-    static public function getLikeOrderReferenceByCreateDate ($orderReference, $limit = 0, $offset = 0)
+    static public function getLikeOrderReferenceByCreateDate($orderReference, $limit = 0, $offset = 0)
     {
         return self::generateReturnsFromDBResult(Db::getInstance()->executeS(self::findLikeOrderIdByCreateDateQuery($orderReference, $limit, $offset)));
     }
 
-    static public function getCountLikeOrderReferenceByCreateDate ($orderReference)
+    static public function getCountLikeOrderReferenceByCreateDate($orderReference)
     {
         return self::getCountOfQuery(self::findLikeOrderIdByCreateDateQuery($orderReference));
     }
 
-    static public function getLikeCustomerByCreateDate ($customer, $limit = 0, $offset = 0)
+    static public function getLikeCustomerByCreateDate($customer, $limit = 0, $offset = 0)
     {
         return self::generateReturnsFromDBResult(Db::getInstance()->executeS(self::findLikeCustomerByCreateDateQuery($customer, $limit, $offset)));
     }
 
-    static public function getCountLikeCustomerByCreateDate ($customer)
+    static public function getCountLikeCustomerByCreateDate($customer)
     {
         return self::getCountOfQuery(self::findLikeCustomerByCreateDateQuery($customer));
     }
 
-    static public function findLikeOrderIdByCreateDateQuery ($orderReference, $limit = 0, $offset = 0)
+    static public function findLikeOrderIdByCreateDateQuery($orderReference, $limit = 0, $offset = 0)
     {
         $sql = self::findAllByCreateDateQuery($limit, $offset);
         $sql->where(SRBOrder::getTableName() . '.reference LIKE "%' . pSQL($orderReference) . '%"');
@@ -223,7 +223,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
         return $sql;
     }
 
-    static public function findLikeCustomerByCreateDateQuery ($customer, $limit = 0, $offset = 0)
+    static public function findLikeCustomerByCreateDateQuery($customer, $limit = 0, $offset = 0)
     {
         $sql = self::findAllByCreateDateQuery($limit, $offset);
         $sql->where('
@@ -236,7 +236,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
         return $sql;
     }
 
-    static public function getByOrderId ($orderId)
+    static public function getByOrderId($orderId)
     {
         $sql = self::findAllQuery();
         $sql = SRBOrder::addComponentsToQuery($sql);
@@ -253,7 +253,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
         return new self($shipbackFromDB);
     }
 
-    static public function getByOrderIdIfExists ($orderId)
+    static public function getByOrderIdIfExists($orderId)
     {
         try {
             return self::getByOrderId($orderId);
@@ -262,7 +262,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
         }
     }
 
-    static private function generateReturnsFromDBResult ($shipbacksFromDB)
+    static private function generateReturnsFromDBResult($shipbacksFromDB)
     {
         $shipbacks = [];
         foreach ($shipbacksFromDB as $key => $shipback) {
@@ -273,7 +273,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
         return $shipbacks;
     }
 
-    static public function truncateTable ()
+    static public function truncateTable()
     {
         $sql = 'TRUNCATE TABLE ' . self::getShipbackTableName();
         Db::getInstance()->execute($sql);

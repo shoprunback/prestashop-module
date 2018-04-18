@@ -13,7 +13,7 @@ class ShopRunBackShipbackModuleFrontController extends ModuleFrontController
         }
     }
 
-    public function initContent ()
+    public function initContent()
     {
         $redirectUrl = $this->context->link->getPageLink('index') . '?controller=order-detail';
 
