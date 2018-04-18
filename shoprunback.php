@@ -270,8 +270,8 @@ class ShopRunBack extends Module
 
     public function hookActionProductDelete($params)
     {
-        if (SRBProduct::canBeDeleted($params['product']->id)) {
-            SRBLogger::addLog('Product cannot be deleted on SRB because it has been ordered at least once', SRBLogger::FATAL);
+        if (!SRBProduct::canBeDeleted($params['product']->id)) {
+            SRBLogger::addLog($this->l('module.product.ordered'), SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $params['product']->id);
             return;
         }
 
@@ -283,9 +283,19 @@ class ShopRunBack extends Module
                 );
             } catch (Exception $e) {
                 if (is_a($e, 'Shoprunback\Error\RestClientError')) {
-                    SRBLogger::addLog($e->message, SRBLogger::FATAL);
+                    switch ($e->getCode()) {
+                        case 403:
+                            SRBLogger::addLog($this->l('module.product.ordered'), SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $params['product']->id);
+                            break;
+                        case 404:
+                            SRBLogger::addLog($this->l('module.product.unknown'), SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $params['product']->id);
+                            break;
+                        default:
+                            SRBLogger::addLog($e->message, SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $params['product']->id);
+                            break;
+                    }
                 } else {
-                    SRBLogger::addLog(json_encode($e), SRBLogger::FATAL);
+                    SRBLogger::addLog(json_encode($e), SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $params['product']->id);
                 }
 
                 return;
@@ -299,7 +309,7 @@ class ShopRunBack extends Module
             try {
                 $order = SRBOrder::getById($_GET['id_order']);
 
-                if (! $order->isShipped()) {
+                if (!$order->isShipped()) {
                     return false;
                 }
 

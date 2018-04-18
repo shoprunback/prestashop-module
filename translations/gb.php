@@ -4,6 +4,8 @@ global $_MODULE;
 $_MODULE = array();
 $_MODULE['<{shoprunback}prestashop>shoprunback_bb4768ee80af89876784e903eebc5f40'] = 'ShopRunBack helps you by registering all your products\' updates, additions or deletions';
 $_MODULE['<{shoprunback}prestashop>shoprunback_8ff63b277c7cd76096e7e03431f51c3f'] = 'Are you sure you want to delete ShopRunBack?';
+$_MODULE['<{shoprunback}prestashop>shoprunback_c1cb739244a004fa49e483928f4285f2'] = 'The product has not been deleted on ShopRunBack because you can\'t delete a product that has already been ordered.';
+$_MODULE['<{shoprunback}prestashop>shoprunback_5af91ecbb1dbe469a5b9c709b4530aef'] = 'The product was not found on ShopRunBack\'s database. ';
 $_MODULE['<{shoprunback}prestashop>config_fa152001a93f98c22968c049e24e27da'] = 'My account';
 $_MODULE['<{shoprunback}prestashop>config_16e9156649c34924256fd75ef27f6a3f'] = 'If you save a different API token or switch from production to sandbox mode (or the opposite), all the synchronizations will be reset to match with the new platform. ';
 $_MODULE['<{shoprunback}prestashop>config_57bcc854def680d7733d6cba3ec64a96'] = 'API Token';
