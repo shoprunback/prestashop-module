@@ -119,7 +119,7 @@ class SRBOrder extends SRBObject
         return $sql;
     }
 
-    static protected function findAllQuery ($limit = 0, $offset = 0)
+    static public function findAllQuery ($limit = 0, $offset = 0)
     {
         $sql = new DbQuery();
         $sql->from('orders', self::getTableName());
@@ -144,13 +144,12 @@ class SRBOrder extends SRBObject
                 AND srb.type = "' . $type . '"
                 AND srb.last_sent_at IN (
                     SELECT MAX(srb.last_sent_at)
-                    FROM ' . SRBMap::MAPPER_TABLE_NAME . ' srb
+                    FROM ' . SRBMap::getMapperTableName() . ' srb
                     WHERE srb.type = "' . $type . '"
                     GROUP BY srb.id_item
             )'
         );
         $sql->groupBy(static::getTableName() . '.' . $identifier);
-        $sql->orderBy('o.date_add DESC');
         $sql->orderBy('srb.last_sent_at DESC');
         $sql = self::addLimitToQuery($sql, $limit, $offset);
 

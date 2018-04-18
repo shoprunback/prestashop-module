@@ -6,7 +6,6 @@ include_once 'SRBOrder.php';
 class SRBShipback extends SRBObject
 {
     const SHIPBACK_TABLE_NAME_NO_PREFIX = 'shoprunback_shipbacks';
-    const SHIPBACK_TABLE_NAME = _DB_PREFIX_ . self::SHIPBACK_TABLE_NAME_NO_PREFIX;
 
     public $id_srb_shipback;
     public $mode;
@@ -27,6 +26,11 @@ class SRBShipback extends SRBObject
         $this->public_url = $psReturn['public_url'];
 
         $this->attributesToSend = ['order', 'order_id'];
+    }
+
+    static public function getShipbackTableName()
+    {
+        return _DB_PREFIX_ . self::SHIPBACK_TABLE_NAME_NO_PREFIX;
     }
 
     static public function getObjectTypeForMapping ()
@@ -273,7 +277,7 @@ class SRBShipback extends SRBObject
         return $shipbacks;
     }
 
-    static protected function findAllQuery ($limit = 0, $offset = 0)
+    static public function findAllQuery ($limit = 0, $offset = 0)
     {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*, ' . SRBOrder::getTableName() . '.*');
@@ -287,7 +291,7 @@ class SRBShipback extends SRBObject
 
     static public function truncateTable ()
     {
-        $sql = 'TRUNCATE TABLE ' . self::SHIPBACK_TABLE_NAME;
+        $sql = 'TRUNCATE TABLE ' . self::getShipbackTableName();
         Db::getInstance()->execute($sql);
     }
 }

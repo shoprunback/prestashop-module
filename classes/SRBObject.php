@@ -2,25 +2,14 @@
 
 include_once 'Synchronizer.php';
 include_once 'SRBMap.php';
+include_once 'Resource.php';
 
-abstract class SRBObject
+abstract class SRBObject implements Resource
 {
     public $id;
     public $identifier;
     public $ps;
     public $attributesToSend;
-
-    abstract static public function getTableName();
-
-    abstract static public function getIdColumnName();
-
-    abstract static public function getIdentifier();
-
-    abstract static public function getDisplayNameAttribute();
-
-    abstract static public function getObjectTypeForMapping();
-
-    abstract static public function getPathForAPICall();
 
     static public function syncAll ($newOnly = false) {
         $items = $newOnly ? self::getAllNotSync() : self::getAll();
@@ -34,8 +23,6 @@ abstract class SRBObject
     }
 
     abstract public function sync();
-
-    abstract static protected function findAllQuery($limit = 0, $offset = 0);
 
     static public function getAll ($limit = 0, $offset = 0)
     {

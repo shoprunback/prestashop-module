@@ -2,7 +2,6 @@
 class SRBMap
 {
     const MAPPER_TABLE_NAME_NO_PREFIX = 'shoprunback_mapper';
-    const MAPPER_TABLE_NAME = _DB_PREFIX_ . self::MAPPER_TABLE_NAME_NO_PREFIX;
     const MAPPER_INDEX_NAME = 'index_type_id_item';
     const MAPPER_INDEX_COLUMNS = 'type, id_item';
 
@@ -19,6 +18,11 @@ class SRBMap
         $this->id_item_srb = $psMap['id_item_srb'];
         $this->type = $psMap['type'];
         $this->last_sent_at = SRBObject::convertDateFormatForDB($psMap['last_sent_at']);
+    }
+
+    static public function getMapperTableName()
+    {
+        return _DB_PREFIX_ . self::MAPPER_TABLE_NAME_NO_PREFIX;
     }
 
     static public function getTableName ()
@@ -120,7 +124,7 @@ class SRBMap
         return $shipbacks;
     }
 
-    static protected function findAllQuery ()
+    static public function findAllQuery ()
     {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*');
@@ -159,7 +163,7 @@ class SRBMap
 
     static public function truncateTable ()
     {
-        $sql = 'TRUNCATE TABLE ' . self::MAPPER_TABLE_NAME;
+        $sql = 'TRUNCATE TABLE ' . self::getMapperTableName();
         Db::getInstance()->execute($sql);
     }
 }

@@ -51,7 +51,7 @@ class SRBAddress
         return new self($psOrder);
     }
 
-    static protected function findAllQuery ()
+    static public function findAllQuery ()
     {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*, co.*, s.name as stateName');

@@ -34,7 +34,7 @@ class ShopRunBack extends Module
         $this->name = 'shoprunback';
         $this->author = 'ShopRunBack';
         $this->version = '1.0.0';
-        $this->ps_versions_compliancy = array('min' => '1.6.1.0');
+        $this->ps_versions_compliancy = array('min' => '1.6.0.9');
         $this->tab = 'administration';
         $this->tabs = [
             'AdminShoprunback' => ['name' => 'ShopRunBack', 'parent' => 'SELL']
@@ -101,6 +101,7 @@ class ShopRunBack extends Module
         }
 
         if (! parent::install()
+            || ! $this->registerHook('actionProductAdd')
             || ! $this->registerHook('actionProductDelete')
             || ! $this->registerHook('actionProductUpdate')
             || ! $this->registerHook('actionOrderStatusPostUpdate')
@@ -130,6 +131,7 @@ class ShopRunBack extends Module
         }
 
         if (! parent::uninstall()
+            || ! $this->unregisterHook('actionProductAdd')
             || ! $this->unregisterHook('actionProductDelete')
             || ! $this->unregisterHook('actionProductUpdate')
             || ! $this->unregisterHook('actionOrderStatusPostUpdate')
@@ -192,6 +194,42 @@ class ShopRunBack extends Module
         Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminShoprunback') . '&itemType=config');
     }
 
+    public function hookNewOrder ($params)
+    {
+        if (Configuration::get('srbtoken')) {
+            try {
+                $order = SRBOrder::getById($params['order']->id);
+                $order->sync();
+            } catch (OrderException $e) {
+                return $e;
+            }
+        }
+    }
+
+    public function hookActionProductAdd ($params)
+    {
+        if (Configuration::get('srbtoken')) {
+            try {
+                $product = SRBProduct::getById($params['product']->id);
+                $product->sync();
+            } catch (ProductException $e) {
+                return $e;
+            }
+        }
+    }
+
+    public function hookActionProductUpdate ($params)
+    {
+        if (Configuration::get('srbtoken')) {
+            try {
+                $product = SRBProduct::getById($params['product']->id);
+                $product->sync();
+            } catch (ProductException $e) {
+                return $e;
+            }
+        }
+    }
+
     public function hookActionProductDelete ($params)
     {
         if (Configuration::get('srbtoken')) {
@@ -206,30 +244,6 @@ class ShopRunBack extends Module
 
             if ($product) {
                 $product->deleteWithCheck();
-            }
-        }
-    }
-
-    public function hookNewOrder ($params)
-    {
-        if (Configuration::get('srbtoken')) {
-            try {
-                $order = SRBOrder::getById($params['order']->id);
-                $order->sync();
-            } catch (OrderException $e) {
-                return $e;
-            }
-        }
-    }
-
-    public function hookActionProductUpdate ($params)
-    {
-        if (Configuration::get('srbtoken')) {
-            try {
-                $product = SRBProduct::getById($params['product']->id);
-                $product->sync();
-            } catch (ProductException $e) {
-                return $e;
             }
         }
     }
@@ -277,5 +291,5 @@ class ShopRunBack extends Module
     {
         $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/srbGlobal.css');
         $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/front/orderDetail.css');
-    } 
+    }
 }
