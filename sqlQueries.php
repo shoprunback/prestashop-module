@@ -3,17 +3,17 @@
 function checkIfIndexExists () {
     return 'SELECT count(*)
         FROM information_schema.statistics
-        WHERE TABLE_NAME = "' . SRBMap::getMapperTableName() . '"
-        AND INDEX_NAME = "' . SRBMap::MAPPER_INDEX_NAME . '"
+        WHERE TABLE_NAME = "' . ElementMapper::getMapperTableName() . '"
+        AND INDEX_NAME = "' . ElementMapper::MAPPER_INDEX_NAME . '"
     ';
 }
 
 function createIndexQuery () {
-    return 'ALTER TABLE `' . SRBMap::getMapperTableName() . '` ADD INDEX ' . SRBMap::MAPPER_INDEX_NAME . ' (' . SRBMap::MAPPER_INDEX_COLUMNS . ')';
+    return 'ALTER TABLE `' . ElementMapper::getMapperTableName() . '` ADD INDEX ' . ElementMapper::MAPPER_INDEX_NAME . ' (' . ElementMapper::MAPPER_INDEX_COLUMNS . ')';
 }
 
 function createTableQuery () {
-    return 'CREATE TABLE IF NOT EXISTS ' . SRBMap::getMapperTableName() . '(
+    return 'CREATE TABLE IF NOT EXISTS ' . ElementMapper::getMapperTableName() . '(
         `id_srb_map` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
         `id_item_srb` VARCHAR(40) NOT NULL,
         `id_item` INT(11) NOT NULL,
@@ -34,7 +34,7 @@ function createReturnTableQuery () {
 }
 
 function dropTableQuery () {
-    return 'DROP TABLE ' . SRBMap::getMapperTableName();
+    return 'DROP TABLE ' . ElementMapper::getMapperTableName();
 }
 
 function dropReturnTableQuery () {

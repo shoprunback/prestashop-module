@@ -1,16 +1,12 @@
 <?php
 
-class SRBAddress
-{
-    public $id;
-    public $line1;
-    public $line2;
-    public $zipcode;
-    public $country_code;
-    public $city;
-    public $state;
+use Shoprunback\Elements\Address as LibAddress;
 
-    public function __construct ($address)
+class SRBAddress extends LibAddress implements PSInterface
+{
+    use PSElementTrait;
+
+    public function __construct($address)
     {
         $this->id = $address['id_address'];
         $this->line1 = $address['address1'];
@@ -21,7 +17,8 @@ class SRBAddress
         $this->state = $address['stateName'];
     }
 
-    static public function getTableName ()
+    // Inherited functions
+    public static function getTableName()
     {
         return 'a';
     }
@@ -36,6 +33,7 @@ class SRBAddress
         return 'id';
     }
 
+    // Own functions
     static public function getByCustomerId ($customerId)
     {
         return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS(self::findByCustomerIdQuery($customerId)));
@@ -49,17 +47,6 @@ class SRBAddress
     static public function createFromOrder ($psOrder)
     {
         return new self($psOrder);
-    }
-
-    static public function findAllQuery ()
-    {
-        $sql = new DbQuery();
-        $sql->select(self::getTableName() . '.*, co.*, s.name as stateName');
-        $sql->from('address', self::getTableName());
-        $sql->innerJoin('country', 'co', self::getTableName() . '.id_country = co.id_country');
-        $sql->leftJoin('state', 's', self::getTableName() . '.id_state = s.id_state');
-
-        return $sql;
     }
 
     static protected function findByCustomerIdQuery ($customerId)

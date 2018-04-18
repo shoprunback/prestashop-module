@@ -4,7 +4,6 @@ require_once(_PS_MODULE_DIR_ . '../config/config.inc.php');
 require_once(_PS_MODULE_DIR_ . '../init.php');
 
 require_once 'shoprunback.php';
-include_once 'classes/Synchronizer.php';
 include_once 'classes/SRBLogger.php';
 
 $class = $_POST['className'] ? $_POST['className'] : 'ShopRunBack';
@@ -16,7 +15,7 @@ if (isset($_POST['params'])) {
     if ($action == 'sync') {
         SRBLogger::addLog('AsyncCall sync ' . $class . ' ' . $_POST['params'], SRBLogger::INFO);
         try {
-            $item = $class::getById($_POST['params']);
+            $item = $class::getNotSyncById($_POST['params']);
             $result = $item->sync();
         } catch (SRBException $e) {
             SRBLogger::addLog($e, SRBLogger::FATAL, $class);

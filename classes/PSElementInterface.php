@@ -1,10 +1,10 @@
 <?php
 
-interface Resource
+include_once _PS_MODULE_DIR_ . '/shoprunback/lib/shoprunback-php/init.php';
+include_once 'PSInterface.php';
+
+interface PSElementInterface extends PSInterface
 {
-    static function getTableName();
-    static function getIdColumnName();
-    static function getIdentifier();
     static function getDisplayNameAttribute();
     static function getObjectTypeForMapping();
     static function getPathForAPICall();

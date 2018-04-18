@@ -1,17 +1,14 @@
 <?php
 
-include_once 'SRBAddress.php';
+use Shoprunback\Elements\Customer as LibCustomer;
 
-class SRBCustomer
+class SRBCustomer extends LibCustomer implements PSInterface
 {
-    public $first_name;
-    public $last_name;
-    public $email;
-    public $address;
-    public $phone;
+    use PSElementTrait;
 
-    public function __construct ($customer)
+    public function __construct($customer)
     {
+        $this->ps = $customer;
         $this->id = $this->extractIdFromPSArray($customer);
         $this->first_name = $customer['firstname'];
         $this->last_name = $customer['lastname'];
@@ -19,7 +16,8 @@ class SRBCustomer
         $this->locale = Configuration::get('PS_LANG_DEFAULT');
     }
 
-    static public function getTableName ()
+    // Inherited functions
+    public static function getTableName()
     {
         return 'c';
     }
@@ -34,18 +32,10 @@ class SRBCustomer
         return 'id';
     }
 
+    // Own functions
     static private function extractIdFromPSArray ($psCustomerArrayName)
     {
         return isset($psCustomerArrayName['id_customer']) ? $psCustomerArrayName['id_customer'] : $psCustomerArrayName['id'];
-    }
-
-    static public function findAllQuery ()
-    {
-        $sql = new DbQuery();
-        $sql->select(self::getTableName() . '.*');
-        $sql->from('customer', self::getTableName());
-
-        return $sql;
     }
 
     static public function createFromOrder ($psOrderArray)

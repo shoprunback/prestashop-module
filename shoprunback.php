@@ -11,15 +11,33 @@ if (getenv('DASHBOARD_URL')) {
     error_reporting(E_ALL ^ E_DEPRECATED);
 }
 
-include_once 'classes/Synchronizer.php';
+include_once 'lib/shoprunback-php/init.php';
+
+include_once 'classes/ElementMapper.php';
+include_once 'classes/Util.php';
+
+include_once 'classes/PSElementInterface.php';
+include_once 'classes/PSElementTrait.php';
+include_once 'classes/PSInterface.php';
+
+include_once 'classes/SRBAddress.php';
+include_once 'classes/SRBBrand.php';
+include_once 'classes/SRBCustomer.php';
+include_once 'classes/SRBItem.php';
+include_once 'classes/SRBOrder.php';
+include_once 'classes/SRBProduct.php';
 include_once 'classes/SRBShipback.php';
+
 include_once 'classes/SRBLogger.php';
 include_once 'exceptions/ConfigurationException.php';
 include_once 'exceptions/OrderException.php';
+include_once 'exceptions/BrandException.php';
 include_once 'exceptions/ProductException.php';
 include_once 'exceptions/ShipbackException.php';
-include_once 'exceptions/SynchronizerException.php';
 include_once 'sqlQueries.php';
+
+\Shoprunback\RestClient::getClient()->setToken(Configuration::get('srbtoken'));
+\Shoprunback\RestClient::getClient()->setApiBaseUrl(DASHBOARD_URL);
 
 class ShopRunBack extends Module
 {
@@ -114,6 +132,7 @@ class ShopRunBack extends Module
 
         Configuration::updateValue('production', false);
 
+        \Shoprunback\RestClient::getClient()->setToken('');
         SRBLogger::addLog('Module installed', SRBLogger::INFO);
         return true;
     }
@@ -142,7 +161,7 @@ class ShopRunBack extends Module
             return false;
         }
 
-        Configuration::updateValue('srbtoken', '');
+        \Shoprunback\RestClient::getClient()->setToken('');
 
         SRBLogger::addLog('Module uninstalled', SRBLogger::INFO);
         return true;
@@ -196,9 +215,21 @@ class ShopRunBack extends Module
 
     public function hookNewOrder ($params)
     {
-        if (Configuration::get('srbtoken')) {
+        if (\Shoprunback\RestClient::getClient()->getToken()) {
             try {
-                $order = SRBOrder::getById($params['order']->id);
+                $order = SRBOrder::getNotSyncById($params['order']->id);
+                $order->sync();
+            } catch (OrderException $e) {
+                return $e;
+            }
+        }
+    }
+
+    public function hookActionOrderStatusPostUpdate ($params)
+    {
+        if (\Shoprunback\RestClient::getClient()->getToken()) {
+            try {
+                $order = SRBOrder::getById($params['id_order']);
                 $order->sync();
             } catch (OrderException $e) {
                 return $e;
@@ -208,9 +239,9 @@ class ShopRunBack extends Module
 
     public function hookActionProductAdd ($params)
     {
-        if (Configuration::get('srbtoken')) {
+        if (\Shoprunback\RestClient::getClient()->getToken()) {
             try {
-                $product = SRBProduct::getById($params['product']->id);
+                $product = SRBProduct::getNotSyncById($params['product']->id);
                 $product->sync();
             } catch (ProductException $e) {
                 return $e;
@@ -220,19 +251,25 @@ class ShopRunBack extends Module
 
     public function hookActionProductUpdate ($params)
     {
-        if (Configuration::get('srbtoken')) {
+        if (\Shoprunback\RestClient::getClient()->getToken()) {
+            // In 1.7 the productAdd hook doesn't exist, so it's productUpdate that must manage the adding
             try {
                 $product = SRBProduct::getById($params['product']->id);
                 $product->sync();
             } catch (ProductException $e) {
-                return $e;
+                try {
+                    $product = SRBProduct::getNotSyncById($params['product']->id);
+                    $product->sync();
+                } catch (ProductException $e) {
+                    return $e;
+                }
             }
         }
     }
 
     public function hookActionProductDelete ($params)
     {
-        if (Configuration::get('srbtoken')) {
+        if (\Shoprunback\RestClient::getClient()->getToken()) {
             $productParam = $params['product'];
 
             $productArray = ['id_product' => $params['id_product']];
@@ -248,21 +285,9 @@ class ShopRunBack extends Module
         }
     }
 
-    public function hookActionOrderStatusPostUpdate ($params)
-    {
-        if (Configuration::get('srbtoken')) {
-            try {
-                $order = SRBOrder::getById($params['id_order']);
-                $order->sync();
-            } catch (OrderException $e) {
-                return $e;
-            }
-        }
-    }
-
     public function hookDisplayOrderDetail ($params)
     {
-        if (Configuration::get('srbtoken')) {
+        if (\Shoprunback\RestClient::getClient()->getToken()) {
             try {
                 $order = SRBOrder::getById($_GET['id_order']);
 

@@ -1,20 +1,14 @@
 <?php
 
-include_once 'SRBObject.php';
-include_once 'SRBOrder.php';
+use Shoprunback\Elements\Shipback as LibShipback;
 
-class SRBShipback extends SRBObject
+class SRBShipback extends LibShipback implements PSElementInterface
 {
+    use PSElementTrait;
+
     const SHIPBACK_TABLE_NAME_NO_PREFIX = 'shoprunback_shipbacks';
 
-    public $id_srb_shipback;
-    public $mode;
-    public $order_id;
-    public $order;
-    public $state;
-    public $created_at;
-
-    public function __construct ($psReturn)
+    public function __construct($psReturn)
     {
         $this->ps = $psReturn;
         $this->id_srb_shipback = isset($psReturn['id_srb_shipback']) ? $psReturn['id_srb_shipback'] : '';
@@ -22,25 +16,25 @@ class SRBShipback extends SRBObject
         $this->order_id = $this->order->order_number;
         $this->mode = $psReturn['mode'];
         $this->state = $psReturn['state'];
-        $this->created_at = $this->convertDateFormatForDB($psReturn['created_at']);
+        $this->created_at = Util::convertDateFormatForDB($psReturn['created_at']);
         $this->public_url = $psReturn['public_url'];
 
-        $this->attributesToSend = ['order', 'order_id'];
+        if ($srbId = $this->getMapId()) {
+            parent::__construct($srbId);
+        } else {
+            parent::__construct();
+        }
     }
 
-    static public function getShipbackTableName()
+    // Inherited functions
+    public static function getTableName()
     {
-        return _DB_PREFIX_ . self::SHIPBACK_TABLE_NAME_NO_PREFIX;
+        return 'srbr';
     }
 
-    static public function getObjectTypeForMapping ()
+    static public function getIdColumnName ()
     {
-        return 'shipback';
-    }
-
-    static public function getPathForAPICall ()
-    {
-        return 'shipbacks';
+        return 'id_srb_shipback';
     }
 
     static public function getIdentifier ()
@@ -53,61 +47,41 @@ class SRBShipback extends SRBObject
         return self::getIdColumnName();
     }
 
-    static public function getTableName ()
+    static public function getObjectTypeForMapping ()
     {
-        return 'srbr';
+        return 'shipback';
     }
 
-    static public function getIdColumnName ()
+    static public function getPathForAPICall ()
     {
-        return 'id_srb_shipback';
+        return 'shipbacks';
+    }
+
+    static public function findAllQuery ($limit = 0, $offset = 0)
+    {
+        $sql = new DbQuery();
+        $sql->select(self::getTableName() . '.*, ' . SRBOrder::getTableName() . '.*');
+        $sql->from(self::SHIPBACK_TABLE_NAME_NO_PREFIX, self::getTableName());
+        $sql->innerJoin('orders', SRBOrder::getTableName(), self::getTableName() . '.id_order = ' . SRBOrder::getTableName() . '.' . SRBOrder::getIdColumnName());
+        $sql = self::addLimitToQuery($sql, $limit, $offset);
+
+        return $sql;
+    }
+
+    // Own functions
+    static public function getShipbackTableName()
+    {
+        return _DB_PREFIX_ . self::SHIPBACK_TABLE_NAME_NO_PREFIX;
     }
 
     public function getShipbackDetails ()
     {
         $sql = self::findAllQuery();
         $sql->innerJoin('order_detail', 'od', 'ord.id_order_detail = od.id_order_detail');
-        $sql->where(self::getTableName() . '.' . self::getIdColumnName() . ' = ' . pSQL($this->id));
+        $sql->where(self::getTableIdentifier() . ' = ' . pSQL($this->id));
         $sql->groupBy('ord.id_order_detail');
 
         return Db::getInstance()->executeS($sql);
-    }
-
-    public function sync ()
-    {
-        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
-
-        $this->order->sync();
-
-        if (isset($this->order_id) && $this->order_id != '') {
-            $order = $this->order;
-            unset($this->order);
-        }
-
-        $result = Synchronizer::sync($this);
-
-        if (isset($this->order_id) && $this->order_id != '') {
-            $this->order = $order;
-        }
-
-        return $result;
-    }
-
-    public function save ()
-    {
-        $shipbackToUpdate = [
-            'state' => $this->state,
-            'mode' => $this->mode,
-            'created_at' => $this->created_at,
-            'public_url' => $this->public_url,
-        ];
-
-        $sql = Db::getInstance();
-        $result = $sql->update(self::SHIPBACK_TABLE_NAME_NO_PREFIX, $shipbackToUpdate, SRBShipback::getIdColumnName() . ' = "' . pSQL($this->id_srb_shipback) . '"');
-
-        SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $this->getReference() . '" updated', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
-
-        return $result;
     }
 
     static public function createShipbackFromOrderId ($orderId)
@@ -117,7 +91,7 @@ class SRBShipback extends SRBObject
         }
 
         $order = SRBOrder::getById($orderId);
-        if (! $order->isShipped()) {
+        if (!$order->isShipped()) {
             return false;
         }
 
@@ -131,71 +105,93 @@ class SRBShipback extends SRBObject
             'public_url' => ''
         ];
         $srbShipback = new self($psReturn);
-        $result = json_decode($srbShipback->sync());
+        $result = $srbShipback->sync();
 
-        if (isset($result->shipback) && isset($result->shipback->errors)) {
-            $id = explode('(', $result->shipback->errors[0])[1];
-            $id = str_replace(')', '', $id);
-
-            try {
-                $shipbackById = self::getById($id);
-
-                if (isset($shipbackById->shipback) && isset($shipbackById->shipback->errors)) {
-                    return $shipbackById;
-                }
-
-                if (! $shipbackById && strpos($result->shipback->errors[0], 'Order already\'s got return associated') !== false) {
-                    $shipbackGet = json_decode(Synchronizer::APICall('shipbacks/' . $id, 'GET'));
-                    self::createReturnFromSyncResult($shipbackGet, $orderId);
-                    try {
-                        $shipbackById = self::getById($id);
-                    } catch (ShipbackException $e) {
-                        SRBLogger::addLog($e, 'order', $orderId);
-                    }
-                }
-
-                $result = $shipbackById;
-            } catch (ShipbackException $e) {
-                SRBLogger::addLog($e, SRBLogger::ERROR, 'order', $orderId);
-            }
+        if (!is_null($result)) {
+            SRBLogger::addLog('Could not create Shipback on ShopRunBack for order ' . $orderId . '. Response: ' . json_encode($result), SRBLogger::FATAL, self::getObjectTypeForMapping());
         } else {
-            $result = self::createReturnFromSyncResult($result, $orderId);
+            $srbShipback->id_srb_shipback = $srbShipback->id;
+            $srbShipback->insertOnPS();
         }
 
         return $result;
     }
 
-    static private function createReturnFromSyncResult ($item, $orderId)
+    public function insertOnPS()
     {
         $shipbackToInsert = [
-            'id_srb_shipback' => $item->id,
-            'id_order' => $orderId,
-            'state' => $item->state,
-            'mode' => $item->mode,
-            'created_at' => self::convertDateFormatForDB($item->created_at),
-            'public_url' => $item->public_url
+            'id_srb_shipback' => $this->id,
+            'id_order' => $this->ps['id_order'],
+            'state' => $this->state,
+            'mode' => $this->mode,
+            'created_at' => Util::convertDateFormatForDB($this->created_at),
+            'public_url' => $this->public_url
         ];
 
         $sql = Db::getInstance();
-        $result = $sql->insert(self::SHIPBACK_TABLE_NAME_NO_PREFIX, $shipbackToInsert);
-        SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $item->id . '" inserted', SRBLogger::INFO, self::getObjectTypeForMapping(), $item->id);
+        $sql->insert(self::SHIPBACK_TABLE_NAME_NO_PREFIX, $shipbackToInsert);
 
-        return self::getById($item->id);
+        $this->mapApiCall();
+
+        SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $this->id . '" inserted', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->id);
     }
 
-    static private function findAllByCreateDateQuery ($limit = 0, $offset = 0)
+    public function updateOnPS ()
+    {
+        $shipbackToUpdate = [
+            'state' => $this->state,
+            'mode' => $this->mode,
+            'created_at' => $this->created_at,
+            'public_url' => $this->public_url,
+        ];
+
+        $sql = Db::getInstance();
+        $result = $sql->update(self::SHIPBACK_TABLE_NAME_NO_PREFIX, $shipbackToUpdate, self::getIdColumnName() . ' = "' . pSQL($this->id) . '"');
+
+        SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $this->getReference() . '" updated', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
+
+        $this->mapApiCall();
+
+        return $result;
+    }
+
+    public function getMapId()
+    {
+        return $this->id_srb_shipback;
+    }
+
+    static private function findAllByCreateDateQuery ($limit = 0, $offset = 0, $byAsc = false)
     {
         $sql = self::findAllQuery();
         $sql = SRBOrder::addComponentsToQuery($sql);
-        $sql->orderBy('created_at DESC');
+        if ($byAsc) {
+            $sql->orderBy('created_at ASC');
+        } else {
+            $sql->orderBy('created_at DESC');
+        }
         $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
     }
 
-    static public function getAllByCreateDate ($limit = 0, $offset = 0)
+    static public function getComponentsToFindAllWithMappingQuery ($onlySyncItems = false)
     {
-        return self::generateReturnsFromDBResult(Db::getInstance()->executeS(self::findAllByCreateDateQuery($limit, $offset)));
+        $sql = static::findAllQuery();
+        $sql->select(ElementMapper::getTableName() . '.id_item_srb');
+        $sql->innerJoin(
+            ElementMapper::MAPPER_TABLE_NAME_NO_PREFIX,
+            ElementMapper::getTableName(),
+            ElementMapper::getTableName() . '.id_item_srb = ' . static::getTableIdentifier() . '
+                AND ' . ElementMapper::getTableName() . '.type = "' . static::getObjectTypeForMapping() . '"
+                AND ' . ElementMapper::getTableName() . '.last_sent_at IN (' . ElementMapper::findOnlyLastSentByTypeQuery(static::getObjectTypeForMapping()) . ')'
+        );
+
+        return $sql;
+    }
+
+    static public function getAllByCreateDate ($byAsc = false, $limit = 0, $offset = 0)
+    {
+        return self::generateReturnsFromDBResult(Db::getInstance()->executeS(self::findAllByCreateDateQuery($limit, $offset, $byAsc)));
     }
 
     static public function getLikeOrderReferenceByCreateDate ($orderReference, $limit = 0, $offset = 0)
@@ -275,18 +271,6 @@ class SRBShipback extends SRBObject
         }
 
         return $shipbacks;
-    }
-
-    static public function findAllQuery ($limit = 0, $offset = 0)
-    {
-        $sql = new DbQuery();
-        $sql->select(self::getTableName() . '.*, ' . SRBOrder::getTableName() . '.*');
-        $sql->from(self::SHIPBACK_TABLE_NAME_NO_PREFIX, self::getTableName());
-        $sql->innerJoin('orders', SRBOrder::getTableName(), self::getTableName() . '.id_order = ' . SRBOrder::getTableName() . '.' . SRBOrder::getIdColumnName());
-        $sql->groupBy(self::getTableName() . '.' . self::getIdColumnName());
-        $sql = self::addLimitToQuery($sql, $limit, $offset);
-
-        return $sql;
     }
 
     static public function truncateTable ()

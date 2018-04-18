@@ -1,29 +1,33 @@
 <?php
 
-include_once 'SRBObject.php';
+use Shoprunback\Elements\Brand as LibBrand;
 
-class SRBBrand extends SRBObject
+class SRBBrand extends LibBrand implements PSElementInterface
 {
-    public $name;
-    public $reference;
+    use PSElementTrait;
 
-    public function __construct ($manufacturer)
+    public function __construct($manufacturer)
     {
         $this->ps = $manufacturer;
         $this->name = $manufacturer['name'];
         $this->reference = str_replace(' ', '-', $manufacturer['name']);
 
-        $this->attributesToSend = ['name', 'reference'];
+        if ($srbId = $this->getMapId()) {
+            parent::__construct($srbId);
+        } else {
+            parent::__construct();
+        }
     }
 
-    static public function getObjectTypeForMapping ()
+    // Inherited functions
+    public static function getTableName()
     {
-        return 'brand';
+        return 'm';
     }
 
-    static public function getPathForAPICall ()
+    static public function getIdColumnName ()
     {
-        return 'brands';
+        return 'id_manufacturer';
     }
 
     static public function getIdentifier ()
@@ -36,20 +40,14 @@ class SRBBrand extends SRBObject
         return 'name';
     }
 
-    static public function getTableName ()
+    static public function getObjectTypeForMapping ()
     {
-        return 'm';
+        return 'brand';
     }
 
-    static public function getIdColumnName ()
+    static public function getPathForAPICall ()
     {
-        return 'id_manufacturer';
-    }
-
-    public function sync ()
-    {
-        SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
-        return Synchronizer::sync($this);
+        return 'brands';
     }
 
     static public function findAllQuery ($limit = 0, $offset = 0)

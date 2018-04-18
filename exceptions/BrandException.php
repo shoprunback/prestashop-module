@@ -2,12 +2,12 @@
 
 include_once 'SRBException.php';
 
-class SynchronizerException extends SRBException
+class BrandException extends SRBException
 {
     public function __construct($message, $errorCode = 0, Exception $previous = null)
     {
         parent::__construct($message, $errorCode, $previous);
-        SRBLogger::addLog($this->message, SRBLogger::FATAL, 'synchronizer');
+        SRBLogger::addLog($this->message, SRBLogger::FATAL, 'brand');
     }
 
     public function __toString()

@@ -1,14 +1,10 @@
 <?php
 
-include_once 'SRBProduct.php';
+use Shoprunback\Elements\Item as LibItem;
 
-class SRBItem
+class SRBItem extends LibItem
 {
-    public $label;
-    public $reference;
-    public $price_cents;
-    public $currency;
-    public $product;
+    use PSElementTrait;
 
     public function __construct ($psProduct)
     {
