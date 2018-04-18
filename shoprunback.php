@@ -295,8 +295,7 @@ class ShopRunBack extends Module
                     return false;
                 }
 
-                $srbfcLink = $this->context->link->getModuleLink('shoprunback', 'shipback', []);
-                $this->context->smarty->assign('createReturnLink', $srbfcLink);
+                $this->context->smarty->assign('createReturnLink', $this->context->link->getModuleLink('shoprunback', 'shipback', []) . '?orderId=' . $order->getDBId());
                 $this->context->smarty->assign('srborder', $order);
 
                 $shipback = SRBShipback::getByOrderIdIfExists($_GET['id_order']);
