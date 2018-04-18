@@ -109,7 +109,7 @@ class SRBProduct extends LibProduct implements PSElementInterface
     }
 
     // Check if product has NEVER been ordered
-    public function canBeDeleted()
+    public static function canBeDeleted($dbId)
     {
         $sql = new DbQuery();
         $sql->select('COUNT(' . SRBOrder::getTableName() . '.id_order)');
@@ -117,14 +117,14 @@ class SRBProduct extends LibProduct implements PSElementInterface
         $sql->innerJoin('cart_product', 'cp', self::getTableIdentifier() . ' = cp.id_product');
         $sql->innerJoin('cart', 'ca', 'cp.id_cart = ca.id_cart');
         $sql->innerJoin('orders', SRBOrder::getTableName(), 'ca.id_cart = ' . SRBOrder::getTableName() . '.id_cart');
-        $sql->where(self::getTableIdentifier() . ' = ' . $this->getDBId());
+        $sql->where(self::getTableIdentifier() . ' = ' . $dbId);
 
         return (Db::getInstance()->getValue($sql) == 0);
     }
 
     public function deleteWithCheck()
     {
-        if (! $this->canBeDeleted()) {
+        if (!static::canBeDeleted($this->getDBId())) {
             SRBLogger::addLog('Product "' . $this->getReference() . '" couldn\'t be deleted because it has already been ordered', SRBLogger::WARNING, self::getObjectTypeForMapping(), $this->getDBId());
             return false;
         }

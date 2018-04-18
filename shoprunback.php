@@ -270,18 +270,25 @@ class ShopRunBack extends Module
 
     public function hookActionProductDelete($params)
     {
+        if (SRBProduct::canBeDeleted($params['product']->id)) {
+            SRBLogger::addLog('Product cannot be deleted on SRB because it has been ordered at least once', SRBLogger::FATAL);
+            return;
+        }
+
         if (\Shoprunback\RestClient::getClient()->getToken()) {
-            $productParam = $params['product'];
+            try {
+                \Shoprunback\Elements\Product::delete(
+                    ElementMapper::getMappingIdIfExists($params['product']->id,
+                    SRBProduct::getObjectTypeForMapping())
+                );
+            } catch (Exception $e) {
+                if (is_a($e, 'Shoprunback\Error\RestClientError')) {
+                    SRBLogger::addLog($e->message, SRBLogger::FATAL);
+                } else {
+                    SRBLogger::addLog(json_encode($e), SRBLogger::FATAL);
+                }
 
-            $productArray = ['id_product' => $params['id_product']];
-            foreach ($productParam as $key => $value) {
-                $productArray[$key] = $value;
-            }
-
-            $product = new SRBProduct($productArray);
-
-            if ($product) {
-                $product->deleteWithCheck();
+                return;
             }
         }
     }
