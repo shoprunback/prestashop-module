@@ -51,7 +51,7 @@ class ShopRunBack extends Module
         // Mandatory parameters
         $this->name = 'shoprunback';
         $this->author = 'ShopRunBack';
-        $this->version = '1.0.0';
+        $this->version = '1.0.1';
         $this->ps_versions_compliancy = array('min' => '1.6.0.9');
         $this->tab = 'administration';
         $this->tabs = [
@@ -103,7 +103,13 @@ class ShopRunBack extends Module
     private function uninstallTab($controllerClassName)
     {
         $tab = new Tab((int)Tab::getIdFromClassName($controllerClassName));
-        return $tab->delete();
+
+        for ($i = 0; $i < count($tab->name); $i++) {
+            $tabToDelete = new Tab((int)Tab::getIdFromClassName($controllerClassName));
+            $tabToDelete->delete();
+        }
+
+        return true;
     }
 
     public function install()
