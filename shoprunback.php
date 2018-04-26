@@ -103,7 +103,13 @@ class ShopRunBack extends Module
     private function uninstallTab($controllerClassName)
     {
         $tab = new Tab((int)Tab::getIdFromClassName($controllerClassName));
-        return $tab->delete();
+
+        for ($i = 0; $i < count($tab->name); $i++) {
+            $tabToDelete = new Tab((int)Tab::getIdFromClassName($controllerClassName));
+            $tabToDelete->delete();
+        }
+
+        return true;
     }
 
     public function install()
