@@ -3,7 +3,7 @@
     "vendor-dir": "lib"
   },
   "require": {
-    "shoprunback-php": "dev-client-review"
+    "shoprunback-php": "dev-master"
   },
   "repositories":[
     {
