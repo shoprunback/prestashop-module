@@ -147,7 +147,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
             'oh',
             'oh.id_order = ' . self::getTableIdentifier() . ' AND oh.id_order_history IN (
                 SELECT MAX(oh.id_order_history)
-                FROM ps_order_history oh
+                FROM ' . _DB_PREFIX_ . 'order_history oh
                 GROUP BY id_order
             )'
         );

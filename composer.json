@@ -3,7 +3,7 @@
     "vendor-dir": "lib"
   },
   "require": {
-    "shoprunback-php": "dev-fix-pluralclassname-and-getapiattributes"
+    "shoprunback-php": "dev-master"
   },
   "repositories":[
     {

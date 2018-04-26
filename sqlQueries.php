@@ -42,5 +42,5 @@ function dropReturnTableQuery() {
 }
 
 function enableReturns() {
-    return 'UPDATE ps_configuration SET value = 1 WHERE name = "PS_ORDER_RETURN"';
+    return 'UPDATE ' . _DB_PREFIX_ . 'configuration SET value = 1 WHERE name = "PS_ORDER_RETURN"';
 }
