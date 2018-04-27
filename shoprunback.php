@@ -303,7 +303,7 @@ class ShopRunBack extends Module
                             break;
                     }
                 } else {
-                    SRBLogger::addLog(json_encode($e), SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $params['product']->id);
+                    SRBLogger::addLog(json_encode($e->message), SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $params['product']->id);
                 }
 
                 return;
