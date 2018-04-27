@@ -299,11 +299,11 @@ class ShopRunBack extends Module
                             SRBLogger::addLog($this->l('module.product.unknown'), SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $params['product']->id);
                             break;
                         default:
-                            SRBLogger::addLog($e->message, SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $params['product']->id);
+                            SRBLogger::addLog($e->getMessage(), SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $params['product']->id);
                             break;
                     }
                 } else {
-                    SRBLogger::addLog(json_encode($e->message), SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $params['product']->id);
+                    SRBLogger::addLog(json_encode($e->getMessage()), SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $params['product']->id);
                 }
 
                 return;
