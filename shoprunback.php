@@ -329,8 +329,7 @@ class ShopRunBack extends Module
                 $shipback = SRBShipback::getByOrderIdIfExists($_GET['id_order']);
                 $this->context->smarty->assign('shipback', $shipback);
 
-                $srbwebhookLink = $this->webhookUrl;
-                $this->context->smarty->assign('webhookLink', $srbwebhookLink);
+                $this->context->controller->addJS(_PS_MODULE_DIR_ . $this->name . '/views/js/front/orderDetail.js');
 
                 return $this->display(__FILE__, 'orderDetail.tpl');
             } catch (OrderException $e) {
