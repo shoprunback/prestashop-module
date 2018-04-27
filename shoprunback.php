@@ -51,7 +51,7 @@ class ShopRunBack extends Module
         // Mandatory parameters
         $this->name = 'shoprunback';
         $this->author = 'ShopRunBack';
-        $this->version = '1.0.1';
+        $this->version = '1.0.2';
         $this->ps_versions_compliancy = array('min' => '1.6.0.9');
         $this->tab = 'administration';
         $this->tabs = [
@@ -129,6 +129,7 @@ class ShopRunBack extends Module
             || ! $this->registerHook('actionProductDelete')
             || ! $this->registerHook('actionProductUpdate')
             || ! $this->registerHook('actionOrderStatusPostUpdate')
+            || ! $this->registerHook('displayBackOfficeHeader')
             || ! $this->registerHook('displayHeader')
             || ! $this->registerHook('displayOrderDetail')
             || ! $this->registerHook('newOrder')
@@ -161,6 +162,7 @@ class ShopRunBack extends Module
             || ! $this->unregisterHook('actionProductDelete')
             || ! $this->unregisterHook('actionProductUpdate')
             || ! $this->unregisterHook('actionOrderStatusPostUpdate')
+            || ! $this->unregisterHook('displayBackOfficeHeader')
             || ! $this->unregisterHook('displayHeader')
             || ! $this->unregisterHook('displayOrderDetail')
             || ! $this->unregisterHook('newOrder')
@@ -301,7 +303,7 @@ class ShopRunBack extends Module
                             break;
                     }
                 } else {
-                    SRBLogger::addLog(json_encode($e), SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $params['product']->id);
+                    SRBLogger::addLog(json_encode($e->message), SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $params['product']->id);
                 }
 
                 return;
@@ -341,7 +343,16 @@ class ShopRunBack extends Module
 
     public function hookDisplayHeader()
     {
-        $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/srbGlobal.css');
-        $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/front/orderDetail.css');
+        $this->context->controller->addCSS($this->SRBModulePath . '/views/css/srbGlobal.css');
+        $this->context->controller->addCSS($this->SRBModulePath . '/views/css/front/orderDetail.css');
+    }
+
+    public function hookDisplayBackOfficeHeader() {
+        // Add icon to tab
+        if (version_compare(_PS_VERSION_, '1.7', '<')) {
+            $this->context->controller->addJs($this->SRBModulePath . '/views/js/admin/tab-1.6.js');
+        } else {
+            $this->context->controller->addJs($this->SRBModulePath . '/views/js/admin/tab-1.7.js');
+        }
     }
 }
