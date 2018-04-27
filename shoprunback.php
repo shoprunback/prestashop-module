@@ -349,6 +349,10 @@ class ShopRunBack extends Module
 
     public function hookDisplayBackOfficeHeader() {
         // Add icon to tab
-        $this->context->controller->addJs($this->SRBModulePath . '/views/js/admin/tab.js');
+        if (version_compare(_PS_VERSION_, '1.7', '<')) {
+            $this->context->controller->addJs($this->SRBModulePath . '/views/js/admin/tab-1.6.js');
+        } else {
+            $this->context->controller->addJs($this->SRBModulePath . '/views/js/admin/tab-1.7.js');
+        }
     }
 }
