@@ -129,6 +129,7 @@ class ShopRunBack extends Module
             || ! $this->registerHook('actionProductDelete')
             || ! $this->registerHook('actionProductUpdate')
             || ! $this->registerHook('actionOrderStatusPostUpdate')
+            || ! $this->registerHook('displayBackOfficeHeader')
             || ! $this->registerHook('displayHeader')
             || ! $this->registerHook('displayOrderDetail')
             || ! $this->registerHook('newOrder')
@@ -161,6 +162,7 @@ class ShopRunBack extends Module
             || ! $this->unregisterHook('actionProductDelete')
             || ! $this->unregisterHook('actionProductUpdate')
             || ! $this->unregisterHook('actionOrderStatusPostUpdate')
+            || ! $this->unregisterHook('displayBackOfficeHeader')
             || ! $this->unregisterHook('displayHeader')
             || ! $this->unregisterHook('displayOrderDetail')
             || ! $this->unregisterHook('newOrder')
@@ -341,7 +343,12 @@ class ShopRunBack extends Module
 
     public function hookDisplayHeader()
     {
-        $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/srbGlobal.css');
-        $this->context->controller->addCSS(_PS_MODULE_DIR_ . $this->name . '/views/css/front/orderDetail.css');
+        $this->context->controller->addCSS($this->SRBModulePath . '/views/css/srbGlobal.css');
+        $this->context->controller->addCSS($this->SRBModulePath . '/views/css/front/orderDetail.css');
+    }
+
+    public function hookDisplayBackOfficeHeader() {
+        // Add icon to tab
+        $this->context->controller->addJs($this->SRBModulePath . '/views/js/admin/tab.js');
     }
 }
