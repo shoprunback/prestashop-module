@@ -11,6 +11,17 @@
 </section>
 
 {if !$shipback}
+    <div id="modale">
+        <div class="modale">
+            <h2>{l s='front.order.detail.modale.title' mod='shoprunback'}</h2>
+
+            <a class="cancel form-control-submit btn btn-primary" target="blank">{l s='front.order.detail.modale.cancel' mod='shoprunback'}</a>
+            <a class="external-link form-control-submit btn btn-primary" target="blank">{l s='front.order.detail.modale.validate' mod='shoprunback'}</a>
+        </div>
+    </div>
+{/if}
+
+{if !$shipback}
   <script type="text/javascript">
     var createReturnLink = '{$createReturnLink nofilter}';
   </script>

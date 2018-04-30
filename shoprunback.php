@@ -324,14 +324,12 @@ class ShopRunBack extends Module
                 // To work everywhere, we must have something like 'shipback?orderId=ID', and not 'shipback&orderId=ID'
                 $this->context->smarty->assign(
                     'createReturnLink',
-                    str_replace('shipback', 'shipback?orderId=' . $order->getDBId(), $this->context->link->getModuleLink('shoprunback', 'shipback', []))
+                    str_replace('shipback', 'shipback?orderId=' . $order->getDBId() . '&action=ajaxCreateShipback', $this->context->link->getModuleLink('shoprunback', 'shipback', []))
                 );
                 $this->context->smarty->assign('srborder', $order);
 
                 $shipback = SRBShipback::getByOrderIdIfExists($_GET['id_order']);
                 $this->context->smarty->assign('shipback', $shipback);
-
-                $this->context->controller->addJS(_PS_MODULE_DIR_ . $this->name . '/views/js/front/orderDetail.js');
 
                 return $this->display(__FILE__, 'orderDetail.tpl');
             } catch (OrderException $e) {
@@ -344,6 +342,7 @@ class ShopRunBack extends Module
     {
         $this->context->controller->addCSS($this->SRBModulePath . '/views/css/srbGlobal.css');
         $this->context->controller->addCSS($this->SRBModulePath . '/views/css/front/orderDetail.css');
+        $this->context->controller->addJs($this->SRBModulePath . '/views/js/front/orderDetail.js');
     }
 
     public function hookDisplayBackOfficeHeader() {

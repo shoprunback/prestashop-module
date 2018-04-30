@@ -1,23 +1,32 @@
 document.addEventListener("DOMContentLoaded", function(event) {
   if (createReturnLink) {
-    $('#create-return').on('click', function () {
+    var redirectUrl = '';
 
+    $('#create-return').on('click', function () {
+      $.ajax({
+        url: createReturnLink,
+        method: 'POST',
+        dataType: 'json',
+        success: function (urls) {
+          if (typeof urls === 'object') {
+            // Success
+            redirectUrl = urls.redirectUrl;
+            $('.external-link').attr('href', urls.shipbackPublicUrl);
+            $('#modale').css('display', 'flex');
+          } else {
+            // Failure
+            window.location.href = urls;
+          }
+        }
+      });
     });
 
-    $.ajax({
-      url: createReturnLink,
-      method: 'GET',
-      success: function (urls) {
-        alert(urls);
-        if (typeof urls === 'array') {
-          // Success
-          window.open(urls.shipbackPublicUrl, '_blank');
-          window.location.href = urls.redirectUrl;
-        } else {
-          // Failure
-          window.location.href = urls;
-        }
-      }
-    })
+    $('.external-link').on('click', function () {
+      window.location.href = redirectUrl;
+    });
+
+    $('.cancel').on('click', function () {
+      window.location.href = redirectUrl;
+    });
   }
 });
