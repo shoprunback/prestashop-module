@@ -330,6 +330,7 @@ class ShopRunBack extends Module
 
                 $shipback = SRBShipback::getByOrderIdIfExists($_GET['id_order']);
                 $this->context->smarty->assign('shipback', $shipback);
+                $this->context->smarty->assign('isPSVersionMoreThan1_7', version_compare(_PS_VERSION_, '1.7', '>='));
 
                 return $this->display(__FILE__, 'orderDetail.tpl');
             } catch (OrderException $e) {
@@ -342,7 +343,6 @@ class ShopRunBack extends Module
     {
         $this->context->controller->addCSS($this->SRBModulePath . '/views/css/srbGlobal.css');
         $this->context->controller->addCSS($this->SRBModulePath . '/views/css/front/orderDetail.css');
-        $this->context->controller->addJs($this->SRBModulePath . '/views/js/front/orderDetail.js');
     }
 
     public function hookDisplayBackOfficeHeader() {

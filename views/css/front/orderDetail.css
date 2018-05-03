@@ -30,7 +30,7 @@
 }
 
 #modale .modale {
-  height: 150px;
+  min-height: 150px;
   width: 500px;
   padding: 20px;
 
@@ -43,7 +43,24 @@
 }
 
 #modale .modale .cancel {
+  height: auto;
+  width: auto;
   margin-right: 20px;
-  background-color: #f3a035;
+  background-color: #f3a035 !important;
   color: #FFFFFF;
+}
+
+#modale .modale .cancel:hover {
+  background-color: #c67a15 !important;
+}
+
+#modale .modale>div {
+  display: flex;
+  justify-content: space-around;
+}
+
+
+#modale .modale .btn {
+  border: none;
+  min-width: 200px;
 }

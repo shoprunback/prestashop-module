@@ -76,3 +76,6 @@ $_MODULE['<{shoprunback}prestashop>orderdetail_16f631de0dc61dd8cb26fbcfaa8ccaf8'
 $_MODULE['<{shoprunback}prestashop>orderdetail_aa2cd42a65735cb81115d87a59180aab'] = 'You can return them';
 $_MODULE['<{shoprunback}prestashop>orderdetail_1443ca477a42209de2a8a35349b560ee'] = 'here';
 $_MODULE['<{shoprunback}prestashop>orderdetail_f8d1a0fbd5de7a6b78d958a2d4bfa123'] = 'Check your return demand';
+$_MODULE['<{shoprunback}prestashop>orderdetail_72493cd16b21442ea4376b861972f332'] = 'A new tab will open to do your return demand.';
+$_MODULE['<{shoprunback}prestashop>orderdetail_e22e726d9cc006b5fe8ea72cce29a1dc'] = 'Later';
+$_MODULE['<{shoprunback}prestashop>orderdetail_92dbd575f333182187bfa950ebe50542'] = 'OK';
