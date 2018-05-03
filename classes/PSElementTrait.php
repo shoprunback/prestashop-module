@@ -29,11 +29,11 @@ trait PSElementTrait
         return $this->ps[static::getIdColumnName()];
     }
 
-    static public function getComponentsToFindAllWithMappingQuery($onlySyncItems = false)
+    static public function getComponentsToFindAllWithMappingQuery($onlySyncElements = false)
     {
         $identifier = static::getIdColumnName();
         $type = static::getObjectTypeForMapping();
-        $joinType = $onlySyncItems ? 'innerJoin' : 'leftJoin';
+        $joinType = $onlySyncElements ? 'innerJoin' : 'leftJoin';
         $mapQuery = ElementMapper::findOnlyLastSentByTypeQuery($type);
 
         $sql = static::findAllQuery();
@@ -57,11 +57,11 @@ trait PSElementTrait
         return static::findAllQuery()->where(static::getTableIdentifier() . ' NOT IN (' . $mapQuery . ')');
     }
 
-    static protected function findAllWithMappingQuery($onlySyncItems = false, $limit = 0, $offset = 0)
+    static protected function findAllWithMappingQuery($onlySyncElements = false, $limit = 0, $offset = 0)
     {
         $identifier = static::getIdColumnName();
 
-        $sql = self::getComponentsToFindAllWithMappingQuery($onlySyncItems);
+        $sql = self::getComponentsToFindAllWithMappingQuery($onlySyncElements);
         $sql->select(ElementMapper::getTableName() . '.*');
         $sql->groupBy(static::getTableName() . '.' . $identifier);
         $sql->orderBy(ElementMapper::getTableName() . '.last_sent_at DESC');
@@ -70,10 +70,10 @@ trait PSElementTrait
         return $sql;
     }
 
-    static public function getAllWithMappingResult($onlySyncItems = false, $limit = 0, $offset = 0)
+    static public function getAllWithMappingResult($onlySyncElements = false, $limit = 0, $offset = 0)
     {
         $class = get_called_class();
-        return Db::getInstance()->executeS($class::findAllWithMappingQuery($onlySyncItems, $limit, $offset));
+        return Db::getInstance()->executeS($class::findAllWithMappingQuery($onlySyncElements, $limit, $offset));
     }
 
     static public function fillElementsWithMapping(&$elements)
@@ -84,22 +84,22 @@ trait PSElementTrait
         }
     }
 
-    static public function getAllWithMapping($onlySyncItems = false, $limit = 0, $offset = 0, $withNestedElements = true)
+    static public function getAllWithMapping($onlySyncElements = false, $limit = 0, $offset = 0, $withNestedElements = true)
     {
-        $elements = self::convertPSArrayToElements(static::getAllWithMappingResult($onlySyncItems, $limit, $offset), $withNestedElements);
+        $elements = self::convertPSArrayToElements(static::getAllWithMappingResult($onlySyncElements, $limit, $offset), $withNestedElements);
         self::fillElementsWithMapping($elements);
         return $elements;
     }
 
-    static public function getCountAllWithMapping($onlySyncItems = false)
+    static public function getCountAllWithMapping($onlySyncElements = false)
     {
         $class = get_called_class();
-        return self::getCountOfQuery($class::findCountAllWithMappingQuery($onlySyncItems));
+        return self::getCountOfQuery($class::findCountAllWithMappingQuery($onlySyncElements));
     }
 
-    static protected function findCountAllWithMappingQuery($onlySyncItems = false)
+    static protected function findCountAllWithMappingQuery($onlySyncElements = false)
     {
-        return self::addCountToQuery(self::getComponentsToFindAllWithMappingQuery($onlySyncItems));
+        return self::addCountToQuery(self::getComponentsToFindAllWithMappingQuery($onlySyncElements));
     }
 
     static protected function addCountToQuery($sql)
@@ -237,11 +237,11 @@ trait PSElementTrait
 
     static public function syncAll($newOnly = false)
     {
-        $items = $newOnly ? self::getAllNotSync() : self::getAll();
+        $elements = $newOnly ? self::getAllNotSync() : self::getAll();
 
         $responses = [];
-        foreach ($items as $item) {
-            $responses[] = $item->sync();
+        foreach ($elements as $element) {
+            $responses[] = $element->sync();
         }
 
         return $responses;
