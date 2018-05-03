@@ -24,6 +24,7 @@ $_MODULE['<{shoprunback}prestashop>header_cf96ebabb49cbe1592c8ea29b9e75a0f'] = '
 $_MODULE['<{shoprunback}prestashop>header_2245023265ae4cf87d02c8b6ba991139'] = 'Configuration';
 $_MODULE['<{shoprunback}prestashop>layout_19c0c10ad904679eb753c3fd1c0ecf81'] = 'Configuration saved!';
 $_MODULE['<{shoprunback}prestashop>layout_536e5c02c641b33bcc42cf255e7d41bf'] = 'Token invalid';
+$_MODULE['<{shoprunback}prestashop>srbmanager_8ff4cf8152bb80da6ebbdecb55f3bf40'] = 'Sending... You can go on another page while the process goes on.';
 $_MODULE['<{shoprunback}prestashop>srbmanager_a6d5d4f8a8c9fc3aa02ffe2069ffaf34'] = 'You need to configure your module in order to synchronize your site with ShopRunBack ';
 $_MODULE['<{shoprunback}prestashop>srbmanager_a9c840ee19c51c6126e681fd360db4eb'] = 'First';
 $_MODULE['<{shoprunback}prestashop>srbmanager_d85c2b5412375a2479538536258a7da3'] = 'Last';
