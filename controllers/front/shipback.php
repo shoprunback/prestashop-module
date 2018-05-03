@@ -9,11 +9,6 @@ class ShopRunBackShipbackModuleFrontController extends ModuleFrontController
 
         if ($_GET && isset($_GET['action'])) {
             $function = $_GET['action'];
-
-            if (strpos($function, 'ajax') >= 0) {
-                $this->ssl = true;
-            }
-
             $this->actionResult = $this->{$function}();
         }
     }
