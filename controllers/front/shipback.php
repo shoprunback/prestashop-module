@@ -4,7 +4,7 @@ class ShopRunBackShipbackModuleFrontController extends ModuleFrontController
     public function __construct()
     {
         parent::__construct();
-        $this->addCSS(_PS_MODULE_DIR_ . '/shoprunback/views/css/srbGlobal.css');
+        $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/srbGlobal.css');
         $this->actionResult = false;
 
         if ($_GET && isset($_GET['action'])) {
