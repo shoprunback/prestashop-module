@@ -4,13 +4,13 @@ use \Shoprunback\ElementManager;
 
 trait PSElementTrait
 {
-    static protected function convertPSArrayToElements($PSArray)
+    static protected function convertPSArrayToElements($PSArray, $withNestedElements = true)
     {
         $class = get_called_class();
         $elements = [];
         foreach ($PSArray as $PSItem) {
             try {
-                $elements[] =  new $class($PSItem);
+                $elements[] =  new $class($PSItem, $withNestedElements);
             } catch (SRBException $e) {
 
             }
@@ -70,17 +70,25 @@ trait PSElementTrait
         return $sql;
     }
 
-    static public function getAllWithMapping($onlySyncItems = false, $limit = 0, $offset = 0)
+    static public function getAllWithMappingResult($onlySyncItems = false, $limit = 0, $offset = 0)
     {
         $class = get_called_class();
-        $items = self::convertPSArrayToElements(Db::getInstance()->executeS($class::findAllWithMappingQuery($onlySyncItems, $limit, $offset)));
+        return Db::getInstance()->executeS($class::findAllWithMappingQuery($onlySyncItems, $limit, $offset));
+    }
 
-        foreach ($items as $key => $item) {
-            $items[$key]->id_item_srb = $item->ps['id_item_srb'];
-            $items[$key]->last_sent_at = $item->ps['last_sent_at'];
+    static public function fillElementsWithMapping(&$elements)
+    {
+        foreach ($elements as $key => $element) {
+            $elements[$key]->id_item_srb = $element->ps['id_item_srb'];
+            $elements[$key]->last_sent_at = $element->ps['last_sent_at'];
         }
+    }
 
-        return $items;
+    static public function getAllWithMapping($onlySyncItems = false, $limit = 0, $offset = 0, $withNestedElements = true)
+    {
+        $elements = self::convertPSArrayToElements(static::getAllWithMappingResult($onlySyncItems, $limit, $offset), $withNestedElements);
+        self::fillElementsWithMapping($elements);
+        return $elements;
     }
 
     static public function getCountAllWithMapping($onlySyncItems = false)
@@ -124,26 +132,26 @@ trait PSElementTrait
         }
     }
 
-    static public function extractNewItemFromGetByIdResult($result, $id)
+    static public function extractNewElementFromGetByIdResult($result, $id, $withNestedElements)
     {
         static::checkResultOfGetById($result, $id);
-        return static::createNewFromGetByIdQuery($result);
+        return static::createNewFromGetByIdQuery($result, $withNestedElements);
     }
 
-    static public function getById($id)
+    static public function getById($id, $withNestedElements = true)
     {
-        return static::extractNewItemFromGetByIdResult(Db::getInstance()->getRow(static::findOneQuery($id)), $id);
+        return static::extractNewElementFromGetByIdResult(Db::getInstance()->getRow(static::findOneQuery($id)), $id, $withNestedElements);
     }
 
-    static public function getNotSyncById($id)
+    static public function getNotSyncById($id, $withNestedElements = true)
     {
-        return static::extractNewItemFromGetByIdResult(Db::getInstance()->getRow(static::findOneNotSyncQuery($id)), $id);
+        return static::extractNewElementFromGetByIdResult(Db::getInstance()->getRow(static::findOneNotSyncQuery($id)), $id, $withNestedElements);
     }
 
-    static public function createNewFromGetByIdQuery($result)
+    static public function createNewFromGetByIdQuery($result, $withNestedElements)
     {
         $class = get_called_class();
-        return new $class($result);
+        return new $class($result, $withNestedElements);
     }
 
     static public function getCountOfQuery($sql)

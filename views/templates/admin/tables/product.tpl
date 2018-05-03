@@ -14,8 +14,8 @@
                     <h1>{l s="product.my_products" mod='shoprunback'}</h1>
 
                     {if $srbtoken != ''}
-                        <a class="srb-button post-all" data-type="{$itemType}">{l s="title.sync_all" mod='shoprunback'}</a>
-                        <a class="srb-button post-new" data-type="{$itemType}">{l s="title.sync_new" mod='shoprunback'}</a>
+                        <a class="srb-button post-all" data-type="{$elementType}">{l s="title.sync_all" mod='shoprunback'}</a>
+                        <a class="srb-button post-new" data-type="{$elementType}">{l s="title.sync_new" mod='shoprunback'}</a>
                     {/if}
                 </div>
 
@@ -42,7 +42,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {foreach from=$items key=id item=item}
+                    {foreach from=$elements key=id item=item}
                         <tr data-id="{$item->getDBId()}">
                             <td class="left" data-link="{$link->getAdminLink('AdminProducts', true, ['id_product' => $item->getDBId()])}"><b>{$item->getName()}</b></td>
                             <td><b>{$item->getReference()}</b></td>
@@ -54,7 +54,7 @@
                                     -
                                 {/if}
                             </td>
-                            <td>{if $srbtoken != ''}<a class="sync-item srb-button" data-type="{$itemType}">{l s="item.sync" mod='shoprunback'}{/if}</a></td>
+                            <td>{if $srbtoken != ''}<a class="sync-item srb-button" data-type="{$elementType}">{l s="item.sync" mod='shoprunback'}{/if}</a></td>
                             <td>
                                 {if $item->id_item_srb}
                                     <a href="{$externalLink}{$item->id_item_srb}" target="_blank"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a>

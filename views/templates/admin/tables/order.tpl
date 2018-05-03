@@ -6,8 +6,8 @@
                     <h1>{l s="order.my_orders" mod='shoprunback'}</h1>
 
                     {if $srbtoken != ''}
-                        <a class="srb-button post-all" data-type="{$itemType}">{l s="title.sync_all" mod='shoprunback'}</a>
-                        <a class="srb-button post-new" data-type="{$itemType}">{l s="title.sync_new" mod='shoprunback'}</a>
+                        <a class="srb-button post-all" data-type="{$elementType}">{l s="title.sync_all" mod='shoprunback'}</a>
+                        <a class="srb-button post-new" data-type="{$elementType}">{l s="title.sync_new" mod='shoprunback'}</a>
                     {/if}
                 </div>
 
@@ -35,7 +35,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {foreach from=$items key=id item=item}
+                    {foreach from=$elements key=id item=item}
                         <tr data-id="{$item->getDBId()}">
                             <td data-link="{if $item->id_item_srb}{$externalLink}{$item->id_item_srb}{/if}"><b>{$item->getName()}</b></td>
                             <td>{$item->customer->first_name} {$item->customer->last_name}</td>
@@ -60,7 +60,7 @@
                                 {if $item->delivery}
                                     {l s="item.delivered" mod='shoprunback'}
                                 {elseif ! $item->last_sent_at && $srbtoken != ''}
-                                    <a class="sync-item srb-button" data-type="{$itemType}">
+                                    <a class="sync-item srb-button" data-type="{$elementType}">
                                         {l s="item.sync" mod='shoprunback'}
                                     </a>
                                 {/if}

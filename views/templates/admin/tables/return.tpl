@@ -25,14 +25,14 @@
                             {l s="return.customer" mod='shoprunback'}
                             <form action="{$actionUrl}" method="POST">
                                 <input type="text" name="customer" placeholder="{l s='form.placeholder' mod='shoprunback'}" value="{$searchCustomer}" autocomplete="off" />
-                                <a href="{$srbManager}&itemType={$itemType}" class="btn btn-default">{l s='form.clear' mod='shoprunback'}</a>
+                                <a href="{$srbManager}&elementType={$elementType}" class="btn btn-default">{l s='form.clear' mod='shoprunback'}</a>
                             </form>
                         </th>
                         <th>
                             {l s='order.id' mod='shoprunback'}
                             <form action="{$actionUrl}" method="POST">
                                 <input type="text" min="0" name="orderReference" placeholder="{l s='form.placeholder' mod='shoprunback'}" value="{$searchOrderReference}" autocomplete="off" />
-                                <a href="{$srbManager}&itemType={$itemType}" class="btn btn-default">{l s='form.clear' mod='shoprunback'}</a>
+                                <a href="{$srbManager}&elementType={$elementType}" class="btn btn-default">{l s='form.clear' mod='shoprunback'}</a>
                             </form>
                         </th>
                         <th>{l s='return.state' mod='shoprunback'}</th>
@@ -41,8 +41,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {if count($items) > 0}
-                        {foreach from=$items key=id item=item}
+                    {if count($elements) > 0}
+                        {foreach from=$elements key=id item=item}
                             <tr data-id="{$item->getReference()}">
                                 <td><a href="{$externalLink}{$item->getReference()}" target="_blank"><b>{$item->getName()}</b></a></td>
                                 <td>{$item->order->customer->first_name} {$item->order->customer->last_name}</td>

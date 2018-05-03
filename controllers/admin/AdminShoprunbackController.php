@@ -8,7 +8,7 @@ class AdminShoprunbackController extends ModuleAdminController
 {
     const SUCCESS_CONFIG = 'success.config';
     const ERROR_NO_TOKEN = 'error.no_token';
-    const ITEMS_BY_PAGE = 10;
+    const ELEMENTS_BY_PAGE = 10;
 
     public $token;
     private $actionResult;
@@ -85,13 +85,13 @@ class AdminShoprunbackController extends ModuleAdminController
         $link = Context::getContext()->link;
         parent::initContent();
 
-        $itemType = (isset($_GET['itemType'])) ? $_GET['itemType'] : '';
-        $items = [];
+        $elementType = (isset($_GET['elementType'])) ? $_GET['elementType'] : '';
+        $elements = [];
         $template = 'srbManager';
         $message = '';
-        $this->context->smarty->assign('itemType', $itemType);
+        $this->context->smarty->assign('elementType', $elementType);
 
-        if ($itemType == 'config') {
+        if ($elementType == 'config') {
             if (Tools::getValue('srbtoken')) {
                 $message = $this->handleConfig();
 
@@ -109,7 +109,7 @@ class AdminShoprunbackController extends ModuleAdminController
 
             $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin/config.css');
         } else {
-            $this->getItems($itemType);
+            $this->getElements($elementType);
         }
 
         $this->context->smarty->assign('srbtoken', RestClient::getClient()->getToken());
@@ -123,20 +123,20 @@ class AdminShoprunbackController extends ModuleAdminController
         $this->setTemplate('../../../../modules/' . $this->module->name . '/views/templates/admin/layout.tpl');
     }
 
-    private function getItems($itemType = 'return')
+    private function getElements($elementType = 'return')
     {
         $externalLink = $this->module->url;
-        $countItems = 0;
+        $countElements = 0;
         $searchCondition = false;
 
         $currentPage = (isset($_GET['currentPage'])) ? $_GET['currentPage'] : 1;
         $class = 'SRBShipback';
         $function = 'getAllByCreateDate';
 
-        switch ($itemType) {
+        switch ($elementType) {
             case 'return':
                 $externalLink .= '/shipbacks/';
-                $actionUrl = Context::getContext()->link->getAdminLink('AdminShoprunback') . '&itemType=return';
+                $actionUrl = Context::getContext()->link->getAdminLink('AdminShoprunback') . '&elementType=return';
                 $this->context->smarty->assign('actionUrl', $actionUrl);
                 $this->context->smarty->assign('searchOrderReference', Tools::getValue('orderReference'));
                 $this->context->smarty->assign('searchCustomer', Tools::getValue('customer'));
@@ -144,49 +144,49 @@ class AdminShoprunbackController extends ModuleAdminController
                 if (Tools::getValue('orderReference') !== false) {
                     $searchCondition = 'orderReference';
                     $function = 'getLikeOrderReferenceByCreateDate';
-                    $countItems = SRBShipback::getCountLikeOrderReferenceByCreateDate(Tools::getValue('orderReference'));
+                    $countElements = SRBShipback::getCountLikeOrderReferenceByCreateDate(Tools::getValue('orderReference'));
                 } elseif (Tools::getValue('customer') !== false) {
                     $searchCondition = 'customer';
                     $function = 'getLikeCustomerByCreateDate';
-                    $countItems = SRBShipback::getCountLikeCustomerByCreateDate(Tools::getValue('customer'));
+                    $countElements = SRBShipback::getCountLikeCustomerByCreateDate(Tools::getValue('customer'));
                 } else {
-                    $countItems = SRBShipback::getCountAll();
+                    $countElements = SRBShipback::getCountAll();
                 }
                 break;
             case 'brand':
                 $externalLink .= '/brands/';
-                $countItems = SRBBrand::getCountAll();
+                $countElements = SRBBrand::getCountAll();
                 $class = 'SRBBrand';
                 $function = 'getAllWithMapping';
                 break;
             case 'product':
                 $externalLink .= '/products/';
-                $countItems = SRBProduct::getCountAll();
+                $countElements = SRBProduct::getCountAll();
                 $class = 'SRBProduct';
                 $function = 'getAllWithMapping';
                 break;
             case 'order':
                 $externalLink .= '/orders/';
-                $countItems = SRBOrder::getCountAll();
+                $countElements = SRBOrder::getCountAll();
                 $class = 'SRBOrder';
                 $function = 'getAllWithMapping';
                 break;
             default:
-                Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminShoprunback') . '&itemType=return');
+                Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminShoprunback') . '&elementType=return');
                 break;
         }
 
-        $pages = ceil($countItems / self::ITEMS_BY_PAGE);
+        $pages = ceil($countElements / self::ELEMENTS_BY_PAGE);
         $currentPage = ($currentPage <= $pages) ? $currentPage : 1;
-        $itemMin = ($currentPage - 1) * self::ITEMS_BY_PAGE;
+        $elementMin = ($currentPage - 1) * self::ELEMENTS_BY_PAGE;
 
-        $items = $searchCondition ?
-            $class::$function(Tools::getValue($searchCondition), false, self::ITEMS_BY_PAGE, $itemMin) :
-            $class::$function(false, self::ITEMS_BY_PAGE, $itemMin);
+        $elements = $searchCondition ?
+            $class::$function(Tools::getValue($searchCondition), false, self::ELEMENTS_BY_PAGE, $elementMin, false) :
+            $class::$function(false, self::ELEMENTS_BY_PAGE, $elementMin, false);
 
-        if ($itemType == 'product') {
+        if ($elementType == 'product') {
             $noBrand = [];
-            foreach ($items as $product) {
+            foreach ($elements as $product) {
                 if (is_null($product->brand)) {
                     $noBrand[] = $product->getDBId();
                 }
@@ -197,7 +197,7 @@ class AdminShoprunbackController extends ModuleAdminController
 
         $this->context->smarty->assign('pages', $pages);
         $this->context->smarty->assign('currentPage', $currentPage);
-        $this->context->smarty->assign('items', $items);
+        $this->context->smarty->assign('elements', $elements);
         $this->context->smarty->assign('externalLink', $externalLink);
         $this->context->smarty->assign('searchCondition', $searchCondition);
         $this->addJs(_PS_MODULE_DIR_ . $this->module->name . '/views/js/admin/srbManager.js');
@@ -207,7 +207,7 @@ class AdminShoprunbackController extends ModuleAdminController
     private function getConfigFormValues()
     {
         $this->context->smarty->assign('PSOrderReturn', Configuration::get('PS_ORDER_RETURN'));
-        $this->context->smarty->assign('formActionUrl', $this->tabUrl . '&itemType=config');
+        $this->context->smarty->assign('formActionUrl', $this->tabUrl . '&elementType=config');
         $this->context->smarty->assign('production', Configuration::get('production'));
     }
 

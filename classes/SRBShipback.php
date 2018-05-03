@@ -8,11 +8,11 @@ class SRBShipback extends LibShipback implements PSElementInterface
 
     const SHIPBACK_TABLE_NAME_NO_PREFIX = 'shoprunback_shipbacks';
 
-    public function __construct($psReturn)
+    public function __construct($psReturn, $withNestedElements = true)
     {
         $this->ps = $psReturn;
         $this->id_srb_shipback = isset($psReturn['id_srb_shipback']) ? $psReturn['id_srb_shipback'] : '';
-        $this->order = isset($psReturn['order']) ? $psReturn['order'] : SRBOrder::getById($this->ps['id_order']);
+        $this->order = isset($psReturn['order']) ? $psReturn['order'] : SRBOrder::getById($this->ps['id_order'], $withNestedElements);
         $this->order_id = $this->order->order_number;
         $this->mode = $psReturn['mode'];
         $this->state = $psReturn['state'];
@@ -106,16 +106,22 @@ class SRBShipback extends LibShipback implements PSElementInterface
             'public_url' => ''
         ];
         $srbShipback = new self($psReturn);
-        $result = $srbShipback->sync();
+
+        try {
+            $result = $srbShipback->sync();
+        } catch (\Shoprunback\Error\Error $e) {
+            return;
+        }
 
         if (!is_null($result)) {
             SRBLogger::addLog('Could not create Shipback on ShopRunBack for order ' . $orderId . '. Response: ' . json_encode($result), SRBLogger::FATAL, self::getObjectTypeForMapping());
+            return $result;
         } else {
             $srbShipback->id_srb_shipback = $srbShipback->id;
             $srbShipback->insertOnPS();
         }
 
-        return $result;
+        return $srbShipback;
     }
 
     public function insertOnPS()
@@ -190,14 +196,14 @@ class SRBShipback extends LibShipback implements PSElementInterface
         return $sql;
     }
 
-    static public function getAllByCreateDate($byAsc = false, $limit = 0, $offset = 0)
+    static public function getAllByCreateDate($byAsc = false, $limit = 0, $offset = 0, $withNestedElements = true)
     {
-        return self::generateReturnsFromDBResult(Db::getInstance()->executeS(self::findAllByCreateDateQuery($limit, $offset, $byAsc)));
+        return self::generateReturnsFromDBResult(Db::getInstance()->executeS(self::findAllByCreateDateQuery($limit, $offset, $byAsc)), $withNestedElements);
     }
 
-    static public function getLikeOrderReferenceByCreateDate($orderReference, $limit = 0, $offset = 0)
+    static public function getLikeOrderReferenceByCreateDate($orderReference, $limit = 0, $offset = 0, $withNestedElements = true)
     {
-        return self::generateReturnsFromDBResult(Db::getInstance()->executeS(self::findLikeOrderIdByCreateDateQuery($orderReference, $limit, $offset)));
+        return self::generateReturnsFromDBResult(Db::getInstance()->executeS(self::findLikeOrderIdByCreateDateQuery($orderReference, $limit, $offset)), $withNestedElements);
     }
 
     static public function getCountLikeOrderReferenceByCreateDate($orderReference)
@@ -205,9 +211,9 @@ class SRBShipback extends LibShipback implements PSElementInterface
         return self::getCountOfQuery(self::findLikeOrderIdByCreateDateQuery($orderReference));
     }
 
-    static public function getLikeCustomerByCreateDate($customer, $limit = 0, $offset = 0)
+    static public function getLikeCustomerByCreateDate($customer, $limit = 0, $offset = 0, $withNestedElements = true)
     {
-        return self::generateReturnsFromDBResult(Db::getInstance()->executeS(self::findLikeCustomerByCreateDateQuery($customer, $limit, $offset)));
+        return self::generateReturnsFromDBResult(Db::getInstance()->executeS(self::findLikeCustomerByCreateDateQuery($customer, $limit, $offset)), $withNestedElements);
     }
 
     static public function getCountLikeCustomerByCreateDate($customer)
@@ -263,12 +269,12 @@ class SRBShipback extends LibShipback implements PSElementInterface
         }
     }
 
-    static private function generateReturnsFromDBResult($shipbacksFromDB)
+    static private function generateReturnsFromDBResult($shipbacksFromDB, $withNestedElements = true)
     {
         $shipbacks = [];
         foreach ($shipbacksFromDB as $key => $shipback) {
-            $shipback['order'] = SRBOrder::createFromShipback($shipback);
-            $shipbacks[] = new self($shipback);
+            $shipback['order'] = SRBOrder::createFromShipback($shipback, $withNestedElements);
+            $shipbacks[] = new self($shipback, $withNestedElements);
         }
 
         return $shipbacks;
