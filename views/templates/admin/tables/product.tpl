@@ -36,8 +36,8 @@
                         <th>{l s="product.products" mod='shoprunback'}</th>
                         <th>{l s="product.reference" mod='shoprunback'}</th>
                         <th>{l s="product.brand" mod='shoprunback'}</th>
-                        <th>{l s="item.last_sync" mod='shoprunback'}</th>
-                        <th>{l s="item.sync" mod='shoprunback'}</th>
+                        <th>{l s="element.last_sync" mod='shoprunback'}</th>
+                        <th>{l s="element.sync" mod='shoprunback'}</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -54,10 +54,10 @@
                                     -
                                 {/if}
                             </td>
-                            <td>{if $srbtoken != ''}<a class="sync-item srb-button" data-type="{$elementType}">{l s="item.sync" mod='shoprunback'}{/if}</a></td>
+                            <td>{if $srbtoken != ''}<a class="sync-item srb-button" data-type="{$elementType}">{l s="element.sync" mod='shoprunback'}{/if}</a></td>
                             <td>
                                 {if $element->id_item_srb}
-                                    <a href="{$externalLink}{$item->id_item_srb}" target="_blank"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a>
+                                    <a href="{$externalLink}{$element->id_item_srb}" target="_blank"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a>
                                 {/if}
                             </td>
                         </tr>

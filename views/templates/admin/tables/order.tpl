@@ -29,8 +29,8 @@
                         <th>{l s="order.customer" mod='shoprunback'}</th>
                         <th>{l s="order.command_date" mod='shoprunback'}</th>
                         <th>{l s="order.return_status" mod='shoprunback'}</th>
-                        <th>{l s="item.last_sync" mod='shoprunback'}</th>
-                        <th>{l s="item.sync" mod='shoprunback'}</th>
+                        <th>{l s="element.last_sync" mod='shoprunback'}</th>
+                        <th>{l s="element.sync" mod='shoprunback'}</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -58,10 +58,10 @@
                             </td>
                             <td>
                                 {if $element->delivery}
-                                    {l s="item.delivered" mod='shoprunback'}
+                                    {l s="element.delivered" mod='shoprunback'}
                                 {elseif ! $element->last_sent_at && $srbtoken != ''}
                                     <a class="sync-item srb-button" data-type="{$elementType}">
-                                        {l s="item.sync" mod='shoprunback'}
+                                        {l s="element.sync" mod='shoprunback'}
                                     </a>
                                 {/if}
                             </td>
