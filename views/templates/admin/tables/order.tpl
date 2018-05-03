@@ -35,39 +35,39 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {foreach from=$elements key=id item=item}
-                        <tr data-id="{$item->getDBId()}">
-                            <td data-link="{if $item->id_item_srb}{$externalLink}{$item->id_item_srb}{/if}"><b>{$item->getName()}</b></td>
-                            <td>{$item->customer->first_name} {$item->customer->last_name}</td>
-                            <td>{$item->ordered_at}</td>
+                    {foreach from=$elements key=id item=element}
+                        <tr data-id="{$element->getDBId()}">
+                            <td data-link="{if $element->id_item_srb}{$externalLink}{$element->id_item_srb}{/if}"><b>{$element->getName()}</b></td>
+                            <td>{$element->customer->first_name} {$element->customer->last_name}</td>
+                            <td>{$element->ordered_at}</td>
                             <td>
-                                {if $item->id_srb_shipback}
-                                    <a href="{$shoprunbackURL}/shipbacks/{$item->id_srb_shipback}" target="blank">
-                                        <span class="badge badge-default {$item->state}">{$item->state|capitalize}</span>
+                                {if $element->id_srb_shipback}
+                                    <a href="{$shoprunbackURL}/shipbacks/{$element->id_srb_shipback}" target="blank">
+                                        <span class="badge badge-default {$element->state}">{$element->state|capitalize}</span>
                                     </a>
                                 {else}
                                     -
                                 {/if}
                             </td>
                             <td>
-                                {if $item->last_sent_at}
-                                    {$item->last_sent_at}
+                                {if $element->last_sent_at}
+                                    {$element->last_sent_at}
                                 {else}
                                     -
                                 {/if}
                             </td>
                             <td>
-                                {if $item->delivery}
+                                {if $element->delivery}
                                     {l s="item.delivered" mod='shoprunback'}
-                                {elseif ! $item->last_sent_at && $srbtoken != ''}
+                                {elseif ! $element->last_sent_at && $srbtoken != ''}
                                     <a class="sync-item srb-button" data-type="{$elementType}">
                                         {l s="item.sync" mod='shoprunback'}
                                     </a>
                                 {/if}
                             </td>
                             <td>
-                                {if $item->id_item_srb}
-                                    <a href="{$externalLink}{$item->id_item_srb}" target="_blank"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a>
+                                {if $element->id_item_srb}
+                                    <a href="{$externalLink}{$element->id_item_srb}" target="_blank"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a>
                                 {/if}
                             </td>
                         </tr>

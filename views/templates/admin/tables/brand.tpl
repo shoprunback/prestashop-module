@@ -32,20 +32,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {foreach from=$elements key=id item=item}
-                        <tr data-id="{$item->getDBId()}">
-                            <td data-link="{if $item->id_item_srb}{$externalLink}{$item->id_item_srb}{/if}"><b>{$item->getName()}</b></td>
+                    {foreach from=$elements key=id item=element}
+                        <tr data-id="{$element->getDBId()}">
+                            <td data-link="{if $element->id_item_srb}{$externalLink}{$element->id_item_srb}{/if}"><b>{$element->getName()}</b></td>
                             <td>
-                                {if $item->last_sent_at}
-                                    {$item->last_sent_at}
+                                {if $element->last_sent_at}
+                                    {$element->last_sent_at}
                                 {else}
                                     -
                                 {/if}
                             </td>
                             <td>{if $srbtoken != ''}<a class="sync-item srb-button" data-type="{$elementType}">{l s="item.sync" mod='shoprunback'}</a>{/if}</td>
                             <td>
-                                {if $item->id_item_srb}
-                                    <a href="{$externalLink}{$item->id_item_srb}" target="_blank"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a>
+                                {if $element->id_item_srb}
+                                    <a href="{$externalLink}{$element->id_item_srb}" target="_blank"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a>
                                 {/if}
                             </td>
                         </tr>

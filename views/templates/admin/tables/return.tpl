@@ -42,18 +42,18 @@
                 </thead>
                 <tbody>
                     {if count($elements) > 0}
-                        {foreach from=$elements key=id item=item}
-                            <tr data-id="{$item->getReference()}">
-                                <td><a href="{$externalLink}{$item->getReference()}" target="_blank"><b>{$item->getName()}</b></a></td>
-                                <td>{$item->order->customer->first_name} {$item->order->customer->last_name}</td>
-                                <td>{$item->order_id}</td>
+                        {foreach from=$elements key=id item=element}
+                            <tr data-id="{$element->getReference()}">
+                                <td><a href="{$externalLink}{$element->getReference()}" target="_blank"><b>{$element->getName()}</b></a></td>
+                                <td>{$element->order->customer->first_name} {$element->order->customer->last_name}</td>
+                                <td>{$element->order_id}</td>
                                 <td>
-                                    <a href="{$externalLink}{$item->getReference()}" target="blank">
-                                        <span class="badge badge-default {$item->state}">{$item->state|capitalize}</span>
+                                    <a href="{$externalLink}{$element->getReference()}" target="blank">
+                                        <span class="badge badge-default {$element->state}">{$element->state|capitalize}</span>
                                     </a>
                                 </td>
-                                <td>{$item->created_at}</td>
-                                <td><a href="{$externalLink}{$item->getReference()}" target="_blank"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a></td>
+                                <td>{$element->created_at}</td>
+                                <td><a href="{$externalLink}{$element->getReference()}" target="_blank"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a></td>
                             </tr>
                         {/foreach}
                     {else}

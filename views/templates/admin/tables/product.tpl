@@ -42,21 +42,21 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {foreach from=$elements key=id item=item}
-                        <tr data-id="{$item->getDBId()}">
-                            <td class="left" data-link="{$link->getAdminLink('AdminProducts', true, ['id_product' => $item->getDBId()])}"><b>{$item->getName()}</b></td>
-                            <td><b>{$item->getReference()}</b></td>
-                            <td>{if $item->brand != ''}{$item->brand->getName()}{/if}</td>
+                    {foreach from=$elements key=id item=element}
+                        <tr data-id="{$element->getDBId()}">
+                            <td class="left" data-link="{$link->getAdminLink('AdminProducts', true, ['id_product' => $element->getDBId()])}"><b>{$element->getName()}</b></td>
+                            <td><b>{$element->getReference()}</b></td>
+                            <td>{if $element->brand != ''}{$element->brand->getName()}{/if}</td>
                             <td>
-                                {if $item->last_sent_at}
-                                    {$item->last_sent_at}
+                                {if $element->last_sent_at}
+                                    {$element->last_sent_at}
                                 {else}
                                     -
                                 {/if}
                             </td>
                             <td>{if $srbtoken != ''}<a class="sync-item srb-button" data-type="{$elementType}">{l s="item.sync" mod='shoprunback'}{/if}</a></td>
                             <td>
-                                {if $item->id_item_srb}
+                                {if $element->id_item_srb}
                                     <a href="{$externalLink}{$item->id_item_srb}" target="_blank"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a>
                                 {/if}
                             </td>
