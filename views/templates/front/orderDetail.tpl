@@ -3,7 +3,7 @@
         {if !$shipback}
             {l s='front.order.detail.title' mod='shoprunback'}<br>
 
-            {l s='front.order.detail.content' mod='shoprunback'} <a id="create-return">{l s='front.order.detail.link' mod='shoprunback'}</a>
+            {l s='front.order.detail.content' mod='shoprunback'} <span id="create-return">{l s='front.order.detail.link' mod='shoprunback'}</span>
         {else}
             <a href="{$shipback->public_url}" target="_blank">{l s='front.order.detail.returned' mod='shoprunback'}</a>
         {/if}
@@ -11,13 +11,13 @@
 </section>
 
 {if !$shipback}
-    <div id="modale">
-        <div class="modale">
-            <h2>{l s='front.order.detail.modale.title' mod='shoprunback'}</h2>
+    <div id="modal">
+        <div class="content">
+            <h2>{l s='front.order.detail.modal.title' mod='shoprunback'}</h2>
 
             <div>
-                <a class="cancel form-control-submit btn btn-primary" target="_blank">{l s='front.order.detail.modale.cancel' mod='shoprunback'}</a>
-                <a class="external-link form-control-submit btn btn-primary" target="_blank">{l s='front.order.detail.modale.validate' mod='shoprunback'}</a>
+                <a class="cancel form-control-submit btn btn-primary" target="_blank">{l s='front.order.detail.modal.cancel' mod='shoprunback'}</a>
+                <a class="external-link form-control-submit btn btn-primary" target="_blank">{l s='front.order.detail.modal.validate' mod='shoprunback'}</a>
             </div>
         </div>
     </div>
@@ -46,7 +46,7 @@
                         redirectUrl = urls.redirectUrl;
                         $('.external-link').attr('href', urls.shipbackPublicUrl);
                         $('.cancel').attr('href', redirectUrl);
-                        $('#modale').css('display', 'flex');
+                        $('#modal').css('display', 'flex');
                     } else {
                         // Failure
                         window.location.href = urls;

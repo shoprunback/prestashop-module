@@ -4,19 +4,15 @@
   margin: 10px 0;
 }
 
-#order-detail h1 a {
+#order-detail h1 a, #order-detail h1 span {
   color: #2FB5D2;
 }
 
-#order-detail h1 a:hover {
+#order-detail h1 span:hover {
   cursor: pointer;
 }
 
-#order-detail h1 a:visited {
-  color: #551A8B;
-}
-
-#modale {
+#modal {
   position: fixed;
   display: none;
   flex-direction: column;
@@ -29,7 +25,7 @@
   background-color: rgba(0, 0, 0, 0.2);
 }
 
-#modale .modale {
+#modal .content {
   min-height: 150px;
   width: 500px;
   padding: 20px;
@@ -38,11 +34,11 @@
   text-align: center;
 }
 
-#modale .modale h2 {
+#modal .content h2 {
   margin-bottom: 28px;
 }
 
-#modale .modale .cancel {
+#modal .content .cancel {
   height: auto;
   width: auto;
   margin-right: 20px;
@@ -50,17 +46,17 @@
   color: #FFFFFF;
 }
 
-#modale .modale .cancel:hover {
+#modal .content .cancel:hover {
   background-color: #c67a15 !important;
 }
 
-#modale .modale>div {
+#modal .content>div {
   display: flex;
   justify-content: space-around;
 }
 
 
-#modale .modale .btn {
+#modal .content .btn {
   border: none;
   min-width: 200px;
 }
