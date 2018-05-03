@@ -19,7 +19,7 @@ class ShopRunBackShipbackModuleFrontController extends ModuleFrontController
         die;
     }
 
-    public function ajaxCreateShipback()
+    public function asyncCreateShipback()
     {
         $redirectUrl = $this->context->link->getPageLink('index') . '?controller=order-detail';
 
