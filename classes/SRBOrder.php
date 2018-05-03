@@ -64,9 +64,9 @@ class SRBOrder extends LibOrder implements PSElementInterface
         return $sql;
     }
 
-    static public function getAllWithMapping($onlySyncItems = false, $limit = 0, $offset = 0, $withNestedElements = true)
+    static public function getAllWithMapping($onlySyncElements = false, $limit = 0, $offset = 0, $withNestedElements = true)
     {
-        $sql = self::findAllWithMappingQuery($onlySyncItems, $limit, $offset);
+        $sql = self::findAllWithMappingQuery($onlySyncElements, $limit, $offset);
         $sql->select(SRBShipback::getTableName() . '.' . SRBShipback::getIdColumnName() . ', ' . SRBShipback::getTableName() . '.state, os.delivery');
         $sql->leftJoin( // We use leftJoin because orders may not have a return associated
             SRBShipback::SHIPBACK_TABLE_NAME_NO_PREFIX,

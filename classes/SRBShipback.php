@@ -175,7 +175,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
         return $sql;
     }
 
-    static public function getComponentsToFindAllWithMappingQuery($onlySyncItems = false)
+    static public function getComponentsToFindAllWithMappingQuery($onlySyncElements = false)
     {
         $sql = static::findAllQuery();
         $sql->select(ElementMapper::getTableName() . '.id_item_srb');
