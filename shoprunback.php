@@ -331,6 +331,7 @@ class ShopRunBack extends Module
                 $shipback = SRBShipback::getByOrderIdIfExists($_GET['id_order']);
                 $this->context->smarty->assign('shipback', $shipback);
                 $this->context->smarty->assign('isVersionGreaterThan1_7', version_compare(_PS_VERSION_, '1.7', '>='));
+                $this->context->smarty->assign('frontJsPath', 'modules/' . $this->name . '/views/js/front/');
 
                 return $this->display(__FILE__, 'orderDetail.tpl');
             } catch (OrderException $e) {
