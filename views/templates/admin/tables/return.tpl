@@ -16,7 +16,7 @@
             </div>
         </div>
 
-        <div id="item-list">
+        <div id="element-list">
             <table class="table">
                 <thead>
                     <tr>

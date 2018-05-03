@@ -21,7 +21,7 @@
             </div>
         </div>
 
-        <div id="item-list">
+        <div id="element-list">
             <table class="table">
                 <thead>
                     <tr>
@@ -42,7 +42,7 @@
                                     -
                                 {/if}
                             </td>
-                            <td>{if $srbtoken != ''}<a class="sync-item srb-button" data-type="{$elementType}">{l s="element.sync" mod='shoprunback'}</a>{/if}</td>
+                            <td>{if $srbtoken != ''}<a class="sync-element srb-button" data-type="{$elementType}">{l s="element.sync" mod='shoprunback'}</a>{/if}</td>
                             <td>
                                 {if $element->id_item_srb}
                                     <a href="{$externalLink}{$element->id_item_srb}" target="_blank"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a>

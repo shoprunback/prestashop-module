@@ -21,7 +21,7 @@
             </div>
         </div>
 
-        <div id="item-list">
+        <div id="element-list">
             <table class="table">
                 <thead>
                     <tr>
@@ -60,7 +60,7 @@
                                 {if $element->delivery}
                                     {l s="element.delivered" mod='shoprunback'}
                                 {elseif ! $element->last_sent_at && $srbtoken != ''}
-                                    <a class="sync-item srb-button" data-type="{$elementType}">
+                                    <a class="sync-element srb-button" data-type="{$elementType}">
                                         {l s="element.sync" mod='shoprunback'}
                                     </a>
                                 {/if}
