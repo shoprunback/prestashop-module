@@ -223,7 +223,8 @@ class AdminShoprunbackController extends ModuleAdminController
         $filename = 'logs_ps_shoprunback_' . Context::getContext()->shop->name . '_' . date('Y-m-d_H.i.s') . '.txt';
 
         try {
-            $logs = SRBLogger::getLogs(100, 0);
+            // TODO Add dynamic values for export
+            $logs = SRBLogger::getLogs();
 
             $content = '';
             foreach ($logs as $log) {
