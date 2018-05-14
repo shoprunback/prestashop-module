@@ -107,8 +107,8 @@ class AdminShoprunbackController extends ModuleAdminController
 
             $this->getConfigFormValues();
 
-            $this->context->smarty->assign('numberOfLinesForLogExport', [10, 50, 100, 500, 1000]);
-            $this->context->smarty->assign('formExportLogsUrl', $this->tabUrl . '&action=exportLogs');
+            $this->context->smarty->assign('numberOfLinesForLogExport', [100, 200, 300, 400, 500, 1000, 2000]);
+            $this->context->smarty->assign('formExportLogsUrl', $this->tabUrl . '&itemType=config&action=exportLogs');
 
             $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin/config.css');
         } else {
@@ -219,16 +219,37 @@ class AdminShoprunbackController extends ModuleAdminController
         require_once($this->module->SRBModulePath . '/asyncCall.php');
     }
 
-    private function exportLogs()
+    public function exportLogs()
     {
-        $numberOfLines = isset($_GET['number-of-lines-for-log-export']) ? $_GET['number-of-lines-for-log-export'] : 100;
-        $filename = 'logs-shoprunback-' . $numberOfLines . '-' . date('Y.m.d-H.i.s') . '.txt';
+        $filename = 'logs_ps_shoprunback_' . Context::getContext()->shop->name . '_' . date('Y-m-d_H.i.s') . '.txt';
 
-        $content = '';
+        try {
+            $logs = SRBLogger::getLogs(100, 0);
 
-        header('Content-type: text/plain');
-        header('Content-Disposition: attachment; filename='. $filename);
+            $content = '';
+            foreach ($logs as $log) {
+                $content .= '[' . $log['date_add'] . '] ' . "\n";
 
-        print $content;
+                if (!empty($log['object_type'])) $content .= 'ObjectType: ' . $log['object_type'] . "\n";
+
+                if (!empty($log['object_id'])) $content .= 'ObjectID: ' . $log['object_id'] . "\n";
+
+                $content .= 'Employee: ' . $log['firstname'] . ' ' . $log['lastname'] . ' <' . $log['email'] . '>' . "\n";
+                $content .= 'Message: ' . $log['message'] . "\n\n";
+            }
+
+            $file = fopen(_PS_MODULE_DIR_ . $this->module->name . '/' . $filename, 'w');
+            fwrite($file, $content);
+
+            header('Content-Type: application/octet-stream');
+            header('Content-Transfer-Encoding: Binary');
+            header('Content-disposition: attachment; filename=' . $filename);
+            readfile(_PS_MODULE_DIR_ . $this->module->name . '/' . $filename);
+
+            unlink(_PS_MODULE_DIR_ . $this->module->name . '/' . $filename);
+            exit();
+        } catch (Exception $e) {
+            SRBLogger::addLog('Log export failed: ' . json_encode($e), SRBLogger::FATAL, 'configuration');
+        }
     }
 }
