@@ -57,7 +57,7 @@
     {if $srbtoken}
         <div class="export-logs col-md-2 text-center">
             <h2>
-                <a href="{$formExportLogsUrl}" class="btn btn-default" type="submit">{l s="config.logs.export" mod='shoprunback'}</a>
+                <a href="{$exportLogsUrl}" class="btn btn-default" type="submit">{l s="config.logs.export" mod='shoprunback'}</a>
             </h2>
         </div>
     {/if}
