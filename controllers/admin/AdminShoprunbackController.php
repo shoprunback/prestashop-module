@@ -107,7 +107,6 @@ class AdminShoprunbackController extends ModuleAdminController
 
             $this->getConfigFormValues();
 
-            $this->context->smarty->assign('numberOfLinesForLogExport', [100, 200, 300, 400, 500, 1000, 2000]);
             $this->context->smarty->assign('formExportLogsUrl', $this->tabUrl . '&itemType=config&action=exportLogs');
 
             $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin/config.css');
