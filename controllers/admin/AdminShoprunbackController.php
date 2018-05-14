@@ -107,6 +107,9 @@ class AdminShoprunbackController extends ModuleAdminController
 
             $this->getConfigFormValues();
 
+            $this->context->smarty->assign('numberOfLinesForLogExport', [10, 50, 100, 500, 1000]);
+            $this->context->smarty->assign('formExportLogsUrl', $this->tabUrl . '&action=exportLogs');
+
             $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin/config.css');
         } else {
             $this->getItems($itemType);
@@ -214,5 +217,18 @@ class AdminShoprunbackController extends ModuleAdminController
     public function asyncCall()
     {
         require_once($this->module->SRBModulePath . '/asyncCall.php');
+    }
+
+    private function exportLogs()
+    {
+        $numberOfLines = isset($_GET['number-of-lines-for-log-export']) ? $_GET['number-of-lines-for-log-export'] : 100;
+        $filename = 'logs-shoprunback-' . $numberOfLines . '-' . date('Y.m.d-H.i.s') . '.txt';
+
+        $content = '';
+
+        header('Content-type: text/plain');
+        header('Content-Disposition: attachment; filename='. $filename);
+
+        print $content;
     }
 }

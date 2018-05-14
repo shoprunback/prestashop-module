@@ -50,5 +50,24 @@
                 </div>
             </div>
         {/if}
+
+        <div class="export-logs">
+            <form action="{$formExportLogsUrl}" method="GET">
+                <div class="form-group">
+                    <label>
+                        {l s="config.logs.numberOfLines" mod='shoprunback'}
+                        <select name="number-of-lines-for-log-export">
+                            {foreach from=$numberOfLinesForLogExport key=id item=numberOfLines}
+                                <option value="{$numberOfLines}">{$numberOfLines}</option>
+                            {/foreach}
+                        </select>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <button class="btn btn-default pull-right" type="submit">{l s="config.logs.export" mod='shoprunback'}</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
