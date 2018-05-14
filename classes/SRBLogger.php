@@ -21,12 +21,14 @@ class SRBLogger
         'l';
     }
 
-    static public function getLogs()
+    static public function getLogs($limit = 100, $offset = 0)
     {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*');
         $sql->from('log', self::getTableName());
-        'SELECT a.* , CONCAT(LEFT(e.firstname, 1), '. ', e.lastname) employee FROM `ps_log` a LEFT JOIN ps_employee e ON (a.id_employee = e.id_employee) WHERE 1 ORDER BY a.id_log DESC LIMIT 0, 50';
-        return;
+        $sql->where(self::getTableName() . '.message LIKE "[ShopRunBack] %"');
+        $sql->limit($limit, $offset);
+
+        return Db::getInstance()->executeS($sql);
     }
 }
