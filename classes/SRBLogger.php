@@ -15,4 +15,22 @@ class SRBLogger
 
         Logger::addLog($message, $severity, null, $objectType, $objectId, true, null);
     }
+
+    static public function getTableName()
+    {
+        return 'l';
+    }
+
+    static public function getLogs($limit = 100, $offset = 0)
+    {
+        $sql = new DbQuery();
+        $sql->select(self::getTableName() . '.*, e.firstname, e.lastname, e.email');
+        $sql->from('log', self::getTableName());
+        $sql->innerJoin('employee', 'e', self::getTableName() . '.id_employee = e.id_employee');
+        $sql->where(self::getTableName() . '.message LIKE "[ShopRunBack] %"');
+        $sql->limit($limit, $offset);
+        $sql->orderBy(self::getTableName() . '.id_log DESC');
+
+        return Db::getInstance()->executeS($sql);
+    }
 }

@@ -107,6 +107,8 @@ class AdminShoprunbackController extends ModuleAdminController
 
             $this->getConfigFormValues();
 
+            $this->context->smarty->assign('exportLogsUrl', $this->tabUrl . '&itemType=config&action=exportLogs');
+
             $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin/config.css');
         } else {
             $this->getElements($elementType);
@@ -214,5 +216,40 @@ class AdminShoprunbackController extends ModuleAdminController
     public function asyncCall()
     {
         require_once($this->module->SRBModulePath . '/asyncCall.php');
+    }
+
+    public function exportLogs()
+    {
+        $filename = 'logs_ps_shoprunback_' . Context::getContext()->shop->name . '_' . date('Y-m-d_H.i.s') . '.txt';
+
+        try {
+            // TODO Add dynamic values for export
+            $logs = SRBLogger::getLogs();
+
+            $content = '';
+            foreach ($logs as $log) {
+                $content .= '[' . $log['date_add'] . '] ' . "\n";
+
+                if (!empty($log['object_type'])) $content .= 'ObjectType: ' . $log['object_type'] . "\n";
+
+                if (!empty($log['object_id'])) $content .= 'ObjectID: ' . $log['object_id'] . "\n";
+
+                $content .= 'Employee: ' . $log['firstname'] . ' ' . $log['lastname'] . ' <' . $log['email'] . '>' . "\n";
+                $content .= 'Message: ' . $log['message'] . "\n\n";
+            }
+
+            $file = fopen(_PS_MODULE_DIR_ . $this->module->name . '/' . $filename, 'w');
+            fwrite($file, $content);
+
+            header('Content-Type: application/octet-stream');
+            header('Content-Transfer-Encoding: Binary');
+            header('Content-disposition: attachment; filename=' . $filename);
+            readfile(_PS_MODULE_DIR_ . $this->module->name . '/' . $filename);
+
+            unlink(_PS_MODULE_DIR_ . $this->module->name . '/' . $filename);
+            exit();
+        } catch (Exception $e) {
+            SRBLogger::addLog('Log export failed: ' . json_encode($e), SRBLogger::FATAL, 'configuration');
+        }
     }
 }
