@@ -33,6 +33,6 @@
     {if $isVersionGreaterThan1_7}
         <script type="text/javascript" src="{$frontJsPath}orderDetail-1.7.js"></script>
     {else}
-        <script type="text/javascript" src="{$frontJsPath}orderDetail-1.6.js"></script>
+        <script type="text/javascript" src="{$frontJsPath}orderDetail.js"></script>
     {/if}
 {/if}
