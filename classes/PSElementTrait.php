@@ -216,7 +216,12 @@ trait PSElementTrait
 
     public function sync()
     {
+        var_dump(SRBLogger::addLog($this->getElementName()));
         SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
+
+        foreach ($this->getAllNestedElements() as $key => $value) {
+            $value->sync();
+        }
 
         try {
             $result = $this->save();
