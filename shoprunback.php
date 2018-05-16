@@ -3,15 +3,36 @@ if (! defined('_PS_VERSION_')) {
     exit;
 }
 
-define ('PRODUCTION_MODE', Configuration::get('production'));
-define ('DASHBOARD_URL', getenv('DASHBOARD_URL') ? getenv('DASHBOARD_URL') : (PRODUCTION_MODE ? 'https://dashboard.shoprunback.com' : 'https://sandbox.dashboard.shoprunback.com'));
-define ('DASHBOARD_PROD_URL', 'https://dashboard.shoprunback.com');
+include_once 'lib/shoprunback-php/init.php';
 
+define ('PRODUCTION_MODE', Configuration::get('production'));
+
+\Shoprunback\RestClient::getClient()->setToken(Configuration::get('srbtoken'));
+
+$dashboardProdUrl = '';
+$dashboardUrl = '';
+
+// If we are on a local environment
 if (getenv('DASHBOARD_URL')) {
     error_reporting(E_ALL ^ E_DEPRECATED);
+    \Shoprunback\RestClient::getClient()->setApiBaseUrl(getenv('DASHBOARD_URL'));
+    $dashboardProdUrl = \Shoprunback\RestClient::getClient()->getApiBaseUrl();
+    $dashboardUrl = \Shoprunback\RestClient::getClient()->getApiBaseUrl();
+} else {
+    // To get the production URL, we set the production environment
+    \Shoprunback\RestClient::getClient()->useProductionEnvironment();
+    $dashboardProdUrl = \Shoprunback\RestClient::getClient()->getApiBaseUrl();
+
+    // Then we check which environment we are on and switch to Sandbox if needed
+    if (!PRODUCTION_MODE) {
+        \Shoprunback\RestClient::getClient()->useSandboxEnvironment();
+    }
+
+    $dashboardUrl = \Shoprunback\RestClient::getClient()->getApiBaseUrl();
 }
 
-include_once 'lib/shoprunback-php/init.php';
+define ('DASHBOARD_PROD_URL', $dashboardProdUrl);
+define ('DASHBOARD_URL', $dashboardUrl);
 
 include_once 'classes/ElementMapper.php';
 include_once 'classes/Util.php';
@@ -35,9 +56,6 @@ include_once 'exceptions/BrandException.php';
 include_once 'exceptions/ProductException.php';
 include_once 'exceptions/ShipbackException.php';
 include_once 'sqlQueries.php';
-
-\Shoprunback\RestClient::getClient()->setToken(Configuration::get('srbtoken'));
-\Shoprunback\RestClient::getClient()->setApiBaseUrl(DASHBOARD_URL);
 
 class ShopRunBack extends Module
 {
