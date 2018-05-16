@@ -25,7 +25,7 @@ class ShopRunBackShipbackModuleFrontController extends ModuleFrontController
 
         if (!isset($_GET['orderId'])) {
             echo $redirectUrl;
-            return true;
+            return false;
         }
 
         $redirectUrl .= '&id_order=' . $_GET['orderId'];
@@ -34,7 +34,7 @@ class ShopRunBackShipbackModuleFrontController extends ModuleFrontController
             $shipback = SRBShipback::createShipbackFromOrderId($_GET['orderId']);
         } catch (\shoprunback\Error\Error $e) {
             echo $redirectUrl;
-            return true;
+            return false;
         }
 
         echo json_encode([

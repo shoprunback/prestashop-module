@@ -8,16 +8,13 @@ $('#create-return').on('click', function () {
     method: 'POST',
     dataType: 'json',
     success: function (urls) {
-      if (typeof urls === 'object') {
-        // Success
-        redirectUrl = urls.redirectUrl;
-        $('.external-link').attr('href', urls.shipbackPublicUrl);
-        $('.cancel').attr('href', redirectUrl);
-        $('#modal').css('display', 'flex');
-      } else {
-        // Failure
-        window.location.href = urls;
-      }
+      redirectUrl = urls.redirectUrl;
+      $('.external-link').attr('href', urls.shipbackPublicUrl);
+      $('.cancel').attr('href', redirectUrl);
+      $('#modal').css('display', 'flex');
+    },
+    error: function (xhr) {
+      window.location.href = xhr.responseText;
     }
   });
 });
