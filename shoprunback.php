@@ -51,7 +51,7 @@ class ShopRunBack extends Module
         // Mandatory parameters
         $this->name = 'shoprunback';
         $this->author = 'ShopRunBack';
-        $this->version = '1.0.4';
+        $this->version = '1.0.5';
         $this->ps_versions_compliancy = array('min' => '1.6.0.9');
         $this->tab = 'administration';
         $this->tabs = [
@@ -330,8 +330,6 @@ class ShopRunBack extends Module
 
                 $shipback = SRBShipback::getByOrderIdIfExists($_GET['id_order']);
                 $this->context->smarty->assign('shipback', $shipback);
-                $this->context->smarty->assign('isVersionGreaterThan1_7', version_compare(_PS_VERSION_, '1.7', '>='));
-                $this->context->smarty->assign('frontJsPath', 'modules/' . $this->name . '/views/js/front/');
 
                 return $this->display(__FILE__, 'orderDetail.tpl');
             } catch (OrderException $e) {
@@ -344,6 +342,7 @@ class ShopRunBack extends Module
     {
         $this->context->controller->addCSS($this->SRBModulePath . '/views/css/srbGlobal.css');
         $this->context->controller->addCSS($this->SRBModulePath . '/views/css/front/orderDetail.css');
+        $this->context->controller->addJs($this->SRBModulePath . '/views/js/front/orderDetail.js');
     }
 
     public function hookDisplayBackOfficeHeader() {
