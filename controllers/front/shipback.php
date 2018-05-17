@@ -13,34 +13,34 @@ class ShopRunBackShipbackModuleFrontController extends ModuleFrontController
         }
     }
 
+    // To prevent the display of the template with the ajax's response
     public function initContent()
+    {
+        die;
+    }
+
+    public function asyncCreateShipback()
     {
         $redirectUrl = $this->context->link->getPageLink('index') . '?controller=order-detail';
 
         if (!isset($_GET['orderId'])) {
-            Tools::redirect($redirectUrl);
+            echo $redirectUrl;
+            return false;
         }
 
         $redirectUrl .= '&id_order=' . $_GET['orderId'];
-        $shipback = SRBShipback::createShipbackFromOrderId($_GET['orderId']);
 
-        if (!$shipback || isset($shipback->shipback)) {
-            Tools::redirect($redirectUrl);
+        try {
+            $shipback = SRBShipback::createShipbackFromOrderId($_GET['orderId']);
+        } catch (\shoprunback\Error\Error $e) {
+            echo $redirectUrl;
+            return false;
         }
 
-        if ($shipback == 'Order not found') {
-            header('HTTP/1.1 404 Not Found');
-            header('Status: 404 Not Found');
-            header('Location: ' . $this->context->link->getPageLink('index'));
-        }
-
-        $this->context->smarty->assign('newTabUrl', $shipback->public_url);
-        $this->context->smarty->assign('redirectUrl', $redirectUrl);
-        parent::initContent();
-        if (version_compare(_PS_VERSION_, '1.7', '>=')) {
-            $this->setTemplate('module:' . $this->module->name . '/views/templates/front/redirect.tpl');
-        } else {
-            $this->setTemplate('redirect.tpl');
-        }
+        echo json_encode([
+            'shipbackPublicUrl' => $shipback->public_url,
+            'redirectUrl' => $redirectUrl
+        ]);
+        return true;
     }
 }
