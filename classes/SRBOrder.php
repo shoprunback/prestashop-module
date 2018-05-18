@@ -6,13 +6,15 @@ class SRBOrder extends LibOrder implements PSElementInterface
 {
     use PSElementTrait;
 
-    public function __construct($psOrder)
+    public function __construct($psOrder, $withNestedElements = true)
     {
         $this->ps = $psOrder;
         $this->order_number = $this->extractOrderNumberFromPSArray($psOrder);
         $this->ordered_at = Util::convertDateFormatForDB($psOrder['date_add']);
         $this->customer = SRBCustomer::createFromOrder($psOrder);
-        $this->items = SRBItem::createItemsFromOrderId($this->getDBId());
+        if ($withNestedElements) {
+            $this->items = SRBItem::createItemsFromOrderId($this->getDBId());
+        }
 
         if ($srbId = $this->getMapId()) {
             parent::__construct($srbId);
@@ -62,9 +64,9 @@ class SRBOrder extends LibOrder implements PSElementInterface
         return $sql;
     }
 
-    static public function getAllWithMapping($onlySyncItems = false, $limit = 0, $offset = 0)
+    static public function getAllWithMapping($onlySyncElements = false, $limit = 0, $offset = 0, $withNestedElements = true)
     {
-        $sql = self::findAllWithMappingQuery($onlySyncItems, $limit, $offset);
+        $sql = self::findAllWithMappingQuery($onlySyncElements, $limit, $offset);
         $sql->select(SRBShipback::getTableName() . '.' . SRBShipback::getIdColumnName() . ', ' . SRBShipback::getTableName() . '.state, os.delivery');
         $sql->leftJoin( // We use leftJoin because orders may not have a return associated
             SRBShipback::SHIPBACK_TABLE_NAME_NO_PREFIX,
@@ -73,17 +75,17 @@ class SRBOrder extends LibOrder implements PSElementInterface
         );
         $sql = self::getComponentsToFindOrderState($sql);
 
-        $items = self::convertPSArrayToElements(Db::getInstance()->executeS($sql));
+        $orders = self::convertPSArrayToElements(Db::getInstance()->executeS($sql), $withNestedElements);
 
-        foreach ($items as $key => $item) {
-            $items[$key]->id_item_srb = $item->ps['id_item_srb'];
-            $items[$key]->last_sent_at = $item->ps['last_sent_at'];
-            $items[$key]->id_srb_shipback = $item->ps['id_srb_shipback'];
-            $items[$key]->state = $item->ps['state'];
-            $items[$key]->delivery = $item->ps['delivery'];
+        foreach ($orders as $key => $order) {
+            $orders[$key]->id_item_srb = $order->ps['id_item_srb'];
+            $orders[$key]->last_sent_at = $order->ps['last_sent_at'];
+            $orders[$key]->id_srb_shipback = $order->ps['id_srb_shipback'];
+            $orders[$key]->state = $order->ps['state'];
+            $orders[$key]->delivery = $order->ps['delivery'];
         }
 
-        return $items;
+        return $orders;
     }
 
     // Own functions
@@ -108,9 +110,9 @@ class SRBOrder extends LibOrder implements PSElementInterface
         return $products;
     }
 
-    static public function createFromShipback($shipback)
+    static public function createFromShipback($shipback, $withNestedElements = true)
     {
-        return new self($shipback);
+        return new self($shipback, $withNestedElements);
     }
 
     static public function addComponentsToQuery($sql)

@@ -45,7 +45,7 @@ $(document).ready(function() {
     ajaxAsyncCall(data);
   });
 
-  $('#srb-content .sync-item').on('click', function (e) {
+  $('#srb-content .sync-element').on('click', function (e) {
     e.preventDefault();
 
     var data = {
