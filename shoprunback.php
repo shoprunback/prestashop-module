@@ -6,33 +6,18 @@ if (! defined('_PS_VERSION_')) {
 include_once 'lib/shoprunback-php/init.php';
 
 define ('PRODUCTION_MODE', Configuration::get('production'));
+define ('DASHBOARD_PROD_URL', \Shoprunback\RestClient::getClient()->getProductionUrl());
 
 \Shoprunback\RestClient::getClient()->setToken(Configuration::get('srbtoken'));
+// We set the production environment by default
+\Shoprunback\RestClient::getClient()->useProductionEnvironment();
 
-$dashboardProdUrl = '';
-$dashboardUrl = '';
-
-// If we are on a local environment
-if (getenv('DASHBOARD_URL')) {
-    error_reporting(E_ALL ^ E_DEPRECATED);
-    \Shoprunback\RestClient::getClient()->setApiBaseUrl(getenv('DASHBOARD_URL'));
-    $dashboardProdUrl = \Shoprunback\RestClient::getClient()->getApiBaseUrl();
-    $dashboardUrl = \Shoprunback\RestClient::getClient()->getApiBaseUrl();
-} else {
-    // To get the production URL, we set the production environment
-    \Shoprunback\RestClient::getClient()->useProductionEnvironment();
-    $dashboardProdUrl = \Shoprunback\RestClient::getClient()->getApiBaseUrl();
-
-    // Then we check which environment we are on and switch to Sandbox if needed
-    if (!PRODUCTION_MODE) {
-        \Shoprunback\RestClient::getClient()->useSandboxEnvironment();
-    }
-
-    $dashboardUrl = \Shoprunback\RestClient::getClient()->getApiBaseUrl();
+// Then we check which environment we are on and switch to Sandbox if needed
+if (!PRODUCTION_MODE) {
+    \Shoprunback\RestClient::getClient()->useSandboxEnvironment();
 }
 
-define ('DASHBOARD_PROD_URL', $dashboardProdUrl);
-define ('DASHBOARD_URL', $dashboardUrl);
+define ('DASHBOARD_URL', \Shoprunback\RestClient::getClient()->getApiBaseUrl());
 
 include_once 'classes/ElementMapper.php';
 include_once 'classes/Util.php';
