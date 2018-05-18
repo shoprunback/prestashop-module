@@ -10,7 +10,7 @@ $(document).ready(function() {
       data: data,
       dataType: 'json',
       beforeSend: function () {
-        $('#srb-manager').html('Sending... You can go on another page while the process goes on.');
+        $('#srb-manager').html(loadingMessage);
       },
       success: function (response) {
         window.location.reload();
@@ -45,7 +45,7 @@ $(document).ready(function() {
     ajaxAsyncCall(data);
   });
 
-  $('#srb-content .sync-item').on('click', function (e) {
+  $('#srb-content .sync-element').on('click', function (e) {
     e.preventDefault();
 
     var data = {

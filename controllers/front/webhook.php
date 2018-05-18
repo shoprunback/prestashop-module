@@ -39,7 +39,7 @@ class ShopRunBackWebhookModuleFrontController extends ModuleFrontController
         if ($type == 'shipback') {
             SRBLogger::addLog('WEBHOOK IS SHIPBACK. id: ' . $id, SRBLogger::INFO, $type, $id);
             try {
-                $item = SRBShipback::getById($id);
+                $shipback = SRBShipback::getById($id);
                 $state = isset($webhook->data->state) ? $webhook->data->state : '';
                 $mode = isset($webhook->data->mode) ? $webhook->data->mode : '';
 
@@ -56,9 +56,9 @@ class ShopRunBackWebhookModuleFrontController extends ModuleFrontController
                     return self::returnHeaderHTTP(200);
                 }
 
-                $item->state = $state;
-                $item->mode = $mode;
-                $item->updateOnPS();
+                $shipback->state = $state;
+                $shipback->mode = $mode;
+                $shipback->updateOnPS();
             } catch (ShipbackException $e) {
                 SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: ' . $e, SRBLogger::FATAL, $type, $id);
                 return self::returnHeaderHTTP(200);

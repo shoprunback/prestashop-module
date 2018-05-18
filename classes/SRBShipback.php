@@ -8,11 +8,11 @@ class SRBShipback extends LibShipback implements PSElementInterface
 
     const SHIPBACK_TABLE_NAME_NO_PREFIX = 'shoprunback_shipbacks';
 
-    public function __construct($psReturn)
+    public function __construct($psReturn, $withNestedElements = true)
     {
         $this->ps = $psReturn;
         $this->id_srb_shipback = isset($psReturn['id_srb_shipback']) ? $psReturn['id_srb_shipback'] : '';
-        $this->order = isset($psReturn['order']) ? $psReturn['order'] : SRBOrder::getById($this->ps['id_order']);
+        $this->order = isset($psReturn['order']) ? $psReturn['order'] : SRBOrder::getById($this->ps['id_order'], $withNestedElements);
         $this->order_id = $this->order->order_number;
         $this->mode = $psReturn['mode'];
         $this->state = $psReturn['state'];
@@ -182,7 +182,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
         return $sql;
     }
 
-    static public function getComponentsToFindAllWithMappingQuery($onlySyncItems = false)
+    static public function getComponentsToFindAllWithMappingQuery($onlySyncElements = false)
     {
         $sql = static::findAllQuery();
         $sql->select(ElementMapper::getTableName() . '.id_item_srb');
@@ -197,14 +197,14 @@ class SRBShipback extends LibShipback implements PSElementInterface
         return $sql;
     }
 
-    static public function getAllByCreateDate($byAsc = false, $limit = 0, $offset = 0)
+    static public function getAllByCreateDate($byAsc = false, $limit = 0, $offset = 0, $withNestedElements = true)
     {
-        return self::generateReturnsFromDBResult(Db::getInstance()->executeS(self::findAllByCreateDateQuery($limit, $offset, $byAsc)));
+        return self::generateReturnsFromDBResult(Db::getInstance()->executeS(self::findAllByCreateDateQuery($limit, $offset, $byAsc)), $withNestedElements);
     }
 
-    static public function getLikeOrderReferenceByCreateDate($orderReference, $limit = 0, $offset = 0)
+    static public function getLikeOrderReferenceByCreateDate($orderReference, $limit = 0, $offset = 0, $withNestedElements = true)
     {
-        return self::generateReturnsFromDBResult(Db::getInstance()->executeS(self::findLikeOrderIdByCreateDateQuery($orderReference, $limit, $offset)));
+        return self::generateReturnsFromDBResult(Db::getInstance()->executeS(self::findLikeOrderIdByCreateDateQuery($orderReference, $limit, $offset)), $withNestedElements);
     }
 
     static public function getCountLikeOrderReferenceByCreateDate($orderReference)
@@ -212,9 +212,9 @@ class SRBShipback extends LibShipback implements PSElementInterface
         return self::getCountOfQuery(self::findLikeOrderIdByCreateDateQuery($orderReference));
     }
 
-    static public function getLikeCustomerByCreateDate($customer, $limit = 0, $offset = 0)
+    static public function getLikeCustomerByCreateDate($customer, $limit = 0, $offset = 0, $withNestedElements = true)
     {
-        return self::generateReturnsFromDBResult(Db::getInstance()->executeS(self::findLikeCustomerByCreateDateQuery($customer, $limit, $offset)));
+        return self::generateReturnsFromDBResult(Db::getInstance()->executeS(self::findLikeCustomerByCreateDateQuery($customer, $limit, $offset)), $withNestedElements);
     }
 
     static public function getCountLikeCustomerByCreateDate($customer)
@@ -270,12 +270,12 @@ class SRBShipback extends LibShipback implements PSElementInterface
         }
     }
 
-    static private function generateReturnsFromDBResult($shipbacksFromDB)
+    static private function generateReturnsFromDBResult($shipbacksFromDB, $withNestedElements = true)
     {
         $shipbacks = [];
         foreach ($shipbacksFromDB as $key => $shipback) {
-            $shipback['order'] = SRBOrder::createFromShipback($shipback);
-            $shipbacks[] = new self($shipback);
+            $shipback['order'] = SRBOrder::createFromShipback($shipback, $withNestedElements);
+            $shipbacks[] = new self($shipback, $withNestedElements);
         }
 
         return $shipbacks;

@@ -16,7 +16,7 @@
             </div>
         </div>
 
-        <div id="item-list">
+        <div id="element-list">
             <table class="table">
                 <thead>
                     <tr>
@@ -25,14 +25,14 @@
                             {l s="return.customer" mod='shoprunback'}
                             <form action="{$actionUrl}" method="POST">
                                 <input type="text" name="customer" placeholder="{l s='form.placeholder' mod='shoprunback'}" value="{$searchCustomer}" autocomplete="off" />
-                                <a href="{$srbManager}&itemType={$itemType}" class="btn btn-default">{l s='form.clear' mod='shoprunback'}</a>
+                                <a href="{$srbManager}&elementType={$elementType}" class="btn btn-default">{l s='form.clear' mod='shoprunback'}</a>
                             </form>
                         </th>
                         <th>
                             {l s='order.id' mod='shoprunback'}
                             <form action="{$actionUrl}" method="POST">
                                 <input type="text" min="0" name="orderReference" placeholder="{l s='form.placeholder' mod='shoprunback'}" value="{$searchOrderReference}" autocomplete="off" />
-                                <a href="{$srbManager}&itemType={$itemType}" class="btn btn-default">{l s='form.clear' mod='shoprunback'}</a>
+                                <a href="{$srbManager}&elementType={$elementType}" class="btn btn-default">{l s='form.clear' mod='shoprunback'}</a>
                             </form>
                         </th>
                         <th>{l s='return.state' mod='shoprunback'}</th>
@@ -41,19 +41,19 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {if count($items) > 0}
-                        {foreach from=$items key=id item=item}
-                            <tr data-id="{$item->getReference()}">
-                                <td><a href="{$externalLink}{$item->getReference()}" target="_blank"><b>{$item->getName()}</b></a></td>
-                                <td>{$item->order->customer->first_name} {$item->order->customer->last_name}</td>
-                                <td>{$item->order_id}</td>
+                    {if count($elements) > 0}
+                        {foreach from=$elements key=id item=element}
+                            <tr data-id="{$element->getReference()}">
+                                <td><a href="{$externalLink}{$element->getReference()}" target="_blank"><b>{$element->getName()}</b></a></td>
+                                <td>{$element->order->customer->first_name} {$element->order->customer->last_name}</td>
+                                <td>{$element->order_id}</td>
                                 <td>
-                                    <a href="{$externalLink}{$item->getReference()}" target="blank">
-                                        <span class="badge badge-default {$item->state}">{$item->state|capitalize}</span>
+                                    <a href="{$externalLink}{$element->getReference()}" target="blank">
+                                        <span class="badge badge-default {$element->state}">{$element->state|capitalize}</span>
                                     </a>
                                 </td>
-                                <td>{$item->created_at}</td>
-                                <td><a href="{$externalLink}{$item->getReference()}" target="_blank"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a></td>
+                                <td>{$element->created_at}</td>
+                                <td><a href="{$externalLink}{$element->getReference()}" target="_blank"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a></td>
                             </tr>
                         {/foreach}
                     {else}

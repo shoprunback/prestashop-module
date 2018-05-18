@@ -222,7 +222,7 @@ class ShopRunBack extends Module
     // Redirect to configuration page
     public function getContent()
     {
-        Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminShoprunback') . '&itemType=config');
+        Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminShoprunback') . '&elementType=config');
     }
 
     public function hookNewOrder ($params)
