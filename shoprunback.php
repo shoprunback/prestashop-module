@@ -51,7 +51,7 @@ class ShopRunBack extends Module
         // Mandatory parameters
         $this->name = 'shoprunback';
         $this->author = 'ShopRunBack';
-        $this->version = '1.0.4';
+        $this->version = '1.0.5';
         $this->ps_versions_compliancy = array('min' => '1.6.0.9');
         $this->tab = 'administration';
         $this->tabs = [
@@ -324,15 +324,12 @@ class ShopRunBack extends Module
                 // To work everywhere, we must have something like 'shipback?orderId=ID', and not 'shipback&orderId=ID'
                 $this->context->smarty->assign(
                     'createReturnLink',
-                    str_replace('shipback', 'shipback?orderId=' . $order->getDBId(), $this->context->link->getModuleLink('shoprunback', 'shipback', []))
+                    str_replace('shipback', 'shipback?orderId=' . $order->getDBId() . '&action=asyncCreateShipback', $this->context->link->getModuleLink('shoprunback', 'shipback', []))
                 );
                 $this->context->smarty->assign('srborder', $order);
 
                 $shipback = SRBShipback::getByOrderIdIfExists($_GET['id_order']);
                 $this->context->smarty->assign('shipback', $shipback);
-
-                $srbwebhookLink = $this->webhookUrl;
-                $this->context->smarty->assign('webhookLink', $srbwebhookLink);
 
                 return $this->display(__FILE__, 'orderDetail.tpl');
             } catch (OrderException $e) {
@@ -345,6 +342,7 @@ class ShopRunBack extends Module
     {
         $this->context->controller->addCSS($this->SRBModulePath . '/views/css/srbGlobal.css');
         $this->context->controller->addCSS($this->SRBModulePath . '/views/css/front/orderDetail.css');
+        $this->context->controller->addJs($this->SRBModulePath . '/views/js/front/orderDetail.js');
     }
 
     public function hookDisplayBackOfficeHeader() {

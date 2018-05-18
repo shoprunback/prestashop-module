@@ -106,16 +106,23 @@ class SRBShipback extends LibShipback implements PSElementInterface
             'public_url' => ''
         ];
         $srbShipback = new self($psReturn);
-        $result = $srbShipback->sync();
+
+        try {
+            $result = $srbShipback->sync();
+        } catch (\Shoprunback\Error\Error $e) {
+            SRBLogger::addLog('Could not create Shipback on ShopRunBack for order ' . $orderId . '. Object: ' . json_encode($srbShipback) . '. |||| Response: ' . json_encode($e), SRBLogger::FATAL, self::getObjectTypeForMapping());
+            return false;
+        }
 
         if (!is_null($result)) {
-            SRBLogger::addLog('Could not create Shipback on ShopRunBack for order ' . $orderId . '. Response: ' . json_encode($result), SRBLogger::FATAL, self::getObjectTypeForMapping());
+            SRBLogger::addLog('Could not create Shipback on ShopRunBack for order ' . $orderId . '. Object: ' . json_encode($srbShipback) . '. |||| Response: ' . json_encode($result), SRBLogger::FATAL, self::getObjectTypeForMapping());
+            return $result;
         } else {
             $srbShipback->id_srb_shipback = $srbShipback->id;
             $srbShipback->insertOnPS();
         }
 
-        return $result;
+        return $srbShipback;
     }
 
     public function insertOnPS()
