@@ -33,7 +33,6 @@ $_MODULE['<{shoprunback}prestashop>srbmanager_5f1cb29a89300688965f8c1962dbf59d']
 $_MODULE['<{shoprunback}prestashop>srbmanager_2bb7bdf609eb9be4c89e6616cb56ba85'] = 'You have no brand yet';
 $_MODULE['<{shoprunback}prestashop>srbmanager_7d32a25861b1e091c440f3462c774ffb'] = 'You have no product yet';
 $_MODULE['<{shoprunback}prestashop>srbmanager_6e081a4fc1464aa0fe275ae3ee8fa57d'] = 'You have no return yet';
-$_MODULE['<{shoprunback}prestashop>productmainleftmiddle_49bb9b738e2960d620e4ecfa82aca317'] = 'ShopRunBack links each product with a brand. If you don\'t attach a product to a brand, it will be attached to a default brand on ShopRunBack\'s platform.';
 $_MODULE['<{shoprunback}prestashop>brand_d8101faeafeb857c26a1aa832374f20a'] = 'My brands';
 $_MODULE['<{shoprunback}prestashop>brand_ca69e7227610e37cf051265a9e0415ba'] = 'Synchronize all';
 $_MODULE['<{shoprunback}prestashop>brand_e966757a696b5c1c158821c6ffd5e036'] = 'Synchronize New only';
@@ -80,6 +79,6 @@ $_MODULE['<{shoprunback}prestashop>orderdetail_16f631de0dc61dd8cb26fbcfaa8ccaf8'
 $_MODULE['<{shoprunback}prestashop>orderdetail_aa2cd42a65735cb81115d87a59180aab'] = 'You can return them';
 $_MODULE['<{shoprunback}prestashop>orderdetail_1443ca477a42209de2a8a35349b560ee'] = 'here';
 $_MODULE['<{shoprunback}prestashop>orderdetail_f8d1a0fbd5de7a6b78d958a2d4bfa123'] = 'Check your return demand';
-$_MODULE['<{shoprunback}prestashop>orderdetail_8cbfc6f2dcdda5c601a2a39e44b747d1'] = 'A new tab will open to do your return demand.';
-$_MODULE['<{shoprunback}prestashop>orderdetail_90f10fe764a4057e6510a42228d9f5a5'] = 'Later';
+$_MODULE['<{shoprunback}prestashop>orderdetail_8cbfc6f2dcdda5c601a2a39e44b747d1'] = 'You will be redirected to fill your return demand.';
+$_MODULE['<{shoprunback}prestashop>orderdetail_90f10fe764a4057e6510a42228d9f5a5'] = 'Cancel';
 $_MODULE['<{shoprunback}prestashop>orderdetail_d2313e8e7f9ba99c4c85503db9f76bff'] = 'OK';
