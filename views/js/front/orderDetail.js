@@ -1,16 +1,18 @@
+function toggleModal() {
+  if ($('#modal').css('display') === 'flex') {
+    $('#modal').css('display', 'none');
+  } else {
+    $('#modal').css('display', 'flex');
+  }
+}
+
 function createShopRunBackReturn(createReturnLink) {
   $.ajax({
     url: createReturnLink,
     method: 'POST',
     dataType: 'json',
-    success: function (urls) {
-      $('.external-link').attr('href', urls.shipbackPublicUrl);
-      $('.cancel').attr('href', urls.redirectUrl);
-      $('#modal').css('display', 'flex');
-
-      $('.external-link').on('click', function () {
-        window.location.href = urls.redirectUrl;
-      });
+    success: function (shipbackPublicUrl) {
+      window.location.href = shipbackPublicUrl;
     },
     error: function (xhr) {
       window.location.href = xhr.responseText;
