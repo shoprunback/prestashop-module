@@ -13,24 +13,20 @@
 }
 
 #modal {
-  position: fixed;
   display: none;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   top: 0;
   left: 0;
   height: 100%;
   width: 100%;
-  background-color: rgba(0, 0, 0, 0.2);
 }
 
 #modal .content {
   min-height: 150px;
   width: 500px;
   padding: 20px;
-
-  background-color: #FFFFFF;
+  margin: auto;
   text-align: center;
 }
 
@@ -42,6 +38,7 @@
   height: auto;
   width: auto;
   margin-right: 20px;
+  background: none !important;
   background-color: #f3a035 !important;
   color: #FFFFFF;
 }
@@ -60,3 +57,4 @@
   border: none;
   min-width: 200px;
 }
+

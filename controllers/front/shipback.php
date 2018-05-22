@@ -37,10 +37,7 @@ class ShopRunBackShipbackModuleFrontController extends ModuleFrontController
             return false;
         }
 
-        echo json_encode([
-            'shipbackPublicUrl' => $shipback->public_url,
-            'redirectUrl' => $redirectUrl
-        ]);
+        echo $shipback->public_url;
         return true;
     }
 }
