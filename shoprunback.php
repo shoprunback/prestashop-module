@@ -3,15 +3,21 @@ if (! defined('_PS_VERSION_')) {
     exit;
 }
 
-define ('PRODUCTION_MODE', Configuration::get('production'));
-define ('DASHBOARD_URL', getenv('DASHBOARD_URL') ? getenv('DASHBOARD_URL') : (PRODUCTION_MODE ? 'https://dashboard.shoprunback.com' : 'https://sandbox.dashboard.shoprunback.com'));
-define ('DASHBOARD_PROD_URL', 'https://dashboard.shoprunback.com');
+include_once 'lib/shoprunback-php/init.php';
 
-if (getenv('DASHBOARD_URL')) {
-    error_reporting(E_ALL ^ E_DEPRECATED);
+define ('PRODUCTION_MODE', Configuration::get('production'));
+define ('DASHBOARD_PROD_URL', \Shoprunback\RestClient::getClient()->getProductionUrl());
+
+\Shoprunback\RestClient::getClient()->setToken(Configuration::get('srbtoken'));
+// We set the production environment by default
+\Shoprunback\RestClient::getClient()->useProductionEnvironment();
+
+// Then we check which environment we are on and switch to Sandbox if needed
+if (!PRODUCTION_MODE) {
+    \Shoprunback\RestClient::getClient()->useSandboxEnvironment();
 }
 
-include_once 'lib/shoprunback-php/init.php';
+define ('DASHBOARD_URL', \Shoprunback\RestClient::getClient()->getApiBaseUrl());
 
 include_once 'classes/ElementMapper.php';
 include_once 'classes/Util.php';
@@ -35,9 +41,6 @@ include_once 'exceptions/BrandException.php';
 include_once 'exceptions/ProductException.php';
 include_once 'exceptions/ShipbackException.php';
 include_once 'sqlQueries.php';
-
-\Shoprunback\RestClient::getClient()->setToken(Configuration::get('srbtoken'));
-\Shoprunback\RestClient::getClient()->setApiBaseUrl(DASHBOARD_URL);
 
 class ShopRunBack extends Module
 {
