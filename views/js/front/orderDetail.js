@@ -1,8 +1,10 @@
 function toggleModal() {
-  if ($('#modal').css('display') === 'flex') {
+  if ($('#modal').css('display') === 'block') {
     $('#modal').css('display', 'none');
+    $('#request').css('display', 'block');
   } else {
-    $('#modal').css('display', 'flex');
+    $('#modal').css('display', 'block');
+    $('#request').css('display', 'none');
   }
 }
 

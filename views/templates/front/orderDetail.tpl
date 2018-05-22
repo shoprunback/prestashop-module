@@ -1,5 +1,5 @@
 <section class="box" id="order-detail">
-    <h1>
+    <h1 id="request">
         {if !$shipback}
             {l s='front.order.detail.title' mod='shoprunback'}<br>
 
@@ -9,9 +9,7 @@
             <a href="{$shipback->public_url}" target="_blank">{l s='front.order.detail.returned' mod='shoprunback'}</a>
         {/if}
     </h1>
-</section>
 
-{if !$shipback}
     <div id="modal">
         <div class="content">
             <h2>{l s='front.order.detail.modal.title' mod='shoprunback'}</h2>
@@ -27,4 +25,4 @@
             </div>
         </div>
     </div>
-{/if}
+</section>
