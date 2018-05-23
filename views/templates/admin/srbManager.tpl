@@ -2,7 +2,7 @@
     var asyncCall = '{$asyncCall}';
     var elementType = '{$elementType}';
     var token = '{$srbtoken}';
-    var loadingMessage = "{l s='manager.loading; mod='shoprunback'}";
+    var loadingMessage = "{l s='manager.loading' mod='shoprunback'}";
 </script>
 
 <div id="srb-manager">
