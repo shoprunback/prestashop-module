@@ -1,4 +1,7 @@
 <?php
+// Use this class to record important infos to show to the user
+// Especially the ones you can register but cannot display directly
+// Ex: When the user deletes a product already ordered, it is deleted on PS but cannot be deleted on SRB, so we register the error
 class SRBNotification
 {
     const NOTIFICATION_TABLE_NAME_NO_PREFIX = 'shoprunback_notification';
