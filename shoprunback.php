@@ -35,6 +35,7 @@ include_once 'classes/SRBProduct.php';
 include_once 'classes/SRBShipback.php';
 
 include_once 'classes/SRBLogger.php';
+include_once 'classes/SRBNotification.php';
 include_once 'exceptions/ConfigurationException.php';
 include_once 'exceptions/OrderException.php';
 include_once 'exceptions/BrandException.php';
@@ -203,6 +204,7 @@ class ShopRunBack extends Module
             $queries[] = createIndexQuery();
         }
 
+        $queries[] = createNotificationTableQuery();
         $queries[] = createReturnTableQuery();
         $queries[] = enableReturns();
 
@@ -214,6 +216,7 @@ class ShopRunBack extends Module
         $queries = [];
 
         $queries[] = dropTableQuery();
+        $queries[] = dropNotificationTableQuery();
         $queries[] = dropReturnTableQuery();
 
         return $this->executeQueries($queries);
@@ -293,21 +296,28 @@ class ShopRunBack extends Module
                     SRBProduct::getObjectTypeForMapping())
                 );
             } catch (Exception $e) {
+                $notification = new SRBNotification();
+                $notification->severity = SRBLogger::FATAL;
+                $notification->objectType = SRBProduct::getObjectTypeForMapping();
+                $notification->objectId = $params['product']->id;
+
                 if (is_a($e, 'Shoprunback\Error\RestClientError')) {
-                    switch ($e->getCode()) {
+                    switch ($e->httpStatus) {
                         case 403:
-                            SRBLogger::addLog($this->l('module.product.ordered'), SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $params['product']->id);
+                            $notification->message = $this->l('module.product.ordered');
                             break;
                         case 404:
-                            SRBLogger::addLog($this->l('module.product.unknown'), SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $params['product']->id);
+                            $notification->message = $this->l('module.product.unknown');
                             break;
                         default:
-                            SRBLogger::addLog($e->getMessage(), SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $params['product']->id);
+                            $notification->message = $e->getMessage();
                             break;
                     }
                 } else {
-                    SRBLogger::addLog(json_encode($e->getMessage()), SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $params['product']->id);
+                    $notification->message = $e->getMessage();
                 }
+
+                $notification->save();
 
                 return;
             }
