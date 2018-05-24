@@ -5,6 +5,10 @@
   padding-bottom: 20px;
 }
 
+#srb-content .notifications h4 {
+  margin-left: 30px;
+}
+
 .srb-button {
   padding: 10px;
   color: white !important;

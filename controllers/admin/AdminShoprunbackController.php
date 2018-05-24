@@ -114,6 +114,13 @@ class AdminShoprunbackController extends ModuleAdminController
             $this->getElements($elementType);
         }
 
+        $notifications = SRBNotification::allUnread();
+        if ($notifications) {
+            $this->context->smarty->assign('notifications', $notifications);
+            $this->context->smarty->assign('putNotificationUrl', $this->tabUrl . '&action=markAsReadNotification');
+            $this->addJs(_PS_MODULE_DIR_ . $this->module->name . '/views/js/admin/notifications.js');
+        }
+
         $this->context->smarty->assign('srbtoken', RestClient::getClient()->getToken());
         $this->context->smarty->assign('shoprunbackURL', $this->module->url);
         $this->context->smarty->assign('shoprunbackURLProd', $this->module->urlProd);
@@ -216,6 +223,11 @@ class AdminShoprunbackController extends ModuleAdminController
     public function asyncCall()
     {
         require_once($this->module->SRBModulePath . '/asyncCall.php');
+    }
+
+    public function markAsReadNotification()
+    {
+        return SRBNotification::markAsReadById($_POST['id']);
     }
 
     public function exportLogs()

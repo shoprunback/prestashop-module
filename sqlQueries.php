@@ -22,6 +22,19 @@ function createTableQuery() {
     )';
 }
 
+function createNotificationTableQuery() {
+    return 'CREATE TABLE IF NOT EXISTS ' . SRBNotification::getNotificationFullTableName() . '(
+        `id_srb_notification` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        `message` VARCHAR(1000) NOT NULL,
+        `severity` VARCHAR(20) NOT NULL,
+        `object_type` VARCHAR(40),
+        `object_id` INT(11),
+        `read` BOOLEAN DEFAULT false,
+        `created_at` DATETIME NOT NULL,
+        `updated_at` DATETIME NOT NULL
+    )';
+}
+
 function createReturnTableQuery() {
     return 'CREATE TABLE IF NOT EXISTS ' . SRBShipback::getShipbackTableName() . '(
         `id_srb_shipback` VARCHAR(40) NOT NULL PRIMARY KEY,
@@ -35,6 +48,10 @@ function createReturnTableQuery() {
 
 function dropTableQuery() {
     return 'DROP TABLE ' . ElementMapper::getMapperTableName();
+}
+
+function dropNotificationTableQuery() {
+    return 'DROP TABLE ' . SRBNotification::getNotificationFullTableName();
 }
 
 function dropReturnTableQuery() {
