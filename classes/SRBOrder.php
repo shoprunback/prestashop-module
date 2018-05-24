@@ -24,6 +24,11 @@ class SRBOrder extends LibOrder implements PSElementInterface
     }
 
     // Inherited functions
+    public static function getTableWithoutPrefix()
+    {
+        return 'orders';
+    }
+
     public static function getTableName()
     {
         return 'o';

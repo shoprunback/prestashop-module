@@ -33,3 +33,4 @@ upload/
 psysh
 /lib/*
 composer.lock
+*.zip

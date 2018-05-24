@@ -27,9 +27,14 @@ class SRBShipback extends LibShipback implements PSElementInterface
     }
 
     // Inherited functions
+    public static function getTableWithoutPrefix()
+    {
+        return 'shoprunback_shipback';
+    }
+
     public static function getTableName()
     {
-        return 'srbr';
+        return 'srbs';
     }
 
     static public function getIdColumnName()

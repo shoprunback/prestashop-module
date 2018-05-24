@@ -18,7 +18,12 @@ class SRBAddress extends LibAddress implements PSInterface
     }
 
     // Inherited functions
-    public static function getTableName()
+    static public function getTableWithoutPrefix()
+    {
+        return 'address';
+    }
+
+    static public function getTableName()
     {
         return 'a';
     }
