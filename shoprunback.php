@@ -346,7 +346,12 @@ class ShopRunBack extends Module
 
                 return $this->display(__FILE__, 'orderDetail.tpl');
             } catch (OrderException $e) {
-                return $e;
+                SRBLogger::addLog(
+                    'Error on OrderDetail: Order ' . $_GET['id_order'] . ' not found. It may not have been synchronized.',
+                    SRBLogger::ERROR,
+                    SRBOrder::getObjectTypeForMapping(),
+                    $_GET['id_order']
+                );
             }
         }
     }
