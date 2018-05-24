@@ -3,8 +3,8 @@
 global $_MODULE;
 $_MODULE = array();
 $_MODULE['<{shoprunback}prestashop>shoprunback_bb4768ee80af89876784e903eebc5f40'] = 'Shoprunback vous aide en enregistrant tout changement sur vos produits, modification, ajout, ou suppression';
-$_MODULE['<{shoprunback}prestashop>shoprunback_8ff63b277c7cd76096e7e03431f51c3f'] = 'Etes vous sur de vouloir supprimer Shoprunback';
-$_MODULE['<{shoprunback}prestashop>shoprunback_c1cb739244a004fa49e483928f4285f2'] = 'Le produit n\'as pas pu être supprimé car il appartient déja à une commande sur ShopRunBack';
+$_MODULE['<{shoprunback}prestashop>shoprunback_8ff63b277c7cd76096e7e03431f51c3f'] = 'Êtes-vous sur de vouloir supprimer Shoprunback';
+$_MODULE['<{shoprunback}prestashop>shoprunback_c1cb739244a004fa49e483928f4285f2'] = 'Le produit n\'a pas pu être supprimé car il appartient déja à une commande sur ShopRunBack';
 $_MODULE['<{shoprunback}prestashop>shoprunback_5af91ecbb1dbe469a5b9c709b4530aef'] = 'Le produit n\'a pas été trouvé dans la base de données de ShopRunBack';
 $_MODULE['<{shoprunback}prestashop>config_fa152001a93f98c22968c049e24e27da'] = 'Mon compte';
 $_MODULE['<{shoprunback}prestashop>config_16e9156649c34924256fd75ef27f6a3f'] = 'Si vous changez votre jeton d\'authentification d\'API ou changez d\'environnement, la synchronisation sera remise à zéro.';
