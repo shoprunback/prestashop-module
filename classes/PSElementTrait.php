@@ -233,16 +233,16 @@ trait PSElementTrait
             $countItemsByReference = count($itemsByReference);
             if ($countItemsByReference > 1) {
                 for ($i = 1; $i < $countItemsByReference; $i++) {
-                    $itemsByReference[$i]->reference = $itemsByReference[$i]->reference . '_' . $i;
+                    $itemsByReference[$i]->reference = $itemsByReference[$i]->reference . '_' . (microtime(true) * 10000);
                     $itemsByReference[$i]->updateLocally();
                     if ($itemsByReference[$i]->getDBId() != $this->getDBId()) {
                         try {
                             $itemsByReference[$i]->sync();
-                        } catch (ProductException $e) {
+                        } catch (\Shoprunback\Error $e) {
                             return $e;
                         }
                     }
-                    // TODO add SRBNotification to tell the user he had many products with the same reference so some have been changed
+                    //TODO add SRBNotification to tell the user he had many products with the same reference so some have been changed
                 }
             }
         }
