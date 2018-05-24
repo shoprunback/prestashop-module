@@ -227,7 +227,7 @@ trait PSElementTrait
         SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
 
         // To manage product duplication
-        //TODO generalize (when needed)
+        //TODO generalize to other Elements
         if (static::getObjectTypeForMapping() === 'product') {
             $itemsByReference = static::getManyByIdentifier($this->getReference());
             $countItemsByReference = count($itemsByReference);
