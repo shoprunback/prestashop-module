@@ -250,6 +250,28 @@ trait PSElementTrait
 
         $this->syncNestedElements();
 
+        // To manage product duplication
+        //TODO generalize to other Elements
+        if (static::getObjectTypeForMapping() === 'product') {
+            $itemsByReference = static::getManyByIdentifier($this->getReference());
+            $countItemsByReference = count($itemsByReference);
+
+            if ($countItemsByReference > 1) {
+                for ($i = 1; $i < $countItemsByReference; $i++) {
+                    $itemsByReference[$i]->reference = $itemsByReference[$i]->reference . '_' . (microtime(true) * 10000);
+                    $itemsByReference[$i]->updateLocally();
+                    if ($itemsByReference[$i]->getDBId() != $this->getDBId()) {
+                        try {
+                            $itemsByReference[$i]->sync();
+                        } catch (\Shoprunback\Error $e) {
+                            return $e;
+                        }
+                    }
+                    //TODO add SRBNotification to tell the user he had many products with the same reference so some have been changed
+                }
+            }
+        }
+
         try {
             $result = $this->save();
             $this->mapApiCall();
@@ -269,5 +291,24 @@ trait PSElementTrait
         }
 
         return $responses;
+    }
+
+    static public function getManyByIdentifier($identifier)
+    {
+        $sql = static::findAllQuery();
+        $sql->where(static::getTableName() . '.' . static::getIdentifier() . ' = "' . pSQL($identifier) . '"');
+        $sql->orderBy(static::getTableIdentifier() . ' ASC');
+
+        return self::convertPSArrayToElements(Db::getInstance()->executeS($sql));
+    }
+
+    public function updateLocally()
+    {
+        // TODO generalize
+        return Db::getInstance()->update(
+            static::getTableWithoutPrefix(),
+            ['reference' => $this->reference], // (For instance this function is only used in case of product duplication where we need to change the reference)
+            static::getIdColumnName() . ' = "' . $this->getDBId() . '"'
+        );
     }
 }

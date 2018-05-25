@@ -9,6 +9,7 @@ define ('PRODUCTION_MODE', Configuration::get('production'));
 define ('DASHBOARD_PROD_URL', \Shoprunback\RestClient::getClient()->getProductionUrl());
 
 \Shoprunback\RestClient::getClient()->setToken(Configuration::get('srbtoken'));
+\Shoprunback\RestClient::getClient()->setCustomHeader(['Prestashop-Version: ' . _PS_VERSION_]);
 // We set the production environment by default
 \Shoprunback\RestClient::getClient()->useProductionEnvironment();
 
@@ -346,7 +347,12 @@ class ShopRunBack extends Module
 
                 return $this->display(__FILE__, 'orderDetail.tpl');
             } catch (OrderException $e) {
-                return $e;
+                SRBLogger::addLog(
+                    'Error on OrderDetail: Order ' . $_GET['id_order'] . ' not found. It may not have been synchronized.',
+                    SRBLogger::ERROR,
+                    SRBOrder::getObjectTypeForMapping(),
+                    $_GET['id_order']
+                );
             }
         }
     }

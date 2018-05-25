@@ -32,6 +32,11 @@ class SRBProduct extends LibProduct implements PSElementInterface
     }
 
     // Inherited functions
+    public static function getTableWithoutPrefix()
+    {
+        return 'product';
+    }
+
     public static function getTableName()
     {
         return 'p';

@@ -17,6 +17,11 @@ class SRBCustomer extends LibCustomer implements PSInterface
     }
 
     // Inherited functions
+    public static function getTableWithoutPrefix()
+    {
+        return 'customer';
+    }
+
     public static function getTableName()
     {
         return 'c';
