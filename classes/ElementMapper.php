@@ -174,7 +174,6 @@ class ElementMapper
 
     static public function truncateTable()
     {
-        $sql = 'TRUNCATE TABLE ' . self::getMapperTableName();
-        Db::getInstance()->execute($sql);
+        Db::getInstance()->execute('TRUNCATE TABLE ' . self::getMapperTableName());
     }
 }

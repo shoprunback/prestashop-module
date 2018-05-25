@@ -283,7 +283,6 @@ class SRBShipback extends LibShipback implements PSElementInterface
 
     static public function truncateTable()
     {
-        $sql = 'TRUNCATE TABLE ' . self::getShipbackTableName();
-        Db::getInstance()->execute($sql);
+        Db::getInstance()->execute('TRUNCATE TABLE ' . self::getShipbackTableName());
     }
 }

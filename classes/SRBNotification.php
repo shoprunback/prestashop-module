@@ -139,4 +139,9 @@ class SRBNotification
             'read' => true
         ], self::getIdColumnName() . ' = ' . $id);
     }
+
+    static public function truncateTable()
+    {
+        Db::getInstance()->execute('TRUNCATE TABLE ' . self::getNotificationFullTableName());
+    }
 }

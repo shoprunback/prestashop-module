@@ -53,6 +53,7 @@ class AdminShoprunbackController extends ModuleAdminController
         if ($oldSrbToken != '' && $oldSrbToken != RestClient::getClient()->getToken()) {
             ElementMapper::truncateTable();
             SRBShipback::truncateTable();
+            SRBNotification::truncateTable();
         }
 
         Configuration::updateValue('srbtoken', $srbtoken);
@@ -67,6 +68,7 @@ class AdminShoprunbackController extends ModuleAdminController
         if ($currentProductionMode != Tools::getValue('production')) {
             ElementMapper::truncateTable();
             SRBShipback::truncateTable();
+            SRBNotification::truncateTable();
         }
 
         // If the application goes to production mode, the PS returns' system must be turned off
