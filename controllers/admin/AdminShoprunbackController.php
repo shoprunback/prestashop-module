@@ -123,7 +123,7 @@ class AdminShoprunbackController extends ModuleAdminController
         if ($notifications) {
             $this->context->smarty->assign('notifications', $notifications);
             $this->context->smarty->assign('putNotificationUrl', $this->tabUrl . '&action=markAsReadNotification');
-            $this->addJs(_PS_MODULE_DIR_ . $this->module->name . '/views/js/admin/notifications.js');
+            $this->addJs(_PS_MODULE_DIR_ . $this->module->name . '/views/js/admin/notification.js');
         }
 
         $this->context->smarty->assign('srbtoken', RestClient::getClient()->getToken());
