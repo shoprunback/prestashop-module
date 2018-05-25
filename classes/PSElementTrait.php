@@ -218,13 +218,37 @@ trait PSElementTrait
         ];
         $map = new ElementMapper($data);
         $map->save();
+    }
 
-        // TODO recursive mapApiCall()
+    public function syncNestedElements()
+    {
+        foreach ($this->getAllNestedElements() as $key => $value) {
+            if (is_array($value)) {
+                foreach ($value as $k => $v) {
+                    $this->$key[$k] = self::syncNestedElement($v);
+                }
+            } else {
+                $this->$key = self::syncNestedElement($value);
+            }
+        }
+    }
+
+    public static function syncNestedElement($element)
+    {
+        if ($element instanceof PSElementInterface) {
+            $element->sync();
+        } else {
+            $element->syncNestedElements();
+        }
+
+        return $element;
     }
 
     public function sync()
     {
         SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
+
+        $this->syncNestedElements();
 
         try {
             $result = $this->save();
