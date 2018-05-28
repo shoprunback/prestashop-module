@@ -74,7 +74,8 @@ class ShopRunBack extends Module
 
         global $classTranslations;
         $classTranslations = [
-            'productDuplicationNotification' => $this->l('product.duplication.notification')
+            'productDuplicationNotification'    => $this->l('product.duplication.notification'),
+            'brandDuplicationNotification'      => $this->l('brand.duplication.notification'),
         ];
 
         // Custom parameters

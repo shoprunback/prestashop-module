@@ -10,7 +10,7 @@ class SRBBrand extends LibBrand implements PSElementInterface
     {
         $this->ps = $manufacturer;
         $this->name = $manufacturer['name'];
-        $this->reference = str_replace(' ', '-', $manufacturer['name']);
+        $this->resetIdentifier();
 
         if ($srbId = $this->getMapId()) {
             parent::__construct($srbId);
@@ -40,6 +40,11 @@ class SRBBrand extends LibBrand implements PSElementInterface
         return 'reference';
     }
 
+    static public function getPreIdentifier()
+    {
+        return 'name';
+    }
+
     static public function getDisplayNameAttribute()
     {
         return 'name';
@@ -53,6 +58,11 @@ class SRBBrand extends LibBrand implements PSElementInterface
     static public function getPathForAPICall()
     {
         return 'brands';
+    }
+
+    public function resetIdentifier()
+    {
+        $this->reference = str_replace(' ', '-', $this->name);
     }
 
     static public function findAllQuery($limit = 0, $offset = 0)

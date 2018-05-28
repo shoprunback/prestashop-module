@@ -52,6 +52,11 @@ class SRBProduct extends LibProduct implements PSElementInterface
         return 'reference';
     }
 
+    static public function getPreIdentifier()
+    {
+        return 'reference';
+    }
+
     static public function getDisplayNameAttribute()
     {
         return 'label';
@@ -65,6 +70,11 @@ class SRBProduct extends LibProduct implements PSElementInterface
     static public function getPathForAPICall()
     {
         return 'products';
+    }
+
+    public function resetIdentifier()
+    {
+        $this->reference = str_replace(' ', '-', $this->reference);
     }
 
     static public function findAllQuery($limit = 0, $offset = 0)
@@ -164,37 +174,5 @@ class SRBProduct extends LibProduct implements PSElementInterface
         $sql->where(SRBOrder::getTableName() . '.id_order = ' . pSQL($orderId));
 
         return $sql;
-    }
-
-    public function checkDuplicates()
-    {
-        $itemsByReference = static::getManyByIdentifier($this->getReference());
-        $countItemsByReference = count($itemsByReference);
-
-        if ($countItemsByReference > 1) {
-            global $classTranslations;
-
-
-            for ($i = 1; $i < $countItemsByReference; $i++) {
-                $itemsByReference[$i]->reference = $itemsByReference[$i]->reference . '_' . $itemsByReference[$i]->getDBId();
-                $itemsByReference[$i]->updateLocally();
-
-                if ($itemsByReference[$i]->getDBId() != $this->getDBId()) {
-                    try {
-                        $itemsByReference[$i]->sync();
-                    } catch (\Shoprunback\Error $e) {
-                        return $e;
-                    }
-                }
-
-                $notification = new SRBNotification();
-                $notification->severity = SRBLogger::FATAL;
-                $notification->objectType = SRBProduct::getObjectTypeForMapping();
-                $notification->objectId = $itemsByReference[$i]->getDBId();
-                $notification->message = $classTranslations['productDuplicationNotification'] . ' ' . $itemsByReference[$i]->label;
-                $notification->save();
-            }
-
-        }
     }
 }

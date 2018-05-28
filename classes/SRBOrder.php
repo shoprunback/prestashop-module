@@ -44,6 +44,11 @@ class SRBOrder extends LibOrder implements PSElementInterface
         return 'order_number';
     }
 
+    static public function getPreIdentifier()
+    {
+        return 'order_number';
+    }
+
     static public function getDisplayNameAttribute()
     {
         return 'order_number';

@@ -6,4 +6,5 @@ interface PSInterface
     static function getTableName();
     static function getIdColumnName();
     static function getIdentifier();
+    static function getPreIdentifier(); // The attribute used to create the Identifier
 }

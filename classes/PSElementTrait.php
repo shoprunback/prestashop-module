@@ -250,9 +250,8 @@ trait PSElementTrait
 
         $this->syncNestedElements();
 
-        // To manage product duplication
-        //TODO generalize to other Elements
-        if (static::getObjectTypeForMapping() === 'product') {
+        // To manage product duplication and brands with same name
+        if (static::canHaveDuplicates()) {
             $this->checkDuplicates();
         }
 
@@ -277,22 +276,82 @@ trait PSElementTrait
         return $responses;
     }
 
-    static public function getManyByIdentifier($identifier)
+    static public function getManyByPreIdentifier($preIdentifier)
     {
         $sql = static::findAllQuery();
-        $sql->where(static::getTableName() . '.' . static::getIdentifier() . ' = "' . pSQL($identifier) . '"');
+        $sql->where(static::getTableName() . '.' . static::getPreIdentifier() . ' = "' . pSQL($preIdentifier) . '"');
         $sql->orderBy(static::getTableIdentifier() . ' ASC');
 
         return self::convertPSArrayToElements(Db::getInstance()->executeS($sql));
     }
 
-    public function updateLocally()
+    // $updates must be an associative array, the key being the column in the DB and the value the associated value
+    public function updateLocally($updates = [])
     {
-        // TODO generalize
-        return Db::getInstance()->update(
+        if (empty($updates)) return true;
+
+        $result = Db::getInstance()->update(
             static::getTableWithoutPrefix(),
-            ['reference' => $this->reference], // (For instance this function is only used in case of product duplication where we need to change the reference)
+            $updates,
             static::getIdColumnName() . ' = "' . $this->getDBId() . '"'
         );
+
+        // Security if the reference field has been updated
+        $this->resetIdentifier();
+
+        return $result;
+    }
+
+    public static function canHaveDuplicates()
+    {
+        return in_array(static::getObjectTypeForMapping(), ['product', 'brand']);
+    }
+
+    public function checkDuplicates()
+    {
+        if (!static::canHaveDuplicates()) return false;
+
+        $itemsByReference = static::getManyByPreIdentifier($this->{static::getPreIdentifier()});
+        $countItemsByReference = count($itemsByReference);
+
+        if ($countItemsByReference > 1) {
+            global $classTranslations;
+
+            for ($i = 1; $i < $countItemsByReference; $i++) {
+                $notification = new SRBNotification();
+                $notification->severity = SRBLogger::FATAL;
+                $notification->objectType = static::getObjectTypeForMapping();
+                $notification->objectId = $itemsByReference[$i]->getDBId();
+
+                switch (static::getObjectTypeForMapping()) {
+                    case 'product':
+                        $itemsByReference[$i]->reference = $itemsByReference[$i]->reference . '_' . $itemsByReference[$i]->getDBId();
+                        $itemsByReference[$i]->updateLocally(['reference' => $itemsByReference[$i]->getReference()]);
+
+                        $notification->message = $classTranslations['productDuplicationNotification'] . ' ' . $itemsByReference[$i]->label;
+                        break;
+                    case 'brand':
+                        $itemsByReference[$i]->name = $itemsByReference[$i]->name . '_' . $itemsByReference[$i]->getDBId();
+                        $itemsByReference[$i]->updateLocally(['name' => $itemsByReference[$i]->name]);
+
+                        $notification->message = $classTranslations['brandDuplicationNotification'] . ' ' . $itemsByReference[$i]->name;
+                        break;
+                }
+
+                $notification->save();
+            }
+
+            // We do a second loop to be sure all the duplicates have their own reference
+            // This way, we avoid recursive calls with the sync()
+            for ($i = 1; $i < $countItemsByReference; $i++) {
+                if ($itemsByReference[$i]->getDBId() != $this->getDBId()) {
+                    try {
+                        $itemsByReference[$i]->sync();
+                    } catch (\Shoprunback\Error $e) {
+                        return $e;
+                    }
+                }
+            }
+        }
     }
 }
