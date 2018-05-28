@@ -165,4 +165,36 @@ class SRBProduct extends LibProduct implements PSElementInterface
 
         return $sql;
     }
+
+    public function checkDuplicates()
+    {
+        $itemsByReference = static::getManyByIdentifier($this->getReference());
+        $countItemsByReference = count($itemsByReference);
+
+        if ($countItemsByReference > 1) {
+            global $classTranslations;
+
+
+            for ($i = 1; $i < $countItemsByReference; $i++) {
+                $itemsByReference[$i]->reference = $itemsByReference[$i]->reference . '_' . $itemsByReference[$i]->getDBId();
+                $itemsByReference[$i]->updateLocally();
+
+                if ($itemsByReference[$i]->getDBId() != $this->getDBId()) {
+                    try {
+                        $itemsByReference[$i]->sync();
+                    } catch (\Shoprunback\Error $e) {
+                        return $e;
+                    }
+                }
+
+                $notification = new SRBNotification();
+                $notification->severity = SRBLogger::FATAL;
+                $notification->objectType = SRBProduct::getObjectTypeForMapping();
+                $notification->objectId = $itemsByReference[$i]->getDBId();
+                $notification->message = $classTranslations['productDuplicationNotification'] . ' ' . $itemsByReference[$i]->label;
+                $notification->save();
+            }
+
+        }
+    }
 }

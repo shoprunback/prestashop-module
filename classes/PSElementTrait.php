@@ -253,23 +253,7 @@ trait PSElementTrait
         // To manage product duplication
         //TODO generalize to other Elements
         if (static::getObjectTypeForMapping() === 'product') {
-            $itemsByReference = static::getManyByIdentifier($this->getReference());
-            $countItemsByReference = count($itemsByReference);
-
-            if ($countItemsByReference > 1) {
-                for ($i = 1; $i < $countItemsByReference; $i++) {
-                    $itemsByReference[$i]->reference = $itemsByReference[$i]->reference . '_' . (microtime(true) * 10000);
-                    $itemsByReference[$i]->updateLocally();
-                    if ($itemsByReference[$i]->getDBId() != $this->getDBId()) {
-                        try {
-                            $itemsByReference[$i]->sync();
-                        } catch (\Shoprunback\Error $e) {
-                            return $e;
-                        }
-                    }
-                    //TODO add SRBNotification to tell the user he had many products with the same reference so some have been changed
-                }
-            }
+            $this->checkDuplicates();
         }
 
         try {
