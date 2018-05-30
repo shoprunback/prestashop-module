@@ -44,8 +44,6 @@ include_once 'exceptions/ProductException.php';
 include_once 'exceptions/ShipbackException.php';
 include_once 'sqlQueries.php';
 
-global $classTranslations;
-
 class ShopRunBack extends Module
 {
     public $formalizer;
@@ -71,12 +69,6 @@ class ShopRunBack extends Module
         $this->description = $this->l('module.description');
         $this->confirmUninstall = $this->l('module.uninstall.alert');
         $this->bootstrap = true;
-
-        global $classTranslations;
-        $classTranslations = [
-            'productDuplicationNotification'    => $this->l('product.duplication.notification'),
-            'brandDuplicationNotification'      => $this->l('brand.duplication.notification'),
-        ];
 
         // Custom parameters
         $this->dirurl = 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']);
