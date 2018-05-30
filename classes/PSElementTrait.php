@@ -252,9 +252,22 @@ trait PSElementTrait
 
         // To manage product duplication and brands with same name
         if (static::canHaveDuplicates()) {
-            $this->checkDuplicates();
+            try {
+                return $this->syncDuplicates();
+            } catch (\Shoprunback\Error $e) {
+                SRBLogger::addLog(json_encode($e), SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
+            }
         }
 
+        try {
+            return $this->doSync();
+        } catch (\Shoprunback\Error $e) {
+            SRBLogger::addLog(json_encode($e), SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
+        }
+    }
+
+    protected function doSync()
+    {
         try {
             $result = $this->save();
             $this->mapApiCall();
@@ -285,73 +298,40 @@ trait PSElementTrait
         return self::convertPSArrayToElements(Db::getInstance()->executeS($sql));
     }
 
-    // $updates must be an associative array, the key being the column in the DB and the value the associated value
-    public function updateLocally($updates = [])
-    {
-        if (empty($updates)) return true;
-
-        $result = Db::getInstance()->update(
-            static::getTableWithoutPrefix(),
-            $updates,
-            static::getIdColumnName() . ' = "' . $this->getDBId() . '"'
-        );
-
-        // Security if the reference field has been updated
-        $this->resetIdentifier();
-
-        return $result;
-    }
-
     public static function canHaveDuplicates()
     {
         return in_array(static::getObjectTypeForMapping(), ['product', 'brand']);
     }
 
-    public function checkDuplicates()
+    public function syncDuplicates()
+    {
+        $duplicates = $this->getDuplicates();
+        $countDuplicates = count($duplicates);
+
+        if ($countDuplicates === 1) {
+            return $this->doSync();
+        }
+
+        $result = [];
+
+        for ($i = 0; $i < $countDuplicates; $i++) {
+            $duplicates[$i]->reference = $duplicates[$i]->getDBId();
+
+            try {
+                $result[] = $duplicates[$i]->save();
+                $duplicates[$i]->mapApiCall();
+            } catch (\Shoprunback\Error $e) {
+                SRBLogger::addLog(json_encode($e), SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
+            }
+        }
+
+        return $result;
+    }
+
+    public function getDuplicates()
     {
         if (!static::canHaveDuplicates()) return false;
 
-        $itemsByReference = static::getManyByPreIdentifier($this->{static::getPreIdentifier()});
-        $countItemsByReference = count($itemsByReference);
-
-        if ($countItemsByReference > 1) {
-            global $classTranslations;
-
-            for ($i = 1; $i < $countItemsByReference; $i++) {
-                $notification = new SRBNotification();
-                $notification->severity = SRBLogger::FATAL;
-                $notification->objectType = static::getObjectTypeForMapping();
-                $notification->objectId = $itemsByReference[$i]->getDBId();
-
-                switch (static::getObjectTypeForMapping()) {
-                    case 'product':
-                        $itemsByReference[$i]->reference = $itemsByReference[$i]->reference . '_' . $itemsByReference[$i]->getDBId();
-                        $itemsByReference[$i]->updateLocally(['reference' => $itemsByReference[$i]->getReference()]);
-
-                        $notification->message = $classTranslations['productDuplicationNotification'] . ' ' . $itemsByReference[$i]->label;
-                        break;
-                    case 'brand':
-                        $itemsByReference[$i]->name = $itemsByReference[$i]->name . '_' . $itemsByReference[$i]->getDBId();
-                        $itemsByReference[$i]->updateLocally(['name' => $itemsByReference[$i]->name]);
-
-                        $notification->message = $classTranslations['brandDuplicationNotification'] . ' ' . $itemsByReference[$i]->name;
-                        break;
-                }
-
-                $notification->save();
-            }
-
-            // We do a second loop to be sure all the duplicates have their own reference
-            // This way, we avoid recursive calls with the sync()
-            for ($i = 1; $i < $countItemsByReference; $i++) {
-                if ($itemsByReference[$i]->getDBId() != $this->getDBId()) {
-                    try {
-                        $itemsByReference[$i]->sync();
-                    } catch (\Shoprunback\Error $e) {
-                        return $e;
-                    }
-                }
-            }
-        }
+        return static::getManyByPreIdentifier($this->{static::getPreIdentifier()});
     }
 }

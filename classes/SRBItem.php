@@ -38,7 +38,7 @@ class SRBItem extends LibItem
     {
         $sql = new DbQuery();
         $sql->select(SRBProduct::getTableName() . '.*, pl.name, cu.iso_code, cp.quantity');
-        $sql->from('product', SRBProduct::getTableName());
+        $sql->from(SRBProduct::getTableWithoutPrefix(), SRBProduct::getTableName());
         $sql->innerJoin('product_lang', 'pl', SRBProduct::getTableName() . '.id_product = pl.id_product');
         $sql->innerJoin('cart_product', 'cp', SRBProduct::getTableName() . '.id_product = cp.id_product');
         $sql->innerJoin('cart', 'ca', 'cp.id_cart = ca.id_cart');
