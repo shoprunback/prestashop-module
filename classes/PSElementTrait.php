@@ -314,7 +314,7 @@ trait PSElementTrait
 
         if (!$syncDuplicates) {
             $this->reference = $this->getDBId();
-            SRBLogger::addLog('The ' . self::getObjectTypeForMapping() . ' "' . $this->getName() . '" has a reference/name shared with others, so it has been replaced by its ID on ShopRunBack\'s database.', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
+            SRBLogger::addLog('The ' . self::getObjectTypeForMapping() . ' "' . $this->getName() . '" has its reference/name shared with others, so it has been replaced by its ID on ShopRunBack\'s database.', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
             return $this->doSync();
         }
 
@@ -322,7 +322,7 @@ trait PSElementTrait
 
         for ($i = 0; $i < $countDuplicates; $i++) {
             $duplicates[$i]->reference = $duplicates[$i]->getDBId();
-            SRBLogger::addLog('The ' . self::getObjectTypeForMapping() . ' "' . $duplicates[$i]->getName() . '" has a reference/name shared with others, so it has been replaced by its ID on ShopRunBack\'s database.', SRBLogger::INFO, self::getObjectTypeForMapping(), $duplicates[$i]->getDBId());
+            SRBLogger::addLog('The ' . self::getObjectTypeForMapping() . ' "' . $duplicates[$i]->getName() . '" has its reference/name shared with others, so it has been replaced by its ID on ShopRunBack\'s database.', SRBLogger::INFO, self::getObjectTypeForMapping(), $duplicates[$i]->getDBId());
 
             try {
                 $result[] = $duplicates[$i]->doSync();
