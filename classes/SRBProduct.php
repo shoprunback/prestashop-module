@@ -74,7 +74,7 @@ class SRBProduct extends LibProduct implements PSElementInterface
 
     public function resetIdentifier()
     {
-        $this->reference = str_replace(' ', '-', $this->reference);
+        $this->reference = str_replace(' ', '-', $this->{self::getPreIdentifier()});
     }
 
     static public function findAllQuery($limit = 0, $offset = 0)
