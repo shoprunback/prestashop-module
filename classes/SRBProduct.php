@@ -86,7 +86,9 @@ class SRBProduct extends LibProduct implements PSElementInterface
         $sql->from('product', self::getTableName());
         $sql->innerJoin('product_lang', 'pl', self::getTableName() . '.id_product = pl.id_product');
         $sql->where('pl.id_lang = ' . Configuration::get('PS_LANG_DEFAULT'));
-        $sql->where(self::getTableName() . '.state = 1'); // state=0 if the product is temporary
+        if (version_compare(_PS_VERSION_, '1.7', '>=')) {
+            $sql->where(self::getTableName() . '.state = 1'); // state=0 if the product is temporary
+        }
         $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
