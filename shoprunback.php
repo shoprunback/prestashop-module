@@ -9,7 +9,7 @@ define ('PRODUCTION_MODE', Configuration::get('production'));
 define ('DASHBOARD_PROD_URL', \Shoprunback\RestClient::getClient()->getProductionUrl());
 
 \Shoprunback\RestClient::getClient()->setToken(Configuration::get('srbtoken'));
-\Shoprunback\RestClient::getClient()->setCustomHeaders(['Prestashop-Version: ' . _PS_VERSION_]);
+
 // We set the production environment by default
 \Shoprunback\RestClient::getClient()->useProductionEnvironment();
 
@@ -56,12 +56,17 @@ class ShopRunBack extends Module
         // Mandatory parameters
         $this->name = 'shoprunback';
         $this->author = 'ShopRunBack';
-        $this->version = '1.0.8';
+        $this->version = '1.0.9';
         $this->ps_versions_compliancy = array('min' => '1.6.0.9');
         $this->tab = 'administration';
         $this->tabs = [
             'AdminShoprunback' => ['name' => 'ShopRunBack', 'parent' => 'SELL']
         ];
+
+        \Shoprunback\RestClient::getClient()->setCustomHeaders([
+            'Prestashop-Version: ' . _PS_VERSION_,
+            'Module-Version: ' . $this->version
+        ]);
 
         parent::__construct();
 
