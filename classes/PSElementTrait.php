@@ -332,7 +332,7 @@ trait PSElementTrait
     {
         if (!static::canHaveDuplicates()) return false;
 
-        // For products, we check if the reference in the PS DB is null (because if it is, we check the label)
+        // For products, we check if the reference in the PS DB is null, and if it is, we check the label
         if (static::getObjectTypeForMapping() === 'product' && $this->ps[static::getPreIdentifier()] == '') {
             return SRBProduct::getManyByName($this->label);
         }
