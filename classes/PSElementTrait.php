@@ -244,7 +244,7 @@ trait PSElementTrait
         return $element;
     }
 
-    public function sync()
+    public function sync($syncDuplicates = true)
     {
         SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
 
@@ -253,7 +253,7 @@ trait PSElementTrait
         // To manage product duplication and brands with same name
         if (static::canHaveDuplicates()) {
             try {
-                return $this->syncDuplicates();
+                return $this->syncDuplicates($syncDuplicates);
             } catch (\Shoprunback\Error $e) {
                 SRBLogger::addLog(json_encode($e), SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
             }
@@ -303,12 +303,17 @@ trait PSElementTrait
         return in_array(static::getObjectTypeForMapping(), ['product', 'brand']);
     }
 
-    public function syncDuplicates()
+    public function syncDuplicates($syncDuplicates = true)
     {
         $duplicates = $this->getDuplicates();
         $countDuplicates = count($duplicates);
 
         if ($countDuplicates === 1) {
+            return $this->doSync();
+        }
+
+        if (!$syncDuplicates) {
+            $this->reference = $this->getDBId();
             return $this->doSync();
         }
 
