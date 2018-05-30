@@ -28,7 +28,7 @@ class SRBProduct extends LibProduct implements PSElementInterface
             $this->reference = LibProduct::retrieve($srbId)->reference;
             parent::__construct($srbId);
         } else {
-            $this->reference = str_replace(' ', '-', ($psProduct['reference'] != '' ? $psProduct['reference'] : $this->label));
+            $this->reference = $this->generateIdentifier();
             parent::__construct();
         }
     }
@@ -74,9 +74,9 @@ class SRBProduct extends LibProduct implements PSElementInterface
         return 'products';
     }
 
-    public function resetIdentifier()
+    public function generateIdentifier()
     {
-        $this->reference = str_replace(' ', '-', $this->{self::getPreIdentifier()});
+        return str_replace(' ', '-', ($this->ps[self::getPreIdentifier()] != '' ? $this->ps[self::getPreIdentifier()] : $this->label));
     }
 
     static public function findAllQuery($limit = 0, $offset = 0)

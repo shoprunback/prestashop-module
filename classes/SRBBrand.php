@@ -15,7 +15,7 @@ class SRBBrand extends LibBrand implements PSElementInterface
             $this->reference = LibBrand::retrieve($srbId)->reference;
             parent::__construct($srbId);
         } else {
-            $this->resetIdentifier();
+            $this->reference = $this->generateIdentifier();
             parent::__construct();
         }
     }
@@ -61,9 +61,9 @@ class SRBBrand extends LibBrand implements PSElementInterface
         return 'brands';
     }
 
-    public function resetIdentifier()
+    public function generateIdentifier()
     {
-        $this->reference = str_replace(' ', '-', $this->{self::getPreIdentifier()});
+        return str_replace(' ', '-', $this->{self::getPreIdentifier()});
     }
 
     static public function findAllQuery($limit = 0, $offset = 0)
