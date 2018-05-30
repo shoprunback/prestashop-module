@@ -100,7 +100,7 @@ class SRBProduct extends LibProduct implements PSElementInterface
 
     static public function getOrderProducts($orderId)
     {
-        return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS(self::findOrderProductsQuery($orderId)));
+        return self::convertPSArrayToElements(Db::getInstance()->executeS(self::findOrderProductsQuery($orderId)));
     }
 
     public function getCoverPicture()
@@ -177,5 +177,17 @@ class SRBProduct extends LibProduct implements PSElementInterface
         $sql->where(SRBOrder::getTableName() . '.id_order = ' . pSQL($orderId));
 
         return $sql;
+    }
+
+    static public function findAllByNameQuery($name)
+    {
+        $sql = static::findAllQuery();
+        $sql->where('pl.name = "' . pSQL($name) . '"');
+        return $sql;
+    }
+
+    static public function getManyByName($name)
+    {
+        return self::convertPSArrayToElements(Db::getInstance()->executeS(self::findAllByNameQuery($name)));
     }
 }
