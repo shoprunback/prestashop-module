@@ -65,7 +65,7 @@ class ShopRunBack extends Module
 
         \Shoprunback\RestClient::getClient()->setCustomHeaders([
             'Prestashop-Version: ' . _PS_VERSION_,
-            'Shoprunback-Version: ' . $this->version
+            'Shoprunback-Module-Version: ' . $this->version
         ]);
 
         parent::__construct();
