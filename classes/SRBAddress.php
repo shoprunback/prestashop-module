@@ -38,15 +38,20 @@ class SRBAddress extends LibAddress implements PSInterface
         return 'id';
     }
 
+    static public function getPreIdentifier()
+    {
+        return 'id';
+    }
+
     // Own functions
     static public function getByCustomerId($customerId)
     {
-        return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS(self::findByCustomerIdQuery($customerId)));
+        return self::convertPSArrayToElements(Db::getInstance()->executeS(self::findByCustomerIdQuery($customerId)));
     }
 
     static public function getByOrderId($orderId)
     {
-        return self::convertPSArrayToSRBObjects(Db::getInstance()->getRow(self::findByOrderIdQuery($orderId)));
+        return self::convertPSArrayToElements(Db::getInstance()->getRow(self::findByOrderIdQuery($orderId)));
     }
 
     static public function createFromOrder($psOrder)

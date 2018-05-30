@@ -46,7 +46,7 @@ class ElementMapper
         unset($mapArray['id_srb_map']);
 
         if (!isset($this->id_srb_map) || $this->id_srb_map == 0) {
-            $mapFromDB = ElementMapper::getByIdItemAndIdType($this->id_item, $this->type);
+            $mapFromDB = ElementMapper::getByIdItemAndItemType($this->id_item, $this->type);
 
             if ($mapFromDB) {
                 $this->id_srb_map = $mapFromDB->id_srb_map;
@@ -56,7 +56,10 @@ class ElementMapper
         $result = '';
         $sql = Db::getInstance();
         if (isset($this->id_srb_map) && $this->id_srb_map != 0) {
-            $result = $sql->update(ElementMapper::MAPPER_TABLE_NAME_NO_PREFIX, $mapArray, 'id_item_srb = "' . pSQL($this->id_item_srb) . '"');
+            $result = $sql->update(ElementMapper::MAPPER_TABLE_NAME_NO_PREFIX, $mapArray, 'id_item_srb = "' . pSQL($this->id_item_srb) . '" && type = "' . pSQL($this->type) . '"');
+            SRBLogger::addLog('Map of ' . ucfirst($this->type) . ' ' . $this->id_item . ' updated', SRBLogger::INFO, $this->type, $this->id_item);
+        } else if (self::getByIdItemAndItemType($this->id_item, $this->type)) {
+            $result = $sql->update(ElementMapper::MAPPER_TABLE_NAME_NO_PREFIX, $mapArray, 'id_item = "' . pSQL($this->id_item) . '" && type = "' . pSQL($this->type) . '"');
             SRBLogger::addLog('Map of ' . ucfirst($this->type) . ' ' . $this->id_item . ' updated', SRBLogger::INFO, $this->type, $this->id_item);
         } else {
             $result = $sql->insert(ElementMapper::MAPPER_TABLE_NAME_NO_PREFIX, $mapArray);
@@ -73,7 +76,7 @@ class ElementMapper
 
     static public function getMappingIdIfExists($itemId, $itemType)
     {
-        $map = self::getByIdItemAndIdType($itemId, $itemType);
+        $map = self::getByIdItemAndItemType($itemId, $itemType);
 
         if ($map) {
             return $map->id_item_srb;
@@ -103,21 +106,21 @@ class ElementMapper
         return $shipbacks;
     }
 
-    static public function getByIdItemAndIdType($idItem, $type)
+    static public function getByIdItemAndItemType($idItem, $type)
     {
-        if (is_string($idItem) && !is_numeric($idItem)) return static::getByIdItemSRBAndIdType($idItem, $type);
+        if (is_string($idItem) && !is_numeric($idItem)) return static::getByIdItemSRBAndItemType($idItem, $type);
 
         $sql = self::findAllQuery();
-        $sql->where(self::getTableName() . '.id_item = ' . pSQL($idItem) . ' AND ' . pSQL(self::getTableName()) . '.type = "' . pSQL($type) . '"');
+        $sql->where(self::getTableName() . '.id_item = ' . pSQL($idItem) . ' AND ' . self::getTableName() . '.type = "' . pSQL($type) . '"');
         $result = Db::getInstance()->getRow($sql);
 
         return self::returnResult($result);
     }
 
-    static public function getByIdItemSRBAndIdType($idItemSrb, $type)
+    static public function getByIdItemSRBAndItemType($idItemSrb, $type)
     {
         $sql = self::findAllQuery();
-        $sql->where(self::getTableName() . '.id_item_srb = "' . pSQL($idItemSrb) . '" AND ' . pSQL(self::getTableName()) . '.type = "' . pSQL($type) . '"');
+        $sql->where(self::getTableName() . '.id_item_srb = "' . pSQL($idItemSrb) . '" AND ' . self::getTableName() . '.type = "' . pSQL($type) . '"');
         $result = Db::getInstance()->getRow($sql);
 
         return self::returnResult($result);

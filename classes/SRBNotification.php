@@ -91,8 +91,8 @@ class SRBNotification
         SRBLogger::addLog(
             $this->message,
             SRBLogger::FATAL,
-            $this->objectType ? pSQL($this->objectType) : null,
-            $this->objectId ? $this->objectId : 0
+            isset($this->objectType) ? pSQL($this->objectType) : null,
+            isset($this->objectId) ? $this->objectId : 0
         );
 
         if (isset($this->id_srb_notification) && !is_null($this->id_srb_notification)) {
@@ -109,8 +109,8 @@ class SRBNotification
         return Db::getInstance()->insert(self::NOTIFICATION_TABLE_NAME_NO_PREFIX, [
             'message'       => pSQL($this->message),
             'severity'      => $this->severity,
-            'object_type'   => $this->objectType ? pSQL($this->objectType) : null,
-            'object_id'     => $this->objectId ? $this->objectId : 0,
+            'object_type'   => isset($this->objectType) ? pSQL($this->objectType) : null,
+            'object_id'     => isset($this->objectId) ? $this->objectId : 0,
             'created_at'    => $currentDate,
             'updated_at'    => $currentDate
         ]);
@@ -121,8 +121,8 @@ class SRBNotification
         return Db::getInstance()->update(self::NOTIFICATION_TABLE_NAME_NO_PREFIX, [
             'message'       => pSQL($this->message),
             'severity'      => $this->severity,
-            'object_type'   => $this->objectType ? pSQL($this->objectType) : null,
-            'object_id'     => $this->objectId ? $this->objectId : 0,
+            'object_type'   => isset($this->objectType) ? pSQL($this->objectType) : null,
+            'object_id'     => isset($this->objectId) ? $this->objectId : 0,
             'read'          => $this->read,
             'updated_at'    => date('Y-m-d H:i:s')
         ], self::getIdColumnName() . ' = ' . $this->id_srb_notification);

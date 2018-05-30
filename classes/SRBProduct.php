@@ -11,12 +11,11 @@ class SRBProduct extends LibProduct implements PSElementInterface
     {
         $this->ps = $psProduct;
         $this->label = $this->extractNameFromPSArray($psProduct['name']);
-        $reference = $psProduct['reference'] != '' ? $psProduct['reference'] : $this->label;
-        $this->reference = str_replace(' ', '-', $reference);
         $this->weight_grams = intval($psProduct['weight'] * 1000);
         $this->width_mm = intval($psProduct['width'] * 10);
         $this->height_mm = intval($psProduct['height'] * 10);
         $this->length_mm = intval($psProduct['depth'] * 10);
+
         $this->addCoverPicture();
 
         if ($psProduct['id_manufacturer'] != 0) {
@@ -24,9 +23,12 @@ class SRBProduct extends LibProduct implements PSElementInterface
             $this->brand_id = $this->brand->reference;
         }
 
+        // In case of products with the same reference, we need to check if the product has been synchronized to get its reference
         if ($srbId = $this->getMapId()) {
+            $this->reference = LibProduct::retrieve($srbId)->reference;
             parent::__construct($srbId);
         } else {
+            $this->reference = $this->generateIdentifier();
             parent::__construct();
         }
     }
@@ -52,6 +54,11 @@ class SRBProduct extends LibProduct implements PSElementInterface
         return 'reference';
     }
 
+    static public function getPreIdentifier()
+    {
+        return 'reference';
+    }
+
     static public function getDisplayNameAttribute()
     {
         return 'label';
@@ -67,6 +74,11 @@ class SRBProduct extends LibProduct implements PSElementInterface
         return 'products';
     }
 
+    public function generateIdentifier()
+    {
+        return str_replace(' ', '-', ($this->ps[self::getPreIdentifier()] != '' ? $this->ps[self::getPreIdentifier()] : $this->label));
+    }
+
     static public function findAllQuery($limit = 0, $offset = 0)
     {
         $sql = new DbQuery();
@@ -74,6 +86,9 @@ class SRBProduct extends LibProduct implements PSElementInterface
         $sql->from('product', self::getTableName());
         $sql->innerJoin('product_lang', 'pl', self::getTableName() . '.id_product = pl.id_product');
         $sql->where('pl.id_lang = ' . Configuration::get('PS_LANG_DEFAULT'));
+        if (version_compare(_PS_VERSION_, '1.7', '>=')) {
+            $sql->where(self::getTableName() . '.state = 1'); // state=0 if the product is temporary
+        }
         $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
@@ -87,7 +102,7 @@ class SRBProduct extends LibProduct implements PSElementInterface
 
     static public function getOrderProducts($orderId)
     {
-        return self::convertPSArrayToSRBObjects(Db::getInstance()->executeS(self::findOrderProductsQuery($orderId)));
+        return self::convertPSArrayToElements(Db::getInstance()->executeS(self::findOrderProductsQuery($orderId)));
     }
 
     public function getCoverPicture()
@@ -164,5 +179,17 @@ class SRBProduct extends LibProduct implements PSElementInterface
         $sql->where(SRBOrder::getTableName() . '.id_order = ' . pSQL($orderId));
 
         return $sql;
+    }
+
+    static public function findAllByNameQuery($name)
+    {
+        $sql = static::findAllQuery();
+        $sql->where('pl.name = "' . pSQL($name) . '"');
+        return $sql;
+    }
+
+    static public function getManyByName($name)
+    {
+        return self::convertPSArrayToElements(Db::getInstance()->executeS(self::findAllByNameQuery($name)));
     }
 }

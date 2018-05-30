@@ -26,6 +26,7 @@
                 <thead>
                     <tr>
                         <th>{l s="brand.brands" mod='shoprunback'}</th>
+                        <th>{l s="brand.reference" mod='shoprunback'}</th>
                         <th>{l s="element.last_sync" mod='shoprunback'}</th>
                         <th>{l s="element.sync" mod='shoprunback'}</th>
                         <th></th>
@@ -35,6 +36,7 @@
                     {foreach from=$elements key=id item=element}
                         <tr data-id="{$element->getDBId()}">
                             <td data-link="{if $element->id_item_srb}{$externalLink}{$element->id_item_srb}{/if}"><b>{$element->getName()}</b></td>
+                            <td><b>{$element->getReference()}</b></td>
                             <td>
                                 {if $element->last_sent_at}
                                     {$element->last_sent_at}

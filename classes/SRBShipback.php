@@ -47,6 +47,11 @@ class SRBShipback extends LibShipback implements PSElementInterface
         return self::getIdColumnName();
     }
 
+    static public function getPreIdentifier()
+    {
+        return self::getIdColumnName();
+    }
+
     static public function getDisplayNameAttribute()
     {
         return self::getIdColumnName();

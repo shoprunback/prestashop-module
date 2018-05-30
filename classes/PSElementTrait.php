@@ -244,34 +244,30 @@ trait PSElementTrait
         return $element;
     }
 
-    public function sync()
+    public function sync($syncDuplicates = true)
     {
         SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
 
         $this->syncNestedElements();
 
-        // To manage product duplication
-        //TODO generalize to other Elements
-        if (static::getObjectTypeForMapping() === 'product') {
-            $itemsByReference = static::getManyByIdentifier($this->getReference());
-            $countItemsByReference = count($itemsByReference);
-
-            if ($countItemsByReference > 1) {
-                for ($i = 1; $i < $countItemsByReference; $i++) {
-                    $itemsByReference[$i]->reference = $itemsByReference[$i]->reference . '_' . (microtime(true) * 10000);
-                    $itemsByReference[$i]->updateLocally();
-                    if ($itemsByReference[$i]->getDBId() != $this->getDBId()) {
-                        try {
-                            $itemsByReference[$i]->sync();
-                        } catch (\Shoprunback\Error $e) {
-                            return $e;
-                        }
-                    }
-                    //TODO add SRBNotification to tell the user he had many products with the same reference so some have been changed
-                }
+        // To manage product duplication and brands with same name
+        if (static::canHaveDuplicates()) {
+            try {
+                return $this->syncDuplicates($syncDuplicates);
+            } catch (\Shoprunback\Error $e) {
+                SRBLogger::addLog(json_encode($e), SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
             }
         }
 
+        try {
+            return $this->doSync();
+        } catch (\Shoprunback\Error $e) {
+            SRBLogger::addLog(json_encode($e), SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
+        }
+    }
+
+    protected function doSync()
+    {
         try {
             $result = $this->save();
             $this->mapApiCall();
@@ -287,28 +283,66 @@ trait PSElementTrait
 
         $responses = [];
         foreach ($elements as $element) {
-            $responses[] = $element->sync();
+            $responses[] = $element->sync(false);
         }
 
         return $responses;
     }
 
-    static public function getManyByIdentifier($identifier)
+    static public function getManyByPreIdentifier($preIdentifier)
     {
         $sql = static::findAllQuery();
-        $sql->where(static::getTableName() . '.' . static::getIdentifier() . ' = "' . pSQL($identifier) . '"');
+        $sql->where(static::getTableName() . '.' . static::getPreIdentifier() . ' = "' . pSQL($preIdentifier) . '"');
         $sql->orderBy(static::getTableIdentifier() . ' ASC');
 
         return self::convertPSArrayToElements(Db::getInstance()->executeS($sql));
     }
 
-    public function updateLocally()
+    public static function canHaveDuplicates()
     {
-        // TODO generalize
-        return Db::getInstance()->update(
-            static::getTableWithoutPrefix(),
-            ['reference' => $this->reference], // (For instance this function is only used in case of product duplication where we need to change the reference)
-            static::getIdColumnName() . ' = "' . $this->getDBId() . '"'
-        );
+        return in_array(static::getObjectTypeForMapping(), ['product', 'brand']);
+    }
+
+    public function syncDuplicates($syncDuplicates = true)
+    {
+        $duplicates = $this->getDuplicates();
+        $countDuplicates = count($duplicates);
+
+        if ($countDuplicates === 1) {
+            return $this->doSync();
+        }
+
+        if (!$syncDuplicates) {
+            $this->reference = $this->getDBId();
+            SRBLogger::addLog('The ' . self::getObjectTypeForMapping() . ' "' . $this->getName() . '" has its reference/name shared with others, so it has been replaced by its ID on ShopRunBack\'s database.', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
+            return $this->doSync();
+        }
+
+        $result = [];
+
+        for ($i = 0; $i < $countDuplicates; $i++) {
+            $duplicates[$i]->reference = $duplicates[$i]->getDBId();
+            SRBLogger::addLog('The ' . self::getObjectTypeForMapping() . ' "' . $duplicates[$i]->getName() . '" has its reference/name shared with others, so it has been replaced by its ID on ShopRunBack\'s database.', SRBLogger::INFO, self::getObjectTypeForMapping(), $duplicates[$i]->getDBId());
+
+            try {
+                $result[] = $duplicates[$i]->doSync();
+            } catch (\Shoprunback\Error $e) {
+                SRBLogger::addLog(json_encode($e), SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
+            }
+        }
+
+        return $result;
+    }
+
+    public function getDuplicates()
+    {
+        if (!static::canHaveDuplicates()) return false;
+
+        // For products, we check if the reference in the PS DB is null, and if it is, we check the label
+        if (static::getObjectTypeForMapping() === 'product' && $this->ps[static::getPreIdentifier()] == '') {
+            return SRBProduct::getManyByName($this->label);
+        }
+
+        return static::getManyByPreIdentifier($this->{static::getPreIdentifier()});
     }
 }

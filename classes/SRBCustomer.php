@@ -37,6 +37,11 @@ class SRBCustomer extends LibCustomer implements PSInterface
         return 'id';
     }
 
+    static public function getPreIdentifier()
+    {
+        return 'id';
+    }
+
     // Own functions
     static private function extractIdFromPSArray($psCustomerArrayName)
     {
