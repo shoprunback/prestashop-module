@@ -4,11 +4,6 @@
             <div class="top row">
                 <div class="title col-sm-8">
                     <h1>{l s="brand.my_brands" mod='shoprunback'}</h1>
-
-                    {if $srbtoken != ''}
-                        <a class="srb-button post-all" data-type="{$elementType}">{l s="title.sync_all" mod='shoprunback'}</a>
-                        <a class="srb-button post-new" data-type="{$elementType}">{l s="title.sync_new" mod='shoprunback'}</a>
-                    {/if}
                 </div>
 
                 <div class="external-link col-sm-4">

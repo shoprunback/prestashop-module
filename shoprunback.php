@@ -56,7 +56,7 @@ class ShopRunBack extends Module
         // Mandatory parameters
         $this->name = 'shoprunback';
         $this->author = 'ShopRunBack';
-        $this->version = '1.0.8';
+        $this->version = '1.0.9';
         $this->ps_versions_compliancy = array('min' => '1.6.0.9');
         $this->tab = 'administration';
         $this->tabs = [
@@ -334,10 +334,29 @@ class ShopRunBack extends Module
     {
         if (\Shoprunback\RestClient::getClient()->getToken()) {
             try {
-                $order = SRBOrder::getById($_GET['id_order']);
+                $order = SRBOrder::getNotSyncById($_GET['id_order']);
 
                 if (!$order->isShipped()) {
                     return false;
+                }
+
+                if (isset($order->_origValues->shipback_id) && !SRBShipback::getByOrderIdIfExists($order->getDBId())) {
+                    $shipback = \Shoprunback\Elements\Shipback::retrieve($order->_origValues->shipback_id);
+                    $psReturn = [
+                        'id_srb_shipback' => $shipback->id,
+                        'id_order' => $order->getDBId(),
+                        'order' => $order,
+                        'state' => $shipback->state,
+                        'mode' => $shipback->mode,
+                        'created_at' => $shipback->created_at,
+                        'public_url' => $shipback->public_url
+                    ];
+                    $srbShipback = new SRBShipback($psReturn);
+                    $srbShipback->insertOnPS();
+                }
+
+                if (!ElementMapper::getMappingIdIfExists($order->id, $order::getObjectTypeForMapping())) {
+                    $order->sync();
                 }
 
                 // To work everywhere, we must have something like 'shipback?orderId=ID', and not 'shipback&orderId=ID'

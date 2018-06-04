@@ -21,30 +21,6 @@ $(document).ready(function() {
     });
   }
 
-  $('#srb-content .post-all').on('click', function(e) {
-    e.preventDefault();
-
-    var data = {
-      'action': 'syncAll',
-      'className': getSRBObjectName($(this).data('type')),
-      'params': ''
-    };
-
-    ajaxAsyncCall(data);
-  });
-
-  $('#srb-content .post-new').on('click', function(e) {
-    e.preventDefault();
-
-    var data = {
-      'action': 'syncAll',
-      'className': getSRBObjectName($(this).data('type')),
-      'params': true
-    };
-
-    ajaxAsyncCall(data);
-  });
-
   $('#srb-content .sync-element').on('click', function (e) {
     e.preventDefault();
 
