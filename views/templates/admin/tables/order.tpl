@@ -52,9 +52,9 @@
                                 {/if}
                             </td>
                             <td>
-                                {if $element->delivery}
+                                {if $element->delivery && $element->last_sent_at}
                                     {l s="element.delivered" mod='shoprunback'}
-                                {elseif ! $element->last_sent_at && $srbtoken != ''}
+                                {elseif $srbtoken != ''}
                                     <a class="sync-element srb-button" data-type="{$elementType}">
                                         {l s="element.sync" mod='shoprunback'}
                                     </a>
