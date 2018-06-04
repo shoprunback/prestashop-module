@@ -4,11 +4,6 @@
             <div class="top row">
                 <div class="title col-sm-8">
                     <h1>{l s="order.my_orders" mod='shoprunback'}</h1>
-
-                    {if $srbtoken != ''}
-                        <a class="srb-button post-all" data-type="{$elementType}">{l s="title.sync_all" mod='shoprunback'}</a>
-                        <a class="srb-button post-new" data-type="{$elementType}">{l s="title.sync_new" mod='shoprunback'}</a>
-                    {/if}
                 </div>
 
                 <div class="external-link col-sm-4">
@@ -57,9 +52,9 @@
                                 {/if}
                             </td>
                             <td>
-                                {if $element->delivery}
+                                {if $element->delivery && $element->last_sent_at}
                                     {l s="element.delivered" mod='shoprunback'}
-                                {elseif ! $element->last_sent_at && $srbtoken != ''}
+                                {elseif $srbtoken != ''}
                                     <a class="sync-element srb-button" data-type="{$elementType}">
                                         {l s="element.sync" mod='shoprunback'}
                                     </a>

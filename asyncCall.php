@@ -20,9 +20,6 @@ if (isset($_POST['params'])) {
         } catch (SRBException $e) {
             SRBLogger::addLog($e, SRBLogger::FATAL, $class);
         }
-    } elseif ($action == 'syncAll') {
-        SRBLogger::addLog('AsyncCall syncAll ' . $class, SRBLogger::INFO);
-        $result = $class::syncAll($_POST['params']);
     } else {
         throw new SRBException('AsyncCall unknown action ' . $action . '. Param: ' . $_POST['params'], 3);
     }

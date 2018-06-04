@@ -237,7 +237,7 @@ trait PSElementTrait
     {
         if ($element instanceof PSElementInterface) {
             $element->sync();
-        } else {
+        } elseif (method_exists($element, 'syncNestedElements')) {
             $element->syncNestedElements();
         }
 
@@ -248,7 +248,10 @@ trait PSElementTrait
     {
         SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
 
-        $this->syncNestedElements();
+        // For Brands
+        if (method_exists($this, 'syncNestedElements')) {
+            $this->syncNestedElements();
+        }
 
         // To manage product duplication and brands with same name
         if (static::canHaveDuplicates()) {
@@ -275,18 +278,6 @@ trait PSElementTrait
         } catch (\Shoprunback\Error $e) {
             SRBLogger::addLog(json_encode($e), SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
         }
-    }
-
-    static public function syncAll($newOnly = false)
-    {
-        $elements = $newOnly ? self::getAllNotSync() : self::getAll();
-
-        $responses = [];
-        foreach ($elements as $element) {
-            $responses[] = $element->sync(false);
-        }
-
-        return $responses;
     }
 
     static public function getManyByPreIdentifier($preIdentifier)

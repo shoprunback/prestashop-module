@@ -56,7 +56,7 @@ class ShopRunBack extends Module
         // Mandatory parameters
         $this->name = 'shoprunback';
         $this->author = 'ShopRunBack';
-        $this->version = '1.0.8';
+        $this->version = '1.0.9';
         $this->ps_versions_compliancy = array('min' => '1.6.0.9');
         $this->tab = 'administration';
         $this->tabs = [
@@ -334,10 +334,34 @@ class ShopRunBack extends Module
     {
         if (\Shoprunback\RestClient::getClient()->getToken()) {
             try {
-                $order = SRBOrder::getById($_GET['id_order']);
+                $order = SRBOrder::getNotSyncById($_GET['id_order']);
 
                 if (!$order->isShipped()) {
                     return false;
+                }
+
+                if (!SRBShipback::getByOrderIdIfExists($order->getDBId())) {
+                    $retrievedOrder = \Shoprunback\Elements\Order::retrieve($order->order_number);
+
+                    if (!is_null($retrievedOrder->shipback)) {
+                        $psReturn = [
+                            'id_srb_shipback' => $retrievedOrder->shipback->id,
+                            'id_order' => $order->getDBId(),
+                            'order' => $order,
+                            'state' => $retrievedOrder->shipback->state,
+                            'mode' => $retrievedOrder->shipback->mode,
+                            'created_at' => $retrievedOrder->shipback->created_at,
+                            'public_url' => $retrievedOrder->shipback->public_url
+                        ];
+                        $srbShipback = new SRBShipback($psReturn);
+                        $srbShipback->insertOnPS();
+
+                        $order->id_srb_shipback = $retrievedOrder->shipback->id;
+                    }
+                }
+
+                if (!ElementMapper::getMappingIdIfExists($order->id, $order::getObjectTypeForMapping())) {
+                    $order->sync();
                 }
 
                 // To work everywhere, we must have something like 'shipback?orderId=ID', and not 'shipback&orderId=ID'
