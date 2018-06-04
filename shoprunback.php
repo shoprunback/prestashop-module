@@ -351,7 +351,6 @@ class ShopRunBack extends Module
                             'state' => $retrievedOrder->shipback->state,
                             'mode' => $retrievedOrder->shipback->mode,
                             'created_at' => $retrievedOrder->shipback->created_at,
-                            'updated_at' => $retrievedOrder->shipback->updated_at,
                             'public_url' => $retrievedOrder->shipback->public_url
                         ];
                         $srbShipback = new SRBShipback($psReturn);
