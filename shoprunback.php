@@ -340,19 +340,25 @@ class ShopRunBack extends Module
                     return false;
                 }
 
-                if (isset($order->_origValues->shipback_id) && !SRBShipback::getByOrderIdIfExists($order->getDBId())) {
-                    $shipback = \Shoprunback\Elements\Shipback::retrieve($order->_origValues->shipback_id);
-                    $psReturn = [
-                        'id_srb_shipback' => $shipback->id,
-                        'id_order' => $order->getDBId(),
-                        'order' => $order,
-                        'state' => $shipback->state,
-                        'mode' => $shipback->mode,
-                        'created_at' => $shipback->created_at,
-                        'public_url' => $shipback->public_url
-                    ];
-                    $srbShipback = new SRBShipback($psReturn);
-                    $srbShipback->insertOnPS();
+                if (!SRBShipback::getByOrderIdIfExists($order->getDBId())) {
+                    $retrievedOrder = \Shoprunback\Elements\Order::retrieve($order->order_number);
+
+                    if (!is_null($retrievedOrder->shipback)) {
+                        $psReturn = [
+                            'id_srb_shipback' => $retrievedOrder->shipback->id,
+                            'id_order' => $order->getDBId(),
+                            'order' => $order,
+                            'state' => $retrievedOrder->shipback->state,
+                            'mode' => $retrievedOrder->shipback->mode,
+                            'created_at' => $retrievedOrder->shipback->created_at,
+                            'updated_at' => $retrievedOrder->shipback->updated_at,
+                            'public_url' => $retrievedOrder->shipback->public_url
+                        ];
+                        $srbShipback = new SRBShipback($psReturn);
+                        $srbShipback->insertOnPS();
+
+                        $order->id_srb_shipback = $retrievedOrder->shipback->id;
+                    }
                 }
 
                 if (!ElementMapper::getMappingIdIfExists($order->id, $order::getObjectTypeForMapping())) {
