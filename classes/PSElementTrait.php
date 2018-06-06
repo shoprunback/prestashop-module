@@ -31,19 +31,16 @@ trait PSElementTrait
 
     static public function getComponentsToFindAllWithMappingQuery($onlySyncElements = false)
     {
-        $identifier = static::getIdColumnName();
-        $type = static::getObjectTypeForMapping();
         $joinType = $onlySyncElements ? 'innerJoin' : 'leftJoin';
-        $mapQuery = ElementMapper::findOnlyLastSentByTypeQuery($type);
 
         $sql = static::findAllQuery();
         $sql->select(ElementMapper::getTableName() . '.id_item_srb');
         $sql->{$joinType}(
             ElementMapper::MAPPER_TABLE_NAME_NO_PREFIX,
             ElementMapper::getTableName(),
-            ElementMapper::getTableName() . '.id_item = ' . static::getTableName() . '.' . $identifier . '
-                AND ' . ElementMapper::getTableName() . '.type = "' . $type . '"
-                AND ' . ElementMapper::getTableName() . '.last_sent_at IN (' . $mapQuery . ')'
+            ElementMapper::getTableName() . '.id_item = ' . static::getTableIdentifier() . '
+                AND ' . ElementMapper::getTableName() . '.type = "' . static::getObjectTypeForMapping() . '"
+                AND ' . ElementMapper::getTableName() . '.last_sent_at IN (' . ElementMapper::findOnlyLastSentByTypeQuery(static::getObjectTypeForMapping()) . ')'
         );
 
         return $sql;
@@ -59,11 +56,9 @@ trait PSElementTrait
 
     static protected function findAllWithMappingQuery($onlySyncElements = false, $limit = 0, $offset = 0)
     {
-        $identifier = static::getIdColumnName();
-
         $sql = self::getComponentsToFindAllWithMappingQuery($onlySyncElements);
         $sql->select(ElementMapper::getTableName() . '.*');
-        $sql->groupBy(static::getTableName() . '.' . $identifier);
+        $sql->groupBy(static::getTableIdentifier());
         $sql->orderBy(ElementMapper::getTableName() . '.last_sent_at DESC');
         $sql = self::addLimitToQuery($sql, $limit, $offset);
 
@@ -115,6 +110,14 @@ trait PSElementTrait
     static protected function findOneNotSyncQuery($id)
     {
         return static::addWhereId(static::findAllQuery(), $id);
+    }
+
+    static public function findAllByMappingDateQuery($onlySyncElements = false, $limit = 0, $offset = 0)
+    {
+        $sql = self::getComponentsToFindAllWithMappingQuery($onlySyncElements);
+        $sql->orderBy(ElementMapper::getTableName() . '.last_sent_at DESC');
+        $sql = self::addLimitToQuery($sql, $limit, $offset);
+        return $sql;
     }
 
     static protected function addWhereId($sql, $id)

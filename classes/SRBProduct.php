@@ -84,8 +84,7 @@ class SRBProduct extends LibProduct implements PSElementInterface
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*, pl.*');
         $sql->from('product', self::getTableName());
-        $sql->innerJoin('product_lang', 'pl', self::getTableName() . '.id_product = pl.id_product');
-        $sql->where('pl.id_lang = ' . Configuration::get('PS_LANG_DEFAULT'));
+        $sql = static::joinLang($sql);
         if (version_compare(_PS_VERSION_, '1.7', '>=')) {
             $sql->where(self::getTableName() . '.state = 1'); // state=0 if the product is temporary
         }
@@ -165,17 +164,23 @@ class SRBProduct extends LibProduct implements PSElementInterface
         return $product->remove();
     }
 
+    static protected function joinLang($sql)
+    {
+        $sql->innerJoin('product_lang', 'pl', self::getTableName() . '.id_product = pl.id_product');
+        $sql->where('pl.id_lang = ' . Configuration::get('PS_LANG_DEFAULT'));
+        return $sql;
+    }
+
     static protected function findOrderProductsQuery($orderId)
     {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.*, pl.name, cu.iso_code');
         $sql->from('product', self::getTableName());
-        $sql->innerJoin('product_lang', 'pl', self::getTableName() . '.id_product = pl.id_product');
+        $sql = static::joinLang($sql);
         $sql->innerJoin('cart_product', 'cp', self::getTableName() . '.id_product = cp.id_product');
         $sql->innerJoin('cart', 'ca', 'cp.id_cart = ca.id_cart');
         $sql->innerJoin('orders', SRBOrder::getTableName(), 'ca.id_cart = ' . SRBOrder::getTableName() . '.id_cart');
         $sql->innerJoin('currency', 'cu', 'cu.id_currency = ' . SRBOrder::getTableName() . '.id_currency');
-        $sql->where('pl.id_lang = ' . Configuration::get('PS_LANG_DEFAULT'));
         $sql->where(SRBOrder::getTableName() . '.id_order = ' . pSQL($orderId));
 
         return $sql;
@@ -191,5 +196,22 @@ class SRBProduct extends LibProduct implements PSElementInterface
     static public function getManyByName($name)
     {
         return self::convertPSArrayToElements(Db::getInstance()->executeS(self::findAllByNameQuery($name)));
+    }
+
+    static public function getCountLikeLabel($label)
+    {
+        return self::getCountOfQuery(self::findLikeLabelQuery($label));
+    }
+
+    static public function getLikeLabel($label, $onlySyncElements = false, $limit = 0, $offset = 0, $withNestedElements = true)
+    {
+        return self::convertPSArrayToElements(Db::getInstance()->executeS(self::findLikeLabelQuery($label, $limit, $offset, $withNestedElements, $onlySyncElements)), $withNestedElements);
+    }
+
+    static public function findLikeLabelQuery($label, $limit = 0, $offset = 0, $onlySyncElements = false)
+    {
+        $sql = self::findAllByMappingDateQuery($onlySyncElements, $limit, $offset);
+        $sql->where('pl.name LIKE "%' . $label . '%"');
+        return $sql;
     }
 }

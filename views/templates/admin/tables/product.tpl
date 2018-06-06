@@ -28,7 +28,10 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>{l s="product.products" mod='shoprunback'}</th>
+                        <th>
+                            {l s="product.products" mod='shoprunback'}
+                            {include file="./search.tpl"}
+                        </th>
                         <th>{l s="product.reference" mod='shoprunback'}</th>
                         <th>{l s="product.brand" mod='shoprunback'}</th>
                         <th>{l s="element.last_sync" mod='shoprunback'}</th>
