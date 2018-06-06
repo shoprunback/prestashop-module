@@ -56,7 +56,7 @@ class ShopRunBack extends Module
         // Mandatory parameters
         $this->name = 'shoprunback';
         $this->author = 'ShopRunBack';
-        $this->version = '1.0.9';
+        $this->version = '1.0.10';
         $this->ps_versions_compliancy = array('min' => '1.6.0.9');
         $this->tab = 'administration';
         $this->tabs = [
@@ -340,27 +340,7 @@ class ShopRunBack extends Module
                     return false;
                 }
 
-                if (!SRBShipback::getByOrderIdIfExists($order->getDBId())) {
-                    $retrievedOrder = \Shoprunback\Elements\Order::retrieve($order->order_number);
-
-                    if (!is_null($retrievedOrder->shipback)) {
-                        $psReturn = [
-                            'id_srb_shipback' => $retrievedOrder->shipback->id,
-                            'id_order' => $order->getDBId(),
-                            'order' => $order,
-                            'state' => $retrievedOrder->shipback->state,
-                            'mode' => $retrievedOrder->shipback->mode,
-                            'created_at' => $retrievedOrder->shipback->created_at,
-                            'public_url' => $retrievedOrder->shipback->public_url
-                        ];
-                        $srbShipback = new SRBShipback($psReturn);
-                        $srbShipback->insertOnPS();
-
-                        $order->id_srb_shipback = $retrievedOrder->shipback->id;
-                    }
-                }
-
-                if (!ElementMapper::getMappingIdIfExists($order->id, $order::getObjectTypeForMapping())) {
+                if (!$order->isPersisted() && !ElementMapper::getMappingIdIfExists($order->id, $order::getObjectTypeForMapping())) {
                     $order->sync();
                 }
 
