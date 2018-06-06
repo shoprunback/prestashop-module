@@ -106,24 +106,6 @@ class SRBShipback extends LibShipback implements PSElementInterface
             return false;
         }
 
-        // If the order already has a shipback
-        $retrievedOrder = \Shoprunback\Elements\Order::retrieve($order->order_number);
-        if (!is_null($retrievedOrder->shipback)) {
-            $psReturn = [
-                'id_srb_shipback' => $retrievedOrder->shipback->id,
-                'id_order' => $order->getDBId(),
-                'order' => $order,
-                'state' => $retrievedOrder->shipback->state,
-                'mode' => $retrievedOrder->shipback->mode,
-                'created_at' => $retrievedOrder->shipback->created_at,
-                'public_url' => $retrievedOrder->shipback->public_url
-            ];
-            $srbShipback = new SRBShipback($psReturn);
-            $srbShipback->insertOnPS();
-
-            return $srbShipback;
-        }
-
         $psReturn = [
             'id_srb_shipback' => 0,
             'id_order' => $orderId,
