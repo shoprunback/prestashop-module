@@ -93,17 +93,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
         $sql = self::getComponentsForShipbacks($sql);
         $sql = self::getComponentsToFindOrderState($sql);
 
-        $orders = self::convertPSArrayToElements(Db::getInstance()->executeS($sql), $withNestedElements);
-
-        foreach ($orders as $key => $order) {
-            $orders[$key]->id_item_srb = $order->ps['id_item_srb'];
-            $orders[$key]->last_sent_at = $order->ps['last_sent_at'];
-            $orders[$key]->id_srb_shipback = $order->ps['id_srb_shipback'];
-            $orders[$key]->state = $order->ps['state'];
-            $orders[$key]->delivery = $order->ps['delivery'];
-        }
-
-        return $orders;
+        return self::convertPSArrayToElements(Db::getInstance()->executeS($sql), $withNestedElements);
     }
 
     // Own functions

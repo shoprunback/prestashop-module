@@ -16,6 +16,24 @@ trait PSElementTrait
             }
         }
 
+        return static::addMappingAttributesToElements($elements);
+    }
+
+    public function addMappingAttributes()
+    {
+        $this->id_item_srb = isset($this->ps['id_item_srb']) ? $this->ps['id_item_srb'] : null;
+        $this->last_sent_at = isset($this->ps['last_sent_at']) ? $this->ps['last_sent_at'] : null;
+        $this->id_srb_shipback = isset($this->ps['id_srb_shipback']) ? $this->ps['id_srb_shipback'] : null;
+        $this->state = isset($this->ps['state']) ? $this->ps['state'] : null;
+        $this->delivery = isset($this->ps['delivery']) ? $this->ps['delivery'] : null;
+    }
+
+    static public function addMappingAttributesToElements($elements)
+    {
+        foreach ($elements as $key => $element) {
+            $elements[$key]->addMappingAttributes();
+        }
+
         return $elements;
     }
 
@@ -34,7 +52,7 @@ trait PSElementTrait
         $joinType = $onlySyncElements ? 'innerJoin' : 'leftJoin';
 
         $sql = static::findAllQuery();
-        $sql->select(ElementMapper::getTableName() . '.id_item_srb');
+        $sql->select(ElementMapper::getTableName() . '.*');
         $sql->{$joinType}(
             ElementMapper::MAPPER_TABLE_NAME_NO_PREFIX,
             ElementMapper::getTableName(),
@@ -57,7 +75,6 @@ trait PSElementTrait
     static protected function findAllWithMappingQuery($onlySyncElements = false, $limit = 0, $offset = 0)
     {
         $sql = self::getComponentsToFindAllWithMappingQuery($onlySyncElements);
-        $sql->select(ElementMapper::getTableName() . '.*');
         $sql->groupBy(static::getTableIdentifier());
         $sql->orderBy(ElementMapper::getTableName() . '.last_sent_at DESC');
         $sql = self::addLimitToQuery($sql, $limit, $offset);
