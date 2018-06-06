@@ -210,7 +210,7 @@ class SRBProduct extends LibProduct implements PSElementInterface
 
     static public function findLikeLabelQuery($label, $limit = 0, $offset = 0, $onlySyncElements = false)
     {
-        $sql = self::findAllByCreateDateQuery($onlySyncElements, $limit, $offset);
+        $sql = self::findAllByMappingDateQuery($onlySyncElements, $limit, $offset);
         $sql->where('pl.name LIKE "%' . $label . '%"');
         return $sql;
     }

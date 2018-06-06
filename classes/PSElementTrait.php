@@ -112,7 +112,7 @@ trait PSElementTrait
         return static::addWhereId(static::findAllQuery(), $id);
     }
 
-    static public function findAllByCreateDateQuery($onlySyncElements = false, $limit = 0, $offset = 0)
+    static public function findAllByMappingDateQuery($onlySyncElements = false, $limit = 0, $offset = 0)
     {
         $sql = self::getComponentsToFindAllWithMappingQuery($onlySyncElements);
         $sql->orderBy(ElementMapper::getTableName() . '.last_sent_at DESC');
