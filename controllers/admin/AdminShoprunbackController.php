@@ -150,19 +150,22 @@ class AdminShoprunbackController extends ModuleAdminController
         switch ($elementType) {
             case 'return':
                 $externalLink .= '/shipbacks/';
-                $actionUrl = Context::getContext()->link->getAdminLink('AdminShoprunback') . '&elementType=return';
-                $this->context->smarty->assign('actionUrl', $actionUrl);
-                $this->context->smarty->assign('searchOrderReference', Tools::getValue('orderReference'));
-                $this->context->smarty->assign('searchCustomer', Tools::getValue('customer'));
+                $this->context->smarty->assign('actionUrl', Context::getContext()->link->getAdminLink('AdminShoprunback') . '&elementType=return');
+                $searchOrderReference = 'orderReference';
+                $searchCustomer = 'customer';
+                $this->context->smarty->assign('searchOrderReferenceName', $searchOrderReference);
+                $this->context->smarty->assign('searchCustomerName', $searchCustomer);
+                $this->context->smarty->assign('searchOrderReference', Tools::getValue($searchOrderReference));
+                $this->context->smarty->assign('searchCustomer', Tools::getValue($searchCustomer));
 
-                if (Tools::getValue('orderReference') !== false) {
-                    $searchCondition = 'orderReference';
+                if (Tools::getValue($searchOrderReference) !== false) {
+                    $searchCondition = $searchOrderReference;
                     $function = 'getLikeOrderReferenceByCreateDate';
-                    $countElements = SRBShipback::getCountLikeOrderReferenceByCreateDate(Tools::getValue('orderReference'));
-                } elseif (Tools::getValue('customer') !== false) {
-                    $searchCondition = 'customer';
+                    $countElements = SRBShipback::getCountLikeOrderReferenceByCreateDate(Tools::getValue($searchCondition));
+                } elseif (Tools::getValue($searchCustomer) !== false) {
+                    $searchCondition = $searchCustomer;
                     $function = 'getLikeCustomerByCreateDate';
-                    $countElements = SRBShipback::getCountLikeCustomerByCreateDate(Tools::getValue('customer'));
+                    $countElements = SRBShipback::getCountLikeCustomerByCreateDate(Tools::getValue($searchCondition));
                 } else {
                     $countElements = SRBShipback::getCountAll();
                 }
@@ -175,9 +178,20 @@ class AdminShoprunbackController extends ModuleAdminController
                 break;
             case 'product':
                 $externalLink .= '/products/';
-                $countElements = SRBProduct::getCountAll();
                 $class = 'SRBProduct';
-                $function = 'getAllWithMapping';
+                $this->context->smarty->assign('actionUrl', Context::getContext()->link->getAdminLink('AdminShoprunback') . '&elementType=product');
+                $searchLabel = 'label';
+                $this->context->smarty->assign('searchName', $searchLabel);
+                $this->context->smarty->assign('search', Tools::getValue($searchLabel));
+
+                if (Tools::getValue($searchLabel) !== false) {
+                    $searchCondition = $searchLabel;
+                    $function = 'getLikeLabel';
+                    $countElements = SRBProduct::getCountLikeLabel(Tools::getValue($searchLabel));
+                } else {
+                    $function = 'getAllWithMapping';
+                    $countElements = SRBProduct::getCountAll();
+                }
                 break;
             case 'order':
                 $externalLink .= '/orders/';
