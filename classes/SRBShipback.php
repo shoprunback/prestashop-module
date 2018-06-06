@@ -101,9 +101,13 @@ class SRBShipback extends LibShipback implements PSElementInterface
             return false;
         }
 
-        $order = SRBOrder::getById($orderId);
+        $order = SRBOrder::getNotSyncById($orderId);
         if (!$order->isShipped()) {
             return false;
+        }
+
+        if (!$order->isPersisted() && !ElementMapper::getMappingIdIfExists($order->id, $order::getObjectTypeForMapping())) {
+            $order->sync();
         }
 
         // If the order already has a shipback

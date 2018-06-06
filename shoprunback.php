@@ -340,10 +340,6 @@ class ShopRunBack extends Module
                     return false;
                 }
 
-                if (!$order->isPersisted() && !ElementMapper::getMappingIdIfExists($order->id, $order::getObjectTypeForMapping())) {
-                    $order->sync();
-                }
-
                 // To work everywhere, we must have something like 'shipback?orderId=ID', and not 'shipback&orderId=ID'
                 $this->context->smarty->assign(
                     'createReturnLink',
