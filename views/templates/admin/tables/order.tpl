@@ -20,8 +20,18 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>{l s="order.orders" mod='shoprunback'}</th>
-                        <th>{l s="order.customer" mod='shoprunback'}</th>
+                        <th>
+                            {l s="order.orders" mod='shoprunback'}
+                            {$search = $searchOrderNumber}
+                            {$searchName = $searchOrderNumberName}
+                            {include file="./search.tpl"}
+                        </th>
+                        <th>
+                            {l s="order.customer" mod='shoprunback'}
+                            {$search = $searchCustomer}
+                            {$searchName = $searchCustomerName}
+                            {include file="./search.tpl"}
+                        </th>
                         <th>{l s="order.command_date" mod='shoprunback'}</th>
                         <th>{l s="order.return_status" mod='shoprunback'}</th>
                         <th>{l s="element.last_sync" mod='shoprunback'}</th>

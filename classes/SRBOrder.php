@@ -4,7 +4,9 @@ use Shoprunback\Elements\Order as LibOrder;
 
 class SRBOrder extends LibOrder implements PSElementInterface
 {
-    use PSElementTrait;
+    use PSElementTrait {
+        findAllByMappingDateQuery as protected trait_findAllByMappingDateQuery;
+    }
 
     public function __construct($psOrder, $withNestedElements = true)
     {
@@ -74,15 +76,21 @@ class SRBOrder extends LibOrder implements PSElementInterface
         return $sql;
     }
 
-    static public function getAllWithMapping($onlySyncElements = false, $limit = 0, $offset = 0, $withNestedElements = true)
+    static public function getComponentsForShipbacks($sql)
     {
-        $sql = self::findAllWithMappingQuery($onlySyncElements, $limit, $offset);
         $sql->select(SRBShipback::getTableName() . '.' . SRBShipback::getIdColumnName() . ', ' . SRBShipback::getTableName() . '.state, os.delivery');
         $sql->leftJoin( // We use leftJoin because orders may not have a return associated
             SRBShipback::SHIPBACK_TABLE_NAME_NO_PREFIX,
             SRBShipback::getTableName(),
             SRBShipback::getTableName() . '.id_order = ' . self::getTableIdentifier()
         );
+        return $sql;
+    }
+
+    static public function getAllWithMapping($onlySyncElements = false, $limit = 0, $offset = 0, $withNestedElements = true)
+    {
+        $sql = self::findAllWithMappingQuery($onlySyncElements, $limit, $offset);
+        $sql = self::getComponentsForShipbacks($sql);
         $sql = self::getComponentsToFindOrderState($sql);
 
         $orders = self::convertPSArrayToElements(Db::getInstance()->executeS($sql), $withNestedElements);
@@ -169,6 +177,58 @@ class SRBOrder extends LibOrder implements PSElementInterface
             'os',
             'os.id_order_state = oh.id_order_state'
         );
+
+        return $sql;
+    }
+
+    static public function getCountLikeOrderNumber($orderNumber)
+    {
+        return self::getCountOfQuery(self::findLikeOrderNumberQuery($orderNumber));
+    }
+
+    static public function getLikeOrderNumber($orderNumber, $onlySyncElements = false, $limit = 0, $offset = 0, $withNestedElements = true)
+    {
+        $sql = self::findLikeOrderNumberQuery($orderNumber, $limit, $offset, $onlySyncElements);
+        $sql->groupBy(static::getTableIdentifier());
+        return self::convertPSArrayToElements(Db::getInstance()->executeS($sql), $withNestedElements);
+    }
+
+    static public function findAllByMappingDateQuery($onlySyncElements = false, $limit = 0, $offset = 0)
+    {
+        $sql = self::trait_findAllByMappingDateQuery($onlySyncElements, $limit, $offset);
+        $sql = self::getComponentsForShipbacks($sql);
+        $sql = self::getComponentsToFindOrderState($sql);
+        return $sql;
+    }
+
+    static public function findLikeOrderNumberQuery($orderNumber, $limit = 0, $offset = 0, $onlySyncElements = false)
+    {
+        $sql = self::findAllByMappingDateQuery($onlySyncElements, $limit, $offset);
+        $sql->where(static::getTableName() . '.reference LIKE "%' . $orderNumber . '%"');
+        return $sql;
+    }
+
+    static public function getLikeCustomer($customer, $onlySyncElements = false, $limit = 0, $offset = 0, $withNestedElements = true)
+    {
+        $sql = self::findLikeCustomerQuery($customer, $limit, $offset, $onlySyncElements);
+        $sql->groupBy(static::getTableIdentifier());
+        return self::convertPSArrayToElements(Db::getInstance()->executeS($sql), $withNestedElements);
+    }
+
+    static public function getCountLikeCustomer($customer)
+    {
+        return self::getCountOfQuery(self::findLikeCustomerQuery($customer));
+    }
+
+    static public function findLikeCustomerQuery($customer, $limit = 0, $offset = 0, $onlySyncElements = false)
+    {
+        $sql = self::findAllByMappingDateQuery($onlySyncElements, $limit, $offset);
+        $sql->where('
+            c.firstname LIKE "%' . pSQL($customer) . '%" OR
+            c.lastname LIKE "%' . pSQL($customer) . '%" OR
+            CONCAT(c.firstname, " ", c.lastname) LIKE "%' . pSQL($customer) . '%"'
+        );
+        $sql->orderBy('srbm.last_sent_at ASC');
 
         return $sql;
     }

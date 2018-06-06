@@ -205,7 +205,7 @@ class SRBProduct extends LibProduct implements PSElementInterface
 
     static public function getLikeLabel($label, $onlySyncElements = false, $limit = 0, $offset = 0, $withNestedElements = true)
     {
-        return self::convertPSArrayToElements(Db::getInstance()->executeS(self::findLikeLabelQuery($label, $limit, $offset, $withNestedElements, $onlySyncElements)), $withNestedElements);
+        return self::convertPSArrayToElements(Db::getInstance()->executeS(self::findLikeLabelQuery($label, $limit, $offset, $onlySyncElements)), $withNestedElements);
     }
 
     static public function findLikeLabelQuery($label, $limit = 0, $offset = 0, $onlySyncElements = false)

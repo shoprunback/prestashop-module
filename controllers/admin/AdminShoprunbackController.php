@@ -146,17 +146,18 @@ class AdminShoprunbackController extends ModuleAdminController
         $currentPage = (isset($_GET['currentPage'])) ? $_GET['currentPage'] : 1;
         $class = 'SRBShipback';
         $function = 'getAllByCreateDate';
+        $this->context->smarty->assign('actionUrl', Context::getContext()->link->getAdminLink('AdminShoprunback') . '&elementType=' . $elementType);
+
+        $searchCustomer = 'customer';
+        $this->context->smarty->assign('searchCustomerName', $searchCustomer);
+        $this->context->smarty->assign('searchCustomer', Tools::getValue($searchCustomer));
 
         switch ($elementType) {
             case 'return':
                 $externalLink .= '/shipbacks/';
-                $this->context->smarty->assign('actionUrl', Context::getContext()->link->getAdminLink('AdminShoprunback') . '&elementType=return');
                 $searchOrderReference = 'orderReference';
-                $searchCustomer = 'customer';
                 $this->context->smarty->assign('searchOrderReferenceName', $searchOrderReference);
-                $this->context->smarty->assign('searchCustomerName', $searchCustomer);
                 $this->context->smarty->assign('searchOrderReference', Tools::getValue($searchOrderReference));
-                $this->context->smarty->assign('searchCustomer', Tools::getValue($searchCustomer));
 
                 if (Tools::getValue($searchOrderReference) !== false) {
                     $searchCondition = $searchOrderReference;
@@ -179,7 +180,6 @@ class AdminShoprunbackController extends ModuleAdminController
             case 'product':
                 $externalLink .= '/products/';
                 $class = 'SRBProduct';
-                $this->context->smarty->assign('actionUrl', Context::getContext()->link->getAdminLink('AdminShoprunback') . '&elementType=product');
                 $searchLabel = 'label';
                 $this->context->smarty->assign('searchName', $searchLabel);
                 $this->context->smarty->assign('search', Tools::getValue($searchLabel));
@@ -195,9 +195,23 @@ class AdminShoprunbackController extends ModuleAdminController
                 break;
             case 'order':
                 $externalLink .= '/orders/';
-                $countElements = SRBOrder::getCountAll();
                 $class = 'SRBOrder';
-                $function = 'getAllWithMapping';
+                $searchOrderNumber = 'orderNumber';
+                $this->context->smarty->assign('searchOrderNumberName', $searchOrderNumber);
+                $this->context->smarty->assign('searchOrderNumber', Tools::getValue($searchOrderNumber));
+
+                if (Tools::getValue($searchOrderNumber) !== false) {
+                    $searchCondition = $searchOrderNumber;
+                    $function = 'getLikeOrderNumber';
+                    $countElements = SRBOrder::getCountLikeOrderNumber(Tools::getValue($searchOrderNumber));
+                } elseif (Tools::getValue($searchCustomer) !== false) {
+                    $searchCondition = $searchCustomer;
+                    $function = 'getLikeCustomer';
+                    $countElements = SRBOrder::getCountLikeCustomer(Tools::getValue($searchCondition));
+                } else {
+                    $function = 'getAllWithMapping';
+                    $countElements = SRBOrder::getCountAll();
+                }
                 break;
             default:
                 Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminShoprunback') . '&elementType=return');
