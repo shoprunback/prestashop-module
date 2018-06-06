@@ -93,7 +93,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
         $sql = self::getComponentsForShipbacks($sql);
         $sql = self::getComponentsToFindOrderState($sql);
 
-        return self::addMappingAttributesToElements(self::convertPSArrayToElements(Db::getInstance()->executeS($sql), $withNestedElements));
+        return self::convertPSArrayToElements(Db::getInstance()->executeS($sql), $withNestedElements);
     }
 
     // Own functions
@@ -180,7 +180,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
     {
         $sql = self::findLikeOrderNumberQuery($orderNumber, $limit, $offset, $onlySyncElements);
         $sql->groupBy(static::getTableIdentifier());
-        return self::addMappingAttributesToElements(self::convertPSArrayToElements(Db::getInstance()->executeS($sql), $withNestedElements));
+        return self::convertPSArrayToElements(Db::getInstance()->executeS($sql), $withNestedElements);
     }
 
     static public function findAllByMappingDateQuery($onlySyncElements = false, $limit = 0, $offset = 0)
@@ -202,7 +202,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
     {
         $sql = self::findLikeCustomerQuery($customer, $limit, $offset, $onlySyncElements);
         $sql->groupBy(static::getTableIdentifier());
-        return self::addMappingAttributesToElements(self::convertPSArrayToElements(Db::getInstance()->executeS($sql), $withNestedElements));
+        return self::convertPSArrayToElements(Db::getInstance()->executeS($sql), $withNestedElements);
     }
 
     static public function getCountLikeCustomer($customer)
