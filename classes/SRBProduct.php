@@ -111,7 +111,7 @@ class SRBProduct extends LibProduct implements PSElementInterface
         $imagePath = $_SERVER['DOCUMENT_ROOT'] . _THEME_PROD_DIR_ . $image->getExistingImgPath() . '.jpg';
 
         if (file_exists($imagePath)) {
-            return file_get_contents($imagePath);
+            return [_PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->getExistingImgPath() . '.jpg', file_get_contents($imagePath)];
         }
 
         return false;
@@ -119,10 +119,10 @@ class SRBProduct extends LibProduct implements PSElementInterface
 
     private function addCoverPicture()
     {
-        $coverPicture = $this->getCoverPicture();
+        list($imageUrl, $coverPicture) = $this->getCoverPicture();
 
         if ($coverPicture) {
-            $this->picture_file_url = 'ps-' . $this->label;
+            $this->picture_file_url = $imageUrl;
             $this->picture_file_base64 = 'data:image/png;base64,' . base64_encode($coverPicture);
         }
     }
