@@ -54,11 +54,9 @@
         {/if}
     </div>
 
-    {if $srbtoken}
-        <div class="export-logs col-md-2 text-center">
-            <h2>
-                <a href="{$exportLogsUrl}" class="btn btn-default" type="submit">{l s="config.logs.export" mod='shoprunback'}</a>
-            </h2>
-        </div>
-    {/if}
+    <div class="export-logs col-md-2 text-center">
+        <h2>
+            <a href="{$exportLogsUrl}" class="btn btn-default" type="submit">{l s="config.logs.export" mod='shoprunback'}</a>
+        </h2>
+    </div>
 </div>
