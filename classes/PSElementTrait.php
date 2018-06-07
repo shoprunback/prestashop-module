@@ -268,7 +268,7 @@ trait PSElementTrait
     {
         SRBLogger::addLog('SYNCHRONIZING ' . self::getObjectTypeForMapping() . ' "' . $this->getReference() . '"', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
 
-        // For Brands
+        // Add condition for Brands (they don't have nested elements)
         if (method_exists($this, 'syncNestedElements')) {
             $this->syncNestedElements();
         }
@@ -345,15 +345,20 @@ trait PSElementTrait
         return $result;
     }
 
+    public function getOriginalPreIdentifier()
+    {
+        return $this->ps[static::getPreIdentifier()];
+    }
+
     public function getDuplicates()
     {
         if (!static::canHaveDuplicates()) return false;
 
         // For products, we check if the reference in the PS DB is null, and if it is, we check the label
-        if (static::getObjectTypeForMapping() === 'product' && $this->ps[static::getPreIdentifier()] == '') {
+        if (static::getObjectTypeForMapping() === 'product' && $this->getOriginalPreIdentifier() == '') {
             return SRBProduct::getManyByName($this->label);
         }
 
-        return static::getManyByPreIdentifier($this->{static::getPreIdentifier()});
+        return static::getManyByPreIdentifier($this->getOriginalPreIdentifier());
     }
 }
