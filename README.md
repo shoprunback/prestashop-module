@@ -11,7 +11,7 @@ Visit the [documentation](https://shoprunback.github.io/documentation/prestashop
 
 ### Setup
 
-You'll need to setup a local server in order to install Prestashop.
+You will need to setup a local server in order to install Prestashop.
 
 To setup a local server on your machine :
 - Linux : https://www.digitalocean.com/community/tutorials/how-to-install-linux-apache-mysql-php-lamp-stack-on-ubuntu
@@ -19,7 +19,7 @@ To setup a local server on your machine :
 - Windows : http://www.wampserver.com/
 
 
-Then [download](https://www.prestashop.com/fr/telecharger) Prestashop and install it on your local server.
+Then [download](https://www.prestashop.com/fr/telecharger) Prestashop and install it on your server.
 
 
 ### Installation
