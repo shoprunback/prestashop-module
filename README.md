@@ -32,4 +32,3 @@ In order to use the module, you need an account on the ShopRunBack dashboard (yo
 To configure it, go to the configuration page. You can go there by 2 ways:
 - Go to Modules & Services -> Installed modules, search for "ShopRunBack", and click on "Configure"
 - Click on the ShopRunBack tab on the left menu, and then go to "Configuration"
-
