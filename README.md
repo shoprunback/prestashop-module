@@ -4,7 +4,7 @@ This repository hosts the code for the ShopRunBack module on Prestashop. To use 
 
 ## If you are an e-merchant
 
-Visit the [documentation](https://shoprunback.github.io/documentation/prestashop.html) for more informations.
+Visit the [documentation](https://shoprunback.github.io/documentation/prestashop.html) and follow the installation instructions.
 
 
 ## If you are a developer
