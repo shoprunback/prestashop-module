@@ -56,7 +56,7 @@ class ShopRunBack extends Module
         // Mandatory parameters
         $this->name = 'shoprunback';
         $this->author = 'ShopRunBack';
-        $this->version = '1.0.11';
+        $this->version = '1.0.12';
         $this->ps_versions_compliancy = array('min' => '1.6.0.9');
         $this->tab = 'administration';
         $this->tabs = [
@@ -364,9 +364,9 @@ class ShopRunBack extends Module
 
     public function hookDisplayHeader()
     {
-        $this->context->controller->addCSS($this->SRBModulePath . '/views/css/srbGlobal.css');
-        $this->context->controller->addCSS($this->SRBModulePath . '/views/css/front/orderDetail.css');
-        $this->context->controller->addJs($this->SRBModulePath . '/views/js/front/orderDetail.js');
+        $this->context->controller->addCSS($this->_path . 'views/css/srbGlobal.css');
+        $this->context->controller->addCSS($this->_path . 'views/css/front/orderDetail.css');
+        $this->context->controller->addJs($this->_path . 'views/js/front/orderDetail.js');
     }
 
     public function hookDisplayBackOfficeHeader() {
