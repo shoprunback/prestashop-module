@@ -121,7 +121,7 @@ trait PSElementTrait
 
     static public function getAllWithMapping($onlySyncElements = false, $limit = 0, $offset = 0, $withNestedElements = true)
     {
-        return self::convertPSArrayToElements(static::getAllWithMappingResult($onlySyncElements, $limit, $offset), $withNestedElements, true);
+        return self::convertPSArrayToElements(static::getAllWithMappingResult($onlySyncElements, $limit, $offset), $withNestedElements);
     }
 
     static public function getCountAllWithMapping($onlySyncElements = false)
