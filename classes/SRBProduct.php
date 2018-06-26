@@ -125,7 +125,7 @@ class SRBProduct extends LibProduct implements PSElementInterface
 
         if ($imageUrl) {
             $this->picture_file_url = $imageUrl;
-        else {
+        } else {
             $this->picture_file_base64 = 'data:image/png;base64,' . base64_encode($coverPicture);
         }
     }
