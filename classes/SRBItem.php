@@ -14,7 +14,7 @@ class SRBItem extends LibItem
         $this->label = $this->product->label;
         $this->reference = $this->product->getReference();
         foreach($combinations as $combination) {
-            $this->label .= ' ' . $combination['name'];
+            $this->label .= ' - ' . $combination['name'];
         }
     }
 
