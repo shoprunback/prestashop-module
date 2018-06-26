@@ -221,7 +221,7 @@ class SRBProduct extends LibProduct implements PSElementInterface
     static public function findCombinationQuery($idProduct, $idCart)
     {
         $sql = new DbQuery();
-        $sql->select('pa.*, al.name');
+        $sql->select('al.name');
         $sql->from('attribute_lang', 'al');
         $sql->innerJoin('product_attribute_combination', 'pac', 'pac.id_attribute = al.id_attribute');
         $sql->innerJoin('product_attribute', 'pa', 'pac.id_product_attribute = pa.id_product_attribute');
