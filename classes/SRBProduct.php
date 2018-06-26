@@ -24,6 +24,12 @@ class SRBProduct extends LibProduct implements PSElementInterface
             $this->brand_id = $this->brand->reference;
         }
 
+        if ($srbId = $this->getMapId()) {
+           parent::__construct($srbId);
+        } else {
+           parent::__construct();
+        }
+
         $this->metadata = [
             'ps_reference' => $psProduct['reference'],
         ];
