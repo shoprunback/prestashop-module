@@ -9,8 +9,6 @@ class SRBProduct extends LibProduct implements PSElementInterface
 
     public function __construct($psProduct)
     {
-        var_dump('product construct');
-        var_dump($psProduct['id_product']);
         $this->ps = $psProduct;
         $this->label = $this->extractNameFromPSArray($psProduct['name']);
         $this->reference = $psProduct['id_product'];
@@ -35,7 +33,6 @@ class SRBProduct extends LibProduct implements PSElementInterface
         $this->metadata = [
             'ps_reference' => $psProduct['reference'],
         ];
-        die;
     }
 
     // Inherited functions
