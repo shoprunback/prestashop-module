@@ -9,6 +9,8 @@ class SRBProduct extends LibProduct implements PSElementInterface
 
     public function __construct($psProduct)
     {
+
+
         $this->ps = $psProduct;
         $this->label = $this->extractNameFromPSArray($psProduct['name']);
         $this->weight_grams = intval($psProduct['weight'] * 1000);
@@ -23,14 +25,20 @@ class SRBProduct extends LibProduct implements PSElementInterface
             $this->brand_id = $this->brand->reference;
         }
 
-        // In case of products with the same reference, we need to check if the product has been synchronized to get its reference
-        if ($srbId = $this->getMapId()) {
-            $this->reference = LibProduct::retrieve($srbId)->reference;
-            parent::__construct($srbId);
-        } else {
-            $this->reference = $this->generateIdentifier();
-            parent::__construct();
-        }
+        $this->reference = $psProduct['id_product'];
+
+        $this->metadata = [
+            'ps_reference' => $psProduct['reference'],
+        ];
+
+        // // In case of products with the same reference, we need to check if the product has been synchronized to get its reference
+        // if ($srbId = $this->getMapId()) {
+        //     $this->reference = LibProduct::retrieve($srbId)->reference;
+        //     parent::__construct($srbId);
+        // } else {
+        //     $this->reference = $this->generateIdentifier();
+        //     parent::__construct();
+        // }
     }
 
     // Inherited functions
@@ -122,7 +130,7 @@ class SRBProduct extends LibProduct implements PSElementInterface
         list($imageUrl, $coverPicture) = $this->getCoverPicture();
 
         if ($coverPicture) {
-            $this->picture_file_url = $imageUrl;
+          //  $this->picture_file_url = $imageUrl;
             $this->picture_file_base64 = 'data:image/png;base64,' . base64_encode($coverPicture);
         }
     }
@@ -214,4 +222,25 @@ class SRBProduct extends LibProduct implements PSElementInterface
         $sql->where('pl.name LIKE "%' . $label . '%"');
         return $sql;
     }
+
+    static public function findCombinationQuery($idProduct, $idCart)
+    {
+        $sql = new DbQuery();
+        $sql->select('pa.*, al.*');
+        $sql->from('attribute_lang', 'al');
+        $sql->innerJoin('product_attribute_combination', 'pac', 'pac.id_attribute = al.id_attribute');
+        $sql->innerJoin('product_attribute', 'pa', 'pac.id_product_attribute = pa.id_product_attribute');
+        $sql->innerJoin('cart_product', 'ca', 'ca.id_product_attribute = pa.id_product_attribute');
+        $sql->where('ca.id_cart = ' . $idCart);
+        $sql->where('pa.' . self::getIdColumnName() . ' = ' . $idProduct);
+        $sql->where('al.id_lang = ' . Configuration::get('PS_LANG_DEFAULT'));
+
+        return $sql;
+    }
+
+    static public function getCombinations($idProduct, $idCart)
+    {
+        return Db::getInstance()->executeS(static::findCombinationQuery($idProduct, $idCart));
+    }
+
 }
