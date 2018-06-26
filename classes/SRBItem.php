@@ -62,7 +62,6 @@ class SRBItem extends LibItem
             for ($i = 1; $i <= $quantity; $i++) {
                 $items[] = $item;
             }
-
         }
 
         return $items;

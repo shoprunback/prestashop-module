@@ -16,6 +16,9 @@ class SRBProduct extends LibProduct implements PSElementInterface
         $this->width_mm = intval($psProduct['width'] * 10);
         $this->height_mm = intval($psProduct['height'] * 10);
         $this->length_mm = intval($psProduct['depth'] * 10);
+        $this->metadata = [
+            'ps_reference' => $psProduct['reference'],
+        ];
 
         $this->addCoverPicture();
 
