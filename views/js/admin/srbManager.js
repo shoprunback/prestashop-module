@@ -36,4 +36,16 @@ $(document).ready(function() {
   $('#srb-content td[data-link][data-link!=""]').on('click', function (e) {
     window.open($(this).data('link'), '_blank');
   });
+
+  $('.post-all').on('click', function(e) {
+    e.preventDefault();
+
+    var data = {
+      'action': 'syncAll',
+      'className': getSRBObjectName($(this).data('type')),
+      'params': ''
+    };
+
+    ajaxAsyncCall(data);
+  });
 });

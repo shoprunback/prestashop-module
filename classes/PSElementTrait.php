@@ -150,10 +150,10 @@ trait PSElementTrait
         return static::addWhereId(static::findAllQuery(), $id);
     }
 
-    static public function findAllByMappingDateQuery($onlySyncElements = false, $limit = 0, $offset = 0)
+    static public function findAllByMappingDateQuery($onlySyncElements = false, $limit = 0, $offset = 0, $orderBy = 'DESC')
     {
         $sql = self::getComponentsToFindAllWithMappingQuery($onlySyncElements);
-        $sql->orderBy(ElementMapper::getTableName() . '.last_sent_at DESC');
+        $sql->orderBy(ElementMapper::getTableName() . '.last_sent_at ' . $orderBy);
         $sql = self::addLimitToQuery($sql, $limit, $offset);
         return $sql;
     }
@@ -231,6 +231,12 @@ trait PSElementTrait
     {
         $class = get_called_class();
         return self::convertPSArrayToElements(Db::getInstance()->executeS($class::findAllQuery($limit, $offset)));
+    }
+
+    static public function getAllBySyncDate($limit = 0, $offset = 0, $orderBy = 'DESC')
+    {
+        $class = get_called_class();
+        return self::convertPSArrayToElements(Db::getInstance()->executeS($class::findAllByMappingDateQuery(false, $limit, $offset, $orderBy)));
     }
 
     static public function getCountAll()
@@ -381,5 +387,14 @@ trait PSElementTrait
         }
 
         return static::getManyByPreIdentifier($this->getOriginalPreIdentifier());
+    }
+
+    static public function syncAll()
+    {
+        $elements = static::getAllBySyncDate(0, 0, 'ASC');
+
+        foreach ($elements as $key => $element) {
+            $element->sync(false);
+        }
     }
 }
