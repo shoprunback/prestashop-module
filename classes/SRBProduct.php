@@ -25,9 +25,9 @@ class SRBProduct extends LibProduct implements PSElementInterface
         }
 
         if ($srbId = $this->getMapId()) {
-           parent::__construct($srbId);
+            parent::__construct($srbId);
         } else {
-           parent::__construct();
+            parent::__construct();
         }
 
         $this->metadata = [
