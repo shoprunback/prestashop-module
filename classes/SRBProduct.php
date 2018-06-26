@@ -217,4 +217,25 @@ class SRBProduct extends LibProduct implements PSElementInterface
         $sql->where('pl.name LIKE "%' . $label . '%"');
         return $sql;
     }
+
+    static public function findCombinationQuery($idProduct, $idCart)
+    {
+        $sql = new DbQuery();
+        $sql->select('al.name');
+        $sql->from('attribute_lang', 'al');
+        $sql->innerJoin('product_attribute_combination', 'pac', 'pac.id_attribute = al.id_attribute');
+        $sql->innerJoin('product_attribute', 'pa', 'pac.id_product_attribute = pa.id_product_attribute');
+        $sql->innerJoin('cart_product', 'ca', 'ca.id_product_attribute = pa.id_product_attribute');
+        $sql->where('ca.id_cart = ' . $idCart);
+        $sql->where('pa.' . self::getIdColumnName() . ' = ' . $idProduct);
+        $sql->where('al.id_lang = ' . Configuration::get('PS_LANG_DEFAULT'));
+
+        return $sql;
+    }
+
+    static public function getCombinations($idProduct, $idCart)
+    {
+        return Db::getInstance()->executeS(static::findCombinationQuery($idProduct, $idCart));
+    }
+
 }
