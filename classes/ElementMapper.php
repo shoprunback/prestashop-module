@@ -139,7 +139,6 @@ class ElementMapper
     static public function getAll()
     {
         return self::generateMappers(Db::getInstance()->executeS(self::findAllQuery()));
-
     }
 
     static public function findAllQuery()
