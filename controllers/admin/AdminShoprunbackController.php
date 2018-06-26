@@ -91,10 +91,23 @@ class AdminShoprunbackController extends ModuleAdminController
         parent::initContent();
 
         $elementType = (isset($_GET['elementType'])) ? $_GET['elementType'] : '';
+        $message = '';
+
+        $this->context->smarty->assign('elementType', $elementType);
+        $this->context->smarty->assign('shoprunbackURL', $this->module->url);
+        $this->context->smarty->assign('shoprunbackURLProd', $this->module->urlProd);
+        $this->context->smarty->assign('srbManager', $this->tabUrl);
+        $this->context->smarty->assign('message', $message);
+        $this->context->smarty->assign('asyncCall', $this->tabUrl . '&action=asyncCall');
+        $this->setTemplate('../../../../modules/' . $this->module->name . '/views/templates/admin/layout.tpl');
+
+        if (isset($_GET['syncAll'])) {
+            $this->syncAll();
+            return;
+        }
+
         $elements = [];
         $template = 'srbManager';
-        $message = '';
-        $this->context->smarty->assign('elementType', $elementType);
 
         if ($elementType == 'config') {
             if (Tools::getValue('srbtoken')) {
@@ -127,14 +140,8 @@ class AdminShoprunbackController extends ModuleAdminController
         }
 
         $this->context->smarty->assign('srbtoken', RestClient::getClient()->getToken());
-        $this->context->smarty->assign('shoprunbackURL', $this->module->url);
-        $this->context->smarty->assign('shoprunbackURLProd', $this->module->urlProd);
-        $this->context->smarty->assign('srbManager', $this->tabUrl);
-        $this->context->smarty->assign('asyncCall', $this->tabUrl . '&action=asyncCall');
         $this->context->smarty->assign('link', $link);
         $this->context->smarty->assign('template', $template);
-        $this->context->smarty->assign('message', $message);
-        $this->setTemplate('../../../../modules/' . $this->module->name . '/views/templates/admin/layout.tpl');
     }
 
     private function getElements($elementType = 'return')
@@ -296,5 +303,14 @@ class AdminShoprunbackController extends ModuleAdminController
         } catch (Exception $e) {
             SRBLogger::addLog('Log export failed: ' . json_encode($e), SRBLogger::FATAL, 'configuration');
         }
+    }
+
+    public function syncAll()
+    {
+        $this->context->smarty->assign('template', 'syncAll');
+        $this->context->smarty->assign('syncBrandsUrl', $this->tabUrl . '&syncAll&synchronize=brand');
+        $this->context->smarty->assign('syncProductsUrl', $this->tabUrl . '&syncAll&synchronize=product');
+        $this->context->smarty->assign('syncOrdersUrl', $this->tabUrl . '&syncAll&synchronize=order');
+        $this->addJs(_PS_MODULE_DIR_ . $this->module->name . '/views/js/admin/srbManager.js');
     }
 }
