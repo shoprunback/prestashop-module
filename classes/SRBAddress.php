@@ -56,7 +56,7 @@ class SRBAddress extends LibAddress implements PSInterface
 
     static public function createFromOrder($psOrder)
     {
-        return new self($psOrder);
+        return self::getNotSyncById($psOrder['id_address_delivery'], false);
     }
 
     static protected function findByCustomerIdQuery($customerId)
@@ -67,5 +67,17 @@ class SRBAddress extends LibAddress implements PSInterface
     static protected function findByOrderIdQuery($orderId)
     {
         return self::findAllQuery()->innerJoin('orders', SRBOrder::getTableName(), SRBOrder::getTableName() . '.id_address_delivery = ' . self::getTableName() . '.id_address')->where(SRBOrder::getTableName() . '.id_order = ' . pSQL($orderId));
+    }
+
+    static public function findAllQuery($limit = 0, $offset = 0)
+    {
+        $sql = new DbQuery();
+        $sql->select(self::getTableName() . '.*, s.name as stateName, co.*');
+        $sql->from('address', self::getTableName());
+        $sql->innerJoin('country', 'co', self::getTableName() . '.id_country = co.id_country');
+        $sql->leftJoin('state', 's', 'a.id_state = s.id_state');
+        $sql = self::addLimitToQuery($sql, $limit, $offset);
+
+        return $sql;
     }
 }
