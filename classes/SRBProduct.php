@@ -9,10 +9,9 @@ class SRBProduct extends LibProduct implements PSElementInterface
 
     public function __construct($psProduct)
     {
-
-
         $this->ps = $psProduct;
         $this->label = $this->extractNameFromPSArray($psProduct['name']);
+        $this->reference = $psProduct['id_product'];
         $this->weight_grams = intval($psProduct['weight'] * 1000);
         $this->width_mm = intval($psProduct['width'] * 10);
         $this->height_mm = intval($psProduct['height'] * 10);
@@ -25,20 +24,11 @@ class SRBProduct extends LibProduct implements PSElementInterface
             $this->brand_id = $this->brand->reference;
         }
 
-        $this->reference = $psProduct['id_product'];
-
-        $this->metadata = [
-            'ps_reference' => $psProduct['reference'],
-        ];
-
-        // // In case of products with the same reference, we need to check if the product has been synchronized to get its reference
-        // if ($srbId = $this->getMapId()) {
-        //     $this->reference = LibProduct::retrieve($srbId)->reference;
-        //     parent::__construct($srbId);
-        // } else {
-        //     $this->reference = $this->generateIdentifier();
-        //     parent::__construct();
-        // }
+        if ($srbId = $this->getMapId()) {
+            parent::__construct($srbId);
+        } else {
+            parent::__construct();
+        }
     }
 
     // Inherited functions

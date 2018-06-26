@@ -4,7 +4,7 @@ use \Shoprunback\ElementManager;
 
 trait PSElementTrait
 {
-    static protected function convertPSArrayToElements($PSArray, $withNestedElements = true)
+    static protected function convertPSArrayToElements($PSArray, $withNestedElements = true, $retrieveMapping = false)
     {
         $class = get_called_class();
         $elements = [];
@@ -16,10 +16,23 @@ trait PSElementTrait
             }
         }
 
-        return static::addMappingAttributesToElements($elements);
+        return static::addMappingAttributesToElements($elements, $retrieveMapping);
     }
 
-    public function addMappingAttributes()
+    static public function addMappingAttributesToElements($elements, $retrieveMapping = false)
+    {
+        if ($retrieveMapping) {
+            return static::addMappingsToElements($elements);
+        }
+
+        foreach ($elements as $key => $element) {
+            $elements[$key]->addMappingAttributesFromPS();
+        }
+
+        return $elements;
+    }
+
+    public function addMappingAttributesFromPS()
     {
         $this->id_item_srb = isset($this->ps['id_item_srb']) ? $this->ps['id_item_srb'] : null;
         $this->last_sent_at = isset($this->ps['last_sent_at']) ? $this->ps['last_sent_at'] : null;
@@ -28,10 +41,28 @@ trait PSElementTrait
         $this->delivery = isset($this->ps['delivery']) ? $this->ps['delivery'] : null;
     }
 
-    static public function addMappingAttributesToElements($elements)
+    public function addMappingAttributesFromMapping($mapping)
     {
+        $this->id_item_srb = $mapping->id_item_srb;
+        $this->last_sent_at = $mapping->last_sent_at;
+    }
+
+    static public function addMappingsToElements($elements)
+    {
+        $ids = [];
         foreach ($elements as $key => $element) {
-            $elements[$key]->addMappingAttributes();
+            $ids[] = $element->getDBId();
+        }
+
+        $mappings = ElementMapper::getMappingsForIdsAndType($ids, static::getObjectTypeForMapping());
+
+        foreach ($mappings as $mapping) {
+            foreach ($elements as $key => $element) {
+                if ($element->getDBId() != $mapping->id_item) continue;
+
+                $elements[$key]->addMappingAttributesFromMapping($mapping);
+                break;
+            }
         }
 
         return $elements;
@@ -88,19 +119,9 @@ trait PSElementTrait
         return Db::getInstance()->executeS($class::findAllWithMappingQuery($onlySyncElements, $limit, $offset));
     }
 
-    static public function fillElementsWithMapping(&$elements)
-    {
-        foreach ($elements as $key => $element) {
-            $elements[$key]->id_item_srb = $element->ps['id_item_srb'];
-            $elements[$key]->last_sent_at = $element->ps['last_sent_at'];
-        }
-    }
-
     static public function getAllWithMapping($onlySyncElements = false, $limit = 0, $offset = 0, $withNestedElements = true)
     {
-        $elements = self::convertPSArrayToElements(static::getAllWithMappingResult($onlySyncElements, $limit, $offset), $withNestedElements);
-        self::fillElementsWithMapping($elements);
-        return $elements;
+        return self::convertPSArrayToElements(static::getAllWithMappingResult($onlySyncElements, $limit, $offset), $withNestedElements, true);
     }
 
     static public function getCountAllWithMapping($onlySyncElements = false)
