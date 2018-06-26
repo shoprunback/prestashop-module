@@ -10,12 +10,11 @@ class SRBBrand extends LibBrand implements PSElementInterface
     {
         $this->ps = $manufacturer;
         $this->name = $manufacturer['name'];
+        $this->reference = $manufacturer['id_manufacturer'];
 
         if ($srbId = $this->getMapId()) {
-            $this->reference = LibBrand::retrieve($srbId)->reference;
             parent::__construct($srbId);
         } else {
-            $this->reference = $this->generateIdentifier();
             parent::__construct();
         }
     }
