@@ -126,16 +126,20 @@ class ElementMapper
         return self::returnResult($result);
     }
 
-    static public function getAll()
+    static private function generateMappers($mappingsFromDB)
     {
-        $shipbacksFromDB = Db::getInstance()->executeS(self::findAllQuery());
-
-        $shipbacks = [];
-        foreach ($shipbacksFromDB as $shipback) {
-            $shipbacks[] = new self($shipback);
+        $mappings = [];
+        foreach ($mappingsFromDB as $mapping) {
+            $mappings[] = new self($mapping);
         }
 
-        return $shipbacks;
+        return $mappings;
+    }
+
+    static public function getAll()
+    {
+        return self::generateMappers(Db::getInstance()->executeS(self::findAllQuery()));
+
     }
 
     static public function findAllQuery()
@@ -171,6 +175,19 @@ class ElementMapper
         $sql->select(self::getTableName() . '.last_sent_at');
         $sql->from(self::MAPPER_TABLE_NAME_NO_PREFIX, self::getTableName());
         $sql->where(self::getTableName() . '.type = "' . $type . '"');
+
+        return $sql;
+    }
+
+    static public function getMappingsForIdsAndType($ids, $type)
+    {
+        return self::generateMappers(Db::getInstance()->executeS(self::findByTypeAndListOfIdsQuery($ids, $type)));
+    }
+
+    static public function findByTypeAndListOfIdsQuery($ids, $type)
+    {
+        $sql = static::findByTypeQuery($type);
+        $sql->where(self::getTableName() . '.id_item IN (' . implode(', ', $ids) . ')');
 
         return $sql;
     }
