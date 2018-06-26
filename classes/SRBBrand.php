@@ -8,6 +8,8 @@ class SRBBrand extends LibBrand implements PSElementInterface
 
     public function __construct($manufacturer)
     {
+        var_dump('brand construct');
+        var_dump($manufacturer['id_manufacturer']);
         $this->ps = $manufacturer;
         $this->name = $manufacturer['name'];
         $this->reference = $manufacturer['id_manufacturer'];
@@ -17,6 +19,7 @@ class SRBBrand extends LibBrand implements PSElementInterface
         } else {
             parent::__construct();
         }
+        // die;
     }
 
     // Inherited functions
