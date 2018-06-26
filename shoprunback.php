@@ -273,13 +273,14 @@ class ShopRunBack extends Module
     public function hookActionProductUpdate($params)
     {
         if (\Shoprunback\RestClient::getClient()->getToken()) {
+            $productId = (version_compare(_PS_VERSION_, '1.7', '>')) ? $params['product']->id : $params['id_product'];
             // In 1.7 the productAdd hook doesn't exist, so it's productUpdate that must manage the adding
             try {
-                $product = SRBProduct::getById($params['product']->id);
+                $product = SRBProduct::getById($productId);
                 $product->sync();
             } catch (ProductException $e) {
                 try {
-                    $product = SRBProduct::getNotSyncById($params['product']->id);
+                    $product = SRBProduct::getNotSyncById($productId);
                     $product->sync();
                 } catch (ProductException $e) {
                     return $e;
