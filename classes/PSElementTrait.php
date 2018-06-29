@@ -259,15 +259,15 @@ trait PSElementTrait
 
     static public function joinCustomer(&$sql)
     {
-        $sql->innerJoin('customer', 'c', SRBOrder::getTableName() . '.id_customer = c.id_customer');
+        $sql->innerJoin(SRBCustomer::getTableWithoutPrefix(), SRBCustomer::getTableName(), SRBOrder::getTableName() . '.' . SRBCustomer::getIdColumnName() . ' = ' . SRBCustomer::getTableIdentifier());
     }
 
     static public function addWhereLikeCustomerToQuery(&$sql, $customer)
     {
-        $sql->where('
-            c.firstname LIKE "%' . pSQL($customer) . '%" OR
-            c.lastname LIKE "%' . pSQL($customer) . '%" OR
-            CONCAT(c.firstname, " ", c.lastname) LIKE "%' . pSQL($customer) . '%"'
+        $sql->where(
+            SRBCustomer::getTableName() . '.firstname LIKE "%' . pSQL($customer) . '%" OR ' .
+            SRBCustomer::getTableName() . '.lastname LIKE "%' . pSQL($customer) . '%" OR
+            CONCAT(' . SRBCustomer::getTableName() . '.firstname, " ", ' . SRBCustomer::getTableName() . '.lastname) LIKE "%' . pSQL($customer) . '%"'
         );
     }
 
