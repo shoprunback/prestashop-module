@@ -241,14 +241,39 @@ trait PSElementTrait
 
     static public function getCountAll()
     {
-        $class = get_called_class();
-        return self::getCountOfQuery($class::findAllQuery());
+        return static::getCountOfQuery(static::getBaseQuery());
     }
 
     static public function getAllNotSync()
     {
         $class = get_called_class();
         return self::convertPSArrayToElements(Db::getInstance()->executeS($class::findNotSyncQuery()));
+    }
+
+    static public function getBaseQuery()
+    {
+        $sql = new DbQuery();
+        $sql->from(static::getTableWithoutPrefix(), static::getTableName());
+        return $sql;
+    }
+
+    static public function joinCustomer(&$sql)
+    {
+        $sql->innerJoin('customer', 'c', SRBOrder::getTableName() . '.id_customer = c.id_customer');
+    }
+
+    static public function addWhereLikeCustomerToQuery(&$sql, $customer)
+    {
+        $sql->where('
+            c.firstname LIKE "%' . pSQL($customer) . '%" OR
+            c.lastname LIKE "%' . pSQL($customer) . '%" OR
+            CONCAT(c.firstname, " ", c.lastname) LIKE "%' . pSQL($customer) . '%"'
+        );
+    }
+
+    static public function addWhereLikeOrderNumberToQuery(&$sql, $orderNumber)
+    {
+        $sql->where(SRBOrder::getTableName() . '.reference LIKE "%' . $orderNumber . '%"');
     }
 
     public function mapApiCall()

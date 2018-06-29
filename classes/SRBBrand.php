@@ -67,9 +67,8 @@ class SRBBrand extends LibBrand implements PSElementInterface
 
     static public function findAllQuery($limit = 0, $offset = 0)
     {
-        $sql = new DbQuery();
+        $sql = static::getBaseQuery();
         $sql->select(self::getTableName() . '.*');
-        $sql->from('manufacturer', self::getTableName());
         $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
