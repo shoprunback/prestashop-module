@@ -262,7 +262,7 @@ trait PSElementTrait
         $sql->innerJoin(SRBCustomer::getTableWithoutPrefix(), SRBCustomer::getTableName(), SRBOrder::getTableName() . '.' . SRBCustomer::getIdColumnName() . ' = ' . SRBCustomer::getTableIdentifier());
     }
 
-    static public function addWhereLikeCustomerToQuery(&$sql, $customer)
+    static public function addLikeCustomerToQuery(&$sql, $customer)
     {
         $sql->where(
             SRBCustomer::getTableName() . '.firstname LIKE "%' . pSQL($customer) . '%" OR ' .
@@ -271,7 +271,7 @@ trait PSElementTrait
         );
     }
 
-    static public function addWhereLikeOrderNumberToQuery(&$sql, $orderNumber)
+    static public function addLikeOrderNumberToQuery(&$sql, $orderNumber)
     {
         $sql->where(SRBOrder::getTableName() . '.reference LIKE "%' . $orderNumber . '%"');
     }

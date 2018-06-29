@@ -172,7 +172,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
     static public function getCountLikeOrderNumber($orderNumber)
     {
         $sql = static::getBaseQuery();
-        static::addWhereLikeOrderNumberToQuery($sql, $orderNumber);
+        static::addLikeOrderNumberToQuery($sql, $orderNumber);
         return self::getCountOfQuery($sql);
     }
 
@@ -194,7 +194,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
     static public function findLikeOrderNumberQuery($orderNumber, $limit = 0, $offset = 0, $onlySyncElements = false)
     {
         $sql = self::findAllByMappingDateQuery($onlySyncElements, $limit, $offset);
-        static::addWhereLikeOrderNumberToQuery($sql, $orderNumber);
+        static::addLikeOrderNumberToQuery($sql, $orderNumber);
         return $sql;
     }
 
@@ -209,14 +209,14 @@ class SRBOrder extends LibOrder implements PSElementInterface
     {
         $sql = static::getBaseQuery();
         static::joinCustomer($sql);
-        static::addWhereLikeCustomerToQuery($sql, $customer);
+        static::addLikeCustomerToQuery($sql, $customer);
         return self::getCountOfQuery($sql);
     }
 
     static public function findLikeCustomerQuery($customer, $limit = 0, $offset = 0, $onlySyncElements = false)
     {
         $sql = self::findAllByMappingDateQuery($onlySyncElements, $limit, $offset);
-        self::addWhereLikeCustomerToQuery($sql, $customer);
+        self::addLikeCustomerToQuery($sql, $customer);
         $sql->orderBy('srbm.last_sent_at ASC');
 
         return $sql;

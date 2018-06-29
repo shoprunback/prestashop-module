@@ -265,7 +265,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
     static public function findLikeCustomerByCreateDateQuery($customer, $limit = 0, $offset = 0)
     {
         $sql = self::findAllByCreateDateQuery($limit, $offset);
-        self::addWhereLikeCustomerToQuery($sql, $customer);
+        self::addLikeCustomerToQuery($sql, $customer);
         $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
