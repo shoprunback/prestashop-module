@@ -71,9 +71,8 @@ class SRBAddress extends LibAddress implements PSInterface
 
     static public function findAllQuery($limit = 0, $offset = 0)
     {
-        $sql = new DbQuery();
+        $sql = static::getBaseQuery();
         $sql->select(self::getTableName() . '.*, s.name as stateName, co.*');
-        $sql->from('address', self::getTableName());
         $sql->innerJoin('country', 'co', self::getTableName() . '.id_country = co.id_country');
         $sql->leftJoin('state', 's', 'a.id_state = s.id_state');
         $sql = self::addLimitToQuery($sql, $limit, $offset);
