@@ -221,8 +221,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
             ElementMapper::MAPPER_TABLE_NAME_NO_PREFIX,
             ElementMapper::getTableName(),
             ElementMapper::getTableName() . '.id_item_srb = ' . static::getTableIdentifier() . '
-                AND ' . ElementMapper::getTableName() . '.type = "' . static::getObjectTypeForMapping() . '"
-                AND ' . ElementMapper::getTableName() . '.last_sent_at IN (' . ElementMapper::findOnlyLastSentByTypeQuery(static::getObjectTypeForMapping()) . ')'
+                AND ' . ElementMapper::getTableName() . '.type = "' . static::getObjectTypeForMapping() . '"'
         );
 
         return $sql;

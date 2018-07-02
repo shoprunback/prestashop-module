@@ -83,13 +83,12 @@ trait PSElementTrait
         $joinType = $onlySyncElements ? 'innerJoin' : 'leftJoin';
 
         $sql = static::findAllQuery();
-        $sql->select(ElementMapper::getTableName() . '.*');
+        ElementMapper::addSelectAllToQuery($sql);
         $sql->{$joinType}(
             ElementMapper::MAPPER_TABLE_NAME_NO_PREFIX,
             ElementMapper::getTableName(),
             ElementMapper::getTableName() . '.id_item = ' . static::getTableIdentifier() . '
-                AND ' . ElementMapper::getTableName() . '.type = "' . static::getObjectTypeForMapping() . '"
-                AND ' . ElementMapper::getTableName() . '.last_sent_at IN (' . ElementMapper::findOnlyLastSentByTypeQuery(static::getObjectTypeForMapping()) . ')'
+                AND ' . ElementMapper::getTableName() . '.type = "' . static::getObjectTypeForMapping() . '"'
         );
 
         return $sql;
@@ -107,8 +106,8 @@ trait PSElementTrait
     {
         $sql = self::getComponentsToFindAllWithMappingQuery($onlySyncElements);
         $sql->groupBy(static::getTableIdentifier());
-        $sql->orderBy(ElementMapper::getTableName() . '.last_sent_at DESC');
         $sql = self::addLimitToQuery($sql, $limit, $offset);
+        $sql->orderBy(ElementMapper::getTableName() . '.last_sent_at DESC');
 
         return $sql;
     }
