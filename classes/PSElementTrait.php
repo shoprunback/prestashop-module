@@ -106,8 +106,8 @@ trait PSElementTrait
     {
         $sql = self::getComponentsToFindAllWithMappingQuery($onlySyncElements);
         $sql->groupBy(static::getTableIdentifier());
-        $sql = self::addLimitToQuery($sql, $limit, $offset);
         $sql->orderBy(ElementMapper::getTableName() . '.last_sent_at DESC');
+        $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
     }
