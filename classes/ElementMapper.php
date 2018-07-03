@@ -35,6 +35,11 @@ class ElementMapper
         return 'id_srb_map';
     }
 
+    static public function getTableIdentifier()
+    {
+        return static::getTableName() . '.' . static::getIdColumnName();
+    }
+
     public function save()
     {
         $mapArray = [];
@@ -96,14 +101,14 @@ class ElementMapper
 
     static public function getByType($type)
     {
-        $shipbacksFromDB = Db::getInstance()->executeS(self::findByTypeQuery($type));
+        $mappingsFromDB = Db::getInstance()->executeS(self::findByTypeQuery($type));
 
-        $shipbacks = [];
-        foreach ($shipbacksFromDB as $shipback) {
-            $shipbacks[] = new self($shipback);
+        $mappings = [];
+        foreach ($mappingsFromDB as $mapping) {
+            $mappings[] = new self($mapping);
         }
 
-        return $shipbacks;
+        return $mappings;
     }
 
     static public function getByIdItemAndItemType($idItem, $type)
@@ -141,10 +146,21 @@ class ElementMapper
         return self::generateMappers(Db::getInstance()->executeS(self::findAllQuery()));
     }
 
+    static public function addSelectAllToQuery(&$sql)
+    {
+        $sql->select(
+            self::getTableName() . '.id_srb_map, ' .
+            self::getTableName() . '.id_item_srb, ' .
+            self::getTableName() . '.id_item, ' .
+            self::getTableName() . '.type, ' .
+            self::getTableName() . '.last_sent_at'
+        );
+    }
+
     static public function findAllQuery()
     {
         $sql = new DbQuery();
-        $sql->select(self::getTableName() . '.*');
+        self::addSelectAllToQuery($sql);
         $sql->from(self::MAPPER_TABLE_NAME_NO_PREFIX, self::getTableName());
 
         return $sql;

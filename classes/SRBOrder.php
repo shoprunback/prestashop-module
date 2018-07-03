@@ -77,7 +77,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
 
     static public function getComponentsForShipbacks($sql)
     {
-        $sql->select(SRBShipback::getTableName() . '.' . SRBShipback::getIdColumnName() . ', ' . SRBShipback::getTableName() . '.state, os.delivery');
+        $sql->select(SRBShipback::getTableName() . '.' . SRBShipback::getIdColumnName() . ', ' . SRBShipback::getTableName() . '.state');
         $sql->leftJoin( // We use leftJoin because orders may not have a return associated
             SRBShipback::SHIPBACK_TABLE_NAME_NO_PREFIX,
             SRBShipback::getTableName(),
@@ -90,7 +90,6 @@ class SRBOrder extends LibOrder implements PSElementInterface
     {
         $sql = self::findAllWithMappingQuery($onlySyncElements, $limit, $offset);
         $sql = self::getComponentsForShipbacks($sql);
-        $sql = self::getComponentsToFindOrderState($sql);
 
         return self::convertPSArrayToElements(Db::getInstance()->executeS($sql), $withNestedElements);
     }
@@ -187,7 +186,6 @@ class SRBOrder extends LibOrder implements PSElementInterface
     {
         $sql = self::trait_findAllByMappingDateQuery($onlySyncElements, $limit, $offset);
         $sql = self::getComponentsForShipbacks($sql);
-        $sql = self::getComponentsToFindOrderState($sql);
         return $sql;
     }
 
