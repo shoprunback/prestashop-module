@@ -13,6 +13,9 @@ function createShopRunBackReturn(createReturnLink) {
     url: createReturnLink,
     method: 'POST',
     dataType: 'json',
+    beforeSend: function () {
+      $('#order-detail #modal .content').html(loadingMessage);
+    },
     success: function (shipbackPublicUrl) {
       window.location.href = shipbackPublicUrl;
     },
