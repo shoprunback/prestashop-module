@@ -155,6 +155,12 @@ class AdminShoprunbackController extends ModuleAdminController
         $function = 'getAllByCreateDate';
         $this->context->smarty->assign('actionUrl', Context::getContext()->link->getAdminLink('AdminShoprunback') . '&elementType=' . $elementType);
 
+        // If we have a filter, we set the value if the POST array so we can get it with the same function everywhere
+        // I had to do this because it seems we can't do a form with a method GET in the back-office...
+        if (isset($_GET['filter']) && !is_null($_GET['filter']) && isset($_GET['filterValue']) && !is_null($_GET['filterValue'])) {
+            $_POST[$_GET['filter']] = $_GET['filterValue'];
+        }
+
         $searchCustomer = 'customer';
         $this->context->smarty->assign('searchCustomerName', $searchCustomer);
         $this->context->smarty->assign('searchCustomer', Tools::getValue($searchCustomer));
@@ -242,6 +248,10 @@ class AdminShoprunbackController extends ModuleAdminController
             }
 
             $this->context->smarty->assign('noBrand', $noBrand);
+        }
+
+        if ($searchCondition) {
+            $searchCondition = '&filter=' . $searchCondition . '&filterValue=' . Tools::getValue($searchCondition);
         }
 
         $this->context->smarty->assign('pages', $pages);
