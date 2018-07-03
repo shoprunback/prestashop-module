@@ -83,10 +83,9 @@ class SRBProduct extends LibProduct implements PSElementInterface
 
     static public function findAllQuery($limit = 0, $offset = 0)
     {
-        $sql = new DbQuery();
+        $sql = static::getBaseQuery();
         $sql->select(self::getTableName() . '.*, pl.*');
-        $sql->from('product', self::getTableName());
-        $sql = static::joinLang($sql);
+        static::joinLang($sql);
         if (version_compare(_PS_VERSION_, '1.7', '>=')) {
             $sql->where(self::getTableName() . '.state = 1'); // state=0 if the product is temporary
         }
@@ -133,15 +132,13 @@ class SRBProduct extends LibProduct implements PSElementInterface
     // Check if product has NEVER been ordered
     public static function canBeDeleted($dbId)
     {
-        $sql = new DbQuery();
-        $sql->select('COUNT(' . SRBOrder::getTableName() . '.id_order)');
-        $sql->from('product', self::getTableName());
-        $sql->innerJoin('cart_product', 'cp', self::getTableIdentifier() . ' = cp.id_product');
-        $sql->innerJoin('cart', 'ca', 'cp.id_cart = ca.id_cart');
-        $sql->innerJoin('orders', SRBOrder::getTableName(), 'ca.id_cart = ' . SRBOrder::getTableName() . '.id_cart');
+        $sql = SRBOrder::getBaseQuery();
+        $sql->innerJoin('cart', 'ca', 'ca.id_cart = ' . SRBOrder::getTableName() . '.id_cart');
+        $sql->innerJoin('cart_product', 'cp', 'cp.id_cart = ca.id_cart');
+        $sql->innerJoin(self::getTableWithoutPrefix(), self::getTableName(), self::getTableIdentifier() . ' = cp.' . self::getIdColumnName());
         $sql->where(self::getTableIdentifier() . ' = ' . $dbId);
 
-        return (Db::getInstance()->getValue($sql) == 0);
+        return (SRBOrder::getCountOfQuery($sql) == 0);
     }
 
     public function deleteWithCheck()
@@ -167,19 +164,17 @@ class SRBProduct extends LibProduct implements PSElementInterface
         return $product->remove();
     }
 
-    static protected function joinLang($sql)
+    static public function joinLang(&$sql)
     {
         $sql->innerJoin('product_lang', 'pl', self::getTableName() . '.id_product = pl.id_product');
         $sql->where('pl.id_lang = ' . Configuration::get('PS_LANG_DEFAULT'));
-        return $sql;
     }
 
     static protected function findOrderProductsQuery($orderId)
     {
-        $sql = new DbQuery();
+        $sql = static::getBaseQuery();
         $sql->select(self::getTableName() . '.*, pl.name, cu.iso_code');
-        $sql->from('product', self::getTableName());
-        $sql = static::joinLang($sql);
+        static::joinLang($sql);
         $sql->innerJoin('cart_product', 'cp', self::getTableName() . '.id_product = cp.id_product');
         $sql->innerJoin('cart', 'ca', 'cp.id_cart = ca.id_cart');
         $sql->innerJoin('orders', SRBOrder::getTableName(), 'ca.id_cart = ' . SRBOrder::getTableName() . '.id_cart');
@@ -203,7 +198,10 @@ class SRBProduct extends LibProduct implements PSElementInterface
 
     static public function getCountLikeLabel($label)
     {
-        return self::getCountOfQuery(self::findLikeLabelQuery($label));
+        $sql = static::getBaseQuery();
+        static::joinLang($sql);
+        static::addWhereLikeLabelToQuery($sql, $label);
+        return self::getCountOfQuery($sql);
     }
 
     static public function getLikeLabel($label, $onlySyncElements = false, $limit = 0, $offset = 0, $withNestedElements = true)
@@ -211,31 +209,33 @@ class SRBProduct extends LibProduct implements PSElementInterface
         return self::convertPSArrayToElements(Db::getInstance()->executeS(self::findLikeLabelQuery($label, $limit, $offset, $onlySyncElements)), $withNestedElements);
     }
 
+    static public function addWhereLikeLabelToQuery(&$sql, $label)
+    {
+        $sql->where('pl.name LIKE "%' . $label . '%"');
+    }
+
     static public function findLikeLabelQuery($label, $limit = 0, $offset = 0, $onlySyncElements = false)
     {
         $sql = self::findAllByMappingDateQuery($onlySyncElements, $limit, $offset);
-        $sql->where('pl.name LIKE "%' . $label . '%"');
+        static::addWhereLikeLabelToQuery($sql, $label);
         return $sql;
     }
 
-    static public function findCombinationQuery($idProduct, $idCart)
+    // To get all the combinations possible of the product
+    static public function joinCombinationByProduct(&$sql)
     {
-        $sql = new DbQuery();
-        $sql->select('al.name');
-        $sql->from('attribute_lang', 'al');
-        $sql->innerJoin('product_attribute_combination', 'pac', 'pac.id_attribute = al.id_attribute');
-        $sql->innerJoin('product_attribute', 'pa', 'pac.id_product_attribute = pa.id_product_attribute');
-        $sql->innerJoin('cart_product', 'ca', 'ca.id_product_attribute = pa.id_product_attribute');
-        $sql->where('ca.id_cart = ' . $idCart);
-        $sql->where('pa.' . self::getIdColumnName() . ' = ' . $idProduct);
-        $sql->where('al.id_lang = ' . Configuration::get('PS_LANG_DEFAULT'));
-
-        return $sql;
+        $sql->leftJoin('product_attribute', 'pa', 'pa.' . self::getIdColumnName() . ' = ' . self::getTableIdentifier());
+        static::joinCombinationByProductAttribute($sql);
     }
 
-    static public function getCombinations($idProduct, $idCart)
+    static public function joinCombinationByProductAttribute(&$sql)
     {
-        return Db::getInstance()->executeS(static::findCombinationQuery($idProduct, $idCart));
+        $sql->leftJoin('product_attribute_combination', 'pac', 'pac.id_product_attribute = pa.id_product_attribute');
+        $sql->leftJoin(
+            'attribute_lang',
+            'al',
+            'pac.id_attribute = al.id_attribute AND
+            al.id_lang = ' . Configuration::get('PS_LANG_DEFAULT')
+        );
     }
-
 }
