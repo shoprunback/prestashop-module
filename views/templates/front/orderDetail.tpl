@@ -1,10 +1,13 @@
+<script type="text/javascript">
+    var loadingMessage = "<h2>{l s='front.order.detail.loading' mod='shoprunback'}</h2>";
+</script>
+
 <section class="box" id="order-detail">
     <h1 id="request">
         {if !$shipback}
             {l s='front.order.detail.title' mod='shoprunback'}<br>
 
             {l s='front.order.detail.content' mod='shoprunback'} <span onclick="toggleModal()" id="create-return">{l s='front.order.detail.link' mod='shoprunback'}</span>
-
         {else}
             <a href="{$shipback->public_url}" target="_blank">{l s='front.order.detail.returned' mod='shoprunback'}</a>
         {/if}

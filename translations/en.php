@@ -72,6 +72,7 @@ $_MODULE['<{shoprunback}prestashop>return_f6c1ad3da480e0e79f8021dfb7e7a7a1'] = '
 $_MODULE['<{shoprunback}prestashop>return_d1113fa6a3548b3d70d7d85d745395e9'] = 'No result has been found for your research';
 $_MODULE['<{shoprunback}prestashop>search_13d47ed5181b7f3a14b2a458425ed7a9'] = 'Search...';
 $_MODULE['<{shoprunback}prestashop>search_be605b8f62832fe725f688b454c89ac7'] = 'Clear';
+$_MODULE['<{shoprunback}prestashop>orderdetail_c6099f6d767232537b7712c6e506747f'] = 'We are creating your return demand. You will be redirected soon.';
 $_MODULE['<{shoprunback}prestashop>orderdetail_16f631de0dc61dd8cb26fbcfaa8ccaf8'] = 'A problem with your products?';
 $_MODULE['<{shoprunback}prestashop>orderdetail_aa2cd42a65735cb81115d87a59180aab'] = 'You can return them';
 $_MODULE['<{shoprunback}prestashop>orderdetail_1443ca477a42209de2a8a35349b560ee'] = 'here';
