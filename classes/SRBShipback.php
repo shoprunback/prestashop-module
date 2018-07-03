@@ -29,7 +29,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
     // Inherited functions
     public static function getTableWithoutPrefix()
     {
-        return 'shoprunback_shipback';
+        return self::SHIPBACK_TABLE_NAME_NO_PREFIX;
     }
 
     public static function getTableName()
@@ -69,9 +69,8 @@ class SRBShipback extends LibShipback implements PSElementInterface
 
     static public function findAllQuery($limit = 0, $offset = 0)
     {
-        $sql = new DbQuery();
+        $sql = static::getBaseQuery();
         $sql->select(self::getTableName() . '.*, ' . SRBOrder::getTableName() . '.*');
-        $sql->from(self::SHIPBACK_TABLE_NAME_NO_PREFIX, self::getTableName());
         $sql->innerJoin('orders', SRBOrder::getTableName(), self::getTableName() . '.id_order = ' . SRBOrder::getTableName() . '.' . SRBOrder::getIdColumnName());
         $sql->groupBy(static::getTableIdentifier());
         $sql = self::addLimitToQuery($sql, $limit, $offset);
@@ -222,8 +221,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
             ElementMapper::MAPPER_TABLE_NAME_NO_PREFIX,
             ElementMapper::getTableName(),
             ElementMapper::getTableName() . '.id_item_srb = ' . static::getTableIdentifier() . '
-                AND ' . ElementMapper::getTableName() . '.type = "' . static::getObjectTypeForMapping() . '"
-                AND ' . ElementMapper::getTableName() . '.last_sent_at IN (' . ElementMapper::findOnlyLastSentByTypeQuery(static::getObjectTypeForMapping()) . ')'
+                AND ' . ElementMapper::getTableName() . '.type = "' . static::getObjectTypeForMapping() . '"'
         );
 
         return $sql;
@@ -266,11 +264,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
     static public function findLikeCustomerByCreateDateQuery($customer, $limit = 0, $offset = 0)
     {
         $sql = self::findAllByCreateDateQuery($limit, $offset);
-        $sql->where('
-            c.firstname LIKE "%' . pSQL($customer) . '%" OR
-            c.lastname LIKE "%' . pSQL($customer) . '%" OR
-            CONCAT(c.firstname, " ", c.lastname) LIKE "%' . pSQL($customer) . '%"'
-        );
+        self::addLikeCustomerToQuery($sql, $customer);
         $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;

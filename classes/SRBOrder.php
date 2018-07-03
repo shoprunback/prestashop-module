@@ -68,8 +68,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
 
     static public function findAllQuery($limit = 0, $offset = 0)
     {
-        $sql = new DbQuery();
-        $sql->from('orders', self::getTableName());
+        $sql = static::getBaseQuery();
         $sql = self::addComponentsToQuery($sql);
         $sql = self::addLimitToQuery($sql, $limit, $offset);
 
@@ -78,7 +77,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
 
     static public function getComponentsForShipbacks($sql)
     {
-        $sql->select(SRBShipback::getTableName() . '.' . SRBShipback::getIdColumnName() . ', ' . SRBShipback::getTableName() . '.state, os.delivery');
+        $sql->select(SRBShipback::getTableName() . '.' . SRBShipback::getIdColumnName() . ', ' . SRBShipback::getTableName() . '.state');
         $sql->leftJoin( // We use leftJoin because orders may not have a return associated
             SRBShipback::SHIPBACK_TABLE_NAME_NO_PREFIX,
             SRBShipback::getTableName(),
@@ -91,7 +90,6 @@ class SRBOrder extends LibOrder implements PSElementInterface
     {
         $sql = self::findAllWithMappingQuery($onlySyncElements, $limit, $offset);
         $sql = self::getComponentsForShipbacks($sql);
-        $sql = self::getComponentsToFindOrderState($sql);
 
         return self::convertPSArrayToElements(Db::getInstance()->executeS($sql), $withNestedElements);
     }
@@ -126,7 +124,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
     static public function addComponentsToQuery($sql)
     {
         $sql->select(self::getTableName() . '.*, c.id_customer, c.firstname, c.lastname, c.email, a.id_address, a.address1, a.address2, a.postcode, a.city, a.phone, s.name as stateName, co.*');
-        $sql->innerJoin('customer', 'c', self::getTableName() . '.id_customer = c.id_customer');
+        static::joinCustomer($sql);
         $sql->innerJoin('address', 'a', 'c.id_customer = a.id_customer');
         $sql->innerJoin('country', 'co', 'a.id_country = co.id_country');
         $sql->leftJoin('state', 's', 'a.id_state = s.id_state');
@@ -137,8 +135,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
     // Returns the attribute "shipped" of an order
     public function isShipped()
     {
-        $sql = new DbQuery();
-        $sql->from('orders', self::getTableName());
+        $sql = static::getBaseQuery();
         $sql = self::getComponentsToFindOrderState($sql);
         $sql->where('oh.id_order = ' . $this->ps['id_order']);
         $sql->select('os.shipped');
@@ -173,7 +170,9 @@ class SRBOrder extends LibOrder implements PSElementInterface
 
     static public function getCountLikeOrderNumber($orderNumber)
     {
-        return self::getCountOfQuery(self::findLikeOrderNumberQuery($orderNumber));
+        $sql = static::getBaseQuery();
+        static::addLikeOrderNumberToQuery($sql, $orderNumber);
+        return self::getCountOfQuery($sql);
     }
 
     static public function getLikeOrderNumber($orderNumber, $onlySyncElements = false, $limit = 0, $offset = 0, $withNestedElements = true)
@@ -187,14 +186,13 @@ class SRBOrder extends LibOrder implements PSElementInterface
     {
         $sql = self::trait_findAllByMappingDateQuery($onlySyncElements, $limit, $offset);
         $sql = self::getComponentsForShipbacks($sql);
-        $sql = self::getComponentsToFindOrderState($sql);
         return $sql;
     }
 
     static public function findLikeOrderNumberQuery($orderNumber, $limit = 0, $offset = 0, $onlySyncElements = false)
     {
         $sql = self::findAllByMappingDateQuery($onlySyncElements, $limit, $offset);
-        $sql->where(static::getTableName() . '.reference LIKE "%' . $orderNumber . '%"');
+        static::addLikeOrderNumberToQuery($sql, $orderNumber);
         return $sql;
     }
 
@@ -207,17 +205,16 @@ class SRBOrder extends LibOrder implements PSElementInterface
 
     static public function getCountLikeCustomer($customer)
     {
-        return self::getCountOfQuery(self::findLikeCustomerQuery($customer));
+        $sql = static::getBaseQuery();
+        static::joinCustomer($sql);
+        static::addLikeCustomerToQuery($sql, $customer);
+        return self::getCountOfQuery($sql);
     }
 
     static public function findLikeCustomerQuery($customer, $limit = 0, $offset = 0, $onlySyncElements = false)
     {
         $sql = self::findAllByMappingDateQuery($onlySyncElements, $limit, $offset);
-        $sql->where('
-            c.firstname LIKE "%' . pSQL($customer) . '%" OR
-            c.lastname LIKE "%' . pSQL($customer) . '%" OR
-            CONCAT(c.firstname, " ", c.lastname) LIKE "%' . pSQL($customer) . '%"'
-        );
+        self::addLikeCustomerToQuery($sql, $customer);
         $sql->orderBy('srbm.last_sent_at ASC');
 
         return $sql;

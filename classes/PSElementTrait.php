@@ -83,13 +83,12 @@ trait PSElementTrait
         $joinType = $onlySyncElements ? 'innerJoin' : 'leftJoin';
 
         $sql = static::findAllQuery();
-        $sql->select(ElementMapper::getTableName() . '.*');
+        ElementMapper::addSelectAllToQuery($sql);
         $sql->{$joinType}(
             ElementMapper::MAPPER_TABLE_NAME_NO_PREFIX,
             ElementMapper::getTableName(),
             ElementMapper::getTableName() . '.id_item = ' . static::getTableIdentifier() . '
-                AND ' . ElementMapper::getTableName() . '.type = "' . static::getObjectTypeForMapping() . '"
-                AND ' . ElementMapper::getTableName() . '.last_sent_at IN (' . ElementMapper::findOnlyLastSentByTypeQuery(static::getObjectTypeForMapping()) . ')'
+                AND ' . ElementMapper::getTableName() . '.type = "' . static::getObjectTypeForMapping() . '"'
         );
 
         return $sql;
@@ -241,14 +240,39 @@ trait PSElementTrait
 
     static public function getCountAll()
     {
-        $class = get_called_class();
-        return self::getCountOfQuery($class::findAllQuery());
+        return static::getCountOfQuery(static::getBaseQuery());
     }
 
     static public function getAllNotSync()
     {
         $class = get_called_class();
         return self::convertPSArrayToElements(Db::getInstance()->executeS($class::findNotSyncQuery()));
+    }
+
+    static public function getBaseQuery()
+    {
+        $sql = new DbQuery();
+        $sql->from(static::getTableWithoutPrefix(), static::getTableName());
+        return $sql;
+    }
+
+    static public function joinCustomer(&$sql)
+    {
+        $sql->innerJoin(SRBCustomer::getTableWithoutPrefix(), SRBCustomer::getTableName(), SRBOrder::getTableName() . '.' . SRBCustomer::getIdColumnName() . ' = ' . SRBCustomer::getTableIdentifier());
+    }
+
+    static public function addLikeCustomerToQuery(&$sql, $customer)
+    {
+        $sql->where(
+            SRBCustomer::getTableName() . '.firstname LIKE "%' . pSQL($customer) . '%" OR ' .
+            SRBCustomer::getTableName() . '.lastname LIKE "%' . pSQL($customer) . '%" OR
+            CONCAT(' . SRBCustomer::getTableName() . '.firstname, " ", ' . SRBCustomer::getTableName() . '.lastname) LIKE "%' . pSQL($customer) . '%"'
+        );
+    }
+
+    static public function addLikeOrderNumberToQuery(&$sql, $orderNumber)
+    {
+        $sql->where(SRBOrder::getTableName() . '.reference LIKE "%' . $orderNumber . '%"');
     }
 
     public function mapApiCall()
