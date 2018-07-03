@@ -5,7 +5,9 @@ use Shoprunback\Elements\Brand as LibBrand;
 
 class SRBProduct extends LibProduct implements PSElementInterface
 {
-    use PSElementTrait;
+    use PSElementTrait {
+        getBaseQuery as protected trait_getBaseQuery;
+    }
 
     public function __construct($psProduct)
     {
@@ -81,14 +83,22 @@ class SRBProduct extends LibProduct implements PSElementInterface
         return str_replace(' ', '-', ($this->ps[self::getPreIdentifier()] != '' ? $this->ps[self::getPreIdentifier()] : $this->label));
     }
 
+    static public function getBaseQuery()
+    {
+        $sql = self::trait_getBaseQuery();
+
+        if (version_compare(_PS_VERSION_, '1.7', '>=')) {
+            $sql->where(self::getTableName() . '.state = 1'); // state=0 if the product is temporary
+        }
+
+        return $sql;
+    }
+
     static public function findAllQuery($limit = 0, $offset = 0)
     {
         $sql = static::getBaseQuery();
         $sql->select(self::getTableName() . '.*, pl.*');
         static::joinLang($sql);
-        if (version_compare(_PS_VERSION_, '1.7', '>=')) {
-            $sql->where(self::getTableName() . '.state = 1'); // state=0 if the product is temporary
-        }
         $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;

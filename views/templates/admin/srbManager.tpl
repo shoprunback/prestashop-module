@@ -20,33 +20,33 @@
         <div class="pagination">
             <ul>
                 {if $pages > 1}
-                    <li><a href="{$srbManager}&elementType={$elementType}&currentPage=1"><span>{l s="pagination.first" mod='shoprunback'}</span></a></li>
+                    <li><a href="{$srbManager}&elementType={$elementType}&currentPage=1{$searchCondition}"><span>{l s="pagination.first" mod='shoprunback'}</span></a></li>
                 {/if}
 
                 {if $currentPage > 1}
-                    <li><a href="{$srbManager}&elementType={$elementType}&currentPage={$currentPage - 1}"><span>«</span></a></li>
+                    <li><a href="{$srbManager}&elementType={$elementType}&currentPage={$currentPage - 1}{$searchCondition}"><span>«</span></a></li>
                 {/if}
 
                 {if $currentPage - 2 > 0}
-                    <li><a href="{$srbManager}&elementType={$elementType}&currentPage={$currentPage - 2}"><span>{$currentPage - 2}</span></a></li>
+                    <li><a href="{$srbManager}&elementType={$elementType}&currentPage={$currentPage - 2}{$searchCondition}"><span>{$currentPage - 2}</span></a></li>
                 {/if}
                 {if $currentPage - 1 > 0}
-                    <li><a href="{$srbManager}&elementType={$elementType}&currentPage={$currentPage - 1}"><span>{$currentPage - 1}</span></a></li>
+                    <li><a href="{$srbManager}&elementType={$elementType}&currentPage={$currentPage - 1}{$searchCondition}"><span>{$currentPage - 1}</span></a></li>
                 {/if}
                 <li class="active"><span>{$currentPage}</span></li>
                 {if $currentPage + 1 <= $pages}
-                    <li><a href="{$srbManager}&elementType={$elementType}&currentPage={$currentPage + 1}"><span>{$currentPage + 1}</span></a></li>
+                    <li><a href="{$srbManager}&elementType={$elementType}&currentPage={$currentPage + 1}{$searchCondition}"><span>{$currentPage + 1}</span></a></li>
                 {/if}
                 {if $currentPage + 2 <= $pages}
-                    <li><a href="{$srbManager}&elementType={$elementType}&currentPage={$currentPage + 2}"><span>{$currentPage + 2}</span></a></li>
+                    <li><a href="{$srbManager}&elementType={$elementType}&currentPage={$currentPage + 2}{$searchCondition}"><span>{$currentPage + 2}</span></a></li>
                 {/if}
 
                 {if $currentPage < $pages}
-                    <li><a href="{$srbManager}&elementType={$elementType}&currentPage={$currentPage + 1}"><span>»</span></a></li>
+                    <li><a href="{$srbManager}&elementType={$elementType}&currentPage={$currentPage + 1}{$searchCondition}"><span>»</span></a></li>
                 {/if}
 
                 {if $pages > 1}
-                    <li><a href="{$srbManager}&elementType={$elementType}&currentPage={$pages}"><span>{l s="pagination.last" mod='shoprunback'}</span></a></li>
+                    <li><a href="{$srbManager}&elementType={$elementType}&currentPage={$pages}{$searchCondition}"><span>{l s="pagination.last" mod='shoprunback'}</span></a></li>
                 {/if}
             </ul>
         </div>
