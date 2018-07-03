@@ -1,5 +1,5 @@
 <script type="text/javascript">
-    var loadingMessage = "<h2>{l s='front.order.detail.loading' mod='shoprunback'}</h2>";
+    var loadingMessage = "<h1>{l s='front.order.detail.loading' mod='shoprunback'}</h1>";
 </script>
 
 <section class="box" id="order-detail">
