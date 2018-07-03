@@ -132,14 +132,13 @@ class SRBProduct extends LibProduct implements PSElementInterface
     // Check if product has NEVER been ordered
     public static function canBeDeleted($dbId)
     {
-        $sql = static::getBaseQuery();
-        $sql->select('COUNT(' . SRBOrder::getTableIdentifier() . ')');
-        $sql->innerJoin('cart_product', 'cp', self::getTableIdentifier() . ' = cp.id_product');
-        $sql->innerJoin('cart', 'ca', 'cp.id_cart = ca.id_cart');
-        $sql->innerJoin('orders', SRBOrder::getTableName(), 'ca.id_cart = ' . SRBOrder::getTableName() . '.id_cart');
+        $sql = SRBOrder::getBaseQuery();
+        $sql->innerJoin('cart', 'ca', 'ca.id_cart = ' . SRBOrder::getTableName() . '.id_cart');
+        $sql->innerJoin('cart_product', 'cp', 'cp.id_cart = ca.id_cart');
+        $sql->innerJoin(self::getTableWithoutPrefix(), self::getTableName(), self::getTableIdentifier() . ' = cp.' . self::getIdColumnName());
         $sql->where(self::getTableIdentifier() . ' = ' . $dbId);
 
-        return (Db::getInstance()->getValue($sql) == 0);
+        return (SRBOrder::getCountOfQuery($sql) == 0);
     }
 
     public function deleteWithCheck()
@@ -165,7 +164,7 @@ class SRBProduct extends LibProduct implements PSElementInterface
         return $product->remove();
     }
 
-    static protected function joinLang(&$sql)
+    static public function joinLang(&$sql)
     {
         $sql->innerJoin('product_lang', 'pl', self::getTableName() . '.id_product = pl.id_product');
         $sql->where('pl.id_lang = ' . Configuration::get('PS_LANG_DEFAULT'));
@@ -222,24 +221,21 @@ class SRBProduct extends LibProduct implements PSElementInterface
         return $sql;
     }
 
-    static public function findCombinationQuery($idProduct, $idCart)
+    // To get all the combinations possible of the product
+    static public function joinCombinationByProduct(&$sql)
     {
-        $sql = new DbQuery();
-        $sql->select('al.name');
-        $sql->from('attribute_lang', 'al');
-        $sql->innerJoin('product_attribute_combination', 'pac', 'pac.id_attribute = al.id_attribute');
-        $sql->innerJoin('product_attribute', 'pa', 'pac.id_product_attribute = pa.id_product_attribute');
-        $sql->innerJoin('cart_product', 'ca', 'ca.id_product_attribute = pa.id_product_attribute');
-        $sql->where('ca.id_cart = ' . $idCart);
-        $sql->where('pa.' . self::getIdColumnName() . ' = ' . $idProduct);
-        $sql->where('al.id_lang = ' . Configuration::get('PS_LANG_DEFAULT'));
-
-        return $sql;
+        $sql->leftJoin('product_attribute', 'pa', 'pa.' . self::getIdColumnName() . ' = ' . self::getTableIdentifier());
+        static::joinCombinationByProductAttribute($sql);
     }
 
-    static public function getCombinations($idProduct, $idCart)
+    static public function joinCombinationByProductAttribute(&$sql)
     {
-        return Db::getInstance()->executeS(static::findCombinationQuery($idProduct, $idCart));
+        $sql->leftJoin('product_attribute_combination', 'pac', 'pac.id_product_attribute = pa.id_product_attribute');
+        $sql->leftJoin(
+            'attribute_lang',
+            'al',
+            'pac.id_attribute = al.id_attribute AND
+            al.id_lang = ' . Configuration::get('PS_LANG_DEFAULT')
+        );
     }
-
 }
