@@ -7,6 +7,7 @@ class SRBProduct extends LibProduct implements PSElementInterface
 {
     use PSElementTrait {
         getBaseQuery as protected trait_getBaseQuery;
+        sync as protected trait_sync;
     }
 
     public function __construct($psProduct)
@@ -247,5 +248,18 @@ class SRBProduct extends LibProduct implements PSElementInterface
             'pac.id_attribute = al.id_attribute AND
             al.id_lang = ' . Configuration::get('PS_LANG_DEFAULT')
         );
+    }
+
+    public function sync()
+    {
+        if (!isset($this->picture_file_url) && !isset($this->picture_file_base64)) {
+            try {
+                $this->deleteImage();
+            } catch (Exception $e) {
+                SRBLogger::addLog('Error when deleting product\'s image: ' . json_encode($e), SRBLogger::FATAL, SRBProduct::getObjectTypeForMapping(), $this->getDBId());
+            }
+        }
+
+        return $this->trait_sync();
     }
 }
