@@ -4,15 +4,13 @@ $(document).ready(function() {
   }
 
   function ajaxAsyncCall(data) {
-    var message = loadingMessage ? loadingMessage : 'Synchronizing...';
-
     $.ajax({
       url: asyncCall,
       method: 'POST',
       data: data,
       dataType: 'json',
       beforeSend: function () {
-        $('#srb-manager').html(message);
+        $('#srb-manager').html(loadingMessage);
       },
       success: function (response) {
         window.location.reload();
