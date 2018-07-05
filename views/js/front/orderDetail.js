@@ -9,12 +9,14 @@ function toggleModal() {
 }
 
 function createShopRunBackReturn(createReturnLink) {
+  var message = loadingMessage ? loadingMessage : '<h1>Loading...</h1>';
+
   $.ajax({
     url: createReturnLink,
     method: 'POST',
     dataType: 'json',
     beforeSend: function () {
-      $('#order-detail #modal .content').html(loadingMessage);
+      $('#order-detail #modal .content').html(message);
     },
     success: function (shipbackPublicUrl) {
       window.location.href = shipbackPublicUrl;
