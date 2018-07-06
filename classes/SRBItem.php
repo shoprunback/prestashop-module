@@ -13,10 +13,13 @@ class SRBItem extends LibItem
         $this->product = new SRBProduct($psProduct);
         $this->label = $this->product->label;
         $this->reference = $this->product->getReference();
+        $combinations = $this->product->getPreciseCombinationInOrder($psProduct['id_order'], $psProduct['id_product_attribute']);
 
-        if ($psProduct['attribute_name']) {
-            $this->label .= ' - ' . $psProduct['attribute_name'];
-            $this->barcode = $psProduct['attribute_ean13'];
+        if ($combinations) {
+            foreach ($combinations as $key => $combination) {
+                $this->label .= ' - ' . $combination['attribute_name'];
+            }
+            $this->barcode = $combinations[0]['attribute_ean13'];
         } else {
             $this->barcode = $psProduct['ean13'];
         }
@@ -41,12 +44,11 @@ class SRBItem extends LibItem
     {
         $sql = SRBProduct::getBaseQuery();
         SRBProduct::joinLang($sql);
-        $sql->select(SRBProduct::getTableName() . '.*, pl.name, cu.iso_code, cp.quantity, ca.id_cart, al.name as attribute_name, pa.ean13 as attribute_ean13');
+        $sql->select(SRBProduct::getTableName() . '.*, pl.name, cu.iso_code, cp.quantity, ca.id_cart, o.id_order, cp.id_product_attribute');
         $sql->innerJoin('cart_product', 'cp', SRBProduct::getTableName() . '.id_product = cp.id_product');
         $sql->innerJoin('cart', 'ca', 'cp.id_cart = ca.id_cart');
         $sql->innerJoin('orders', SRBOrder::getTableName(), 'ca.id_cart = ' . SRBOrder::getTableName() . '.id_cart');
         $sql->innerJoin('currency', 'cu', 'cu.id_currency = ' . SRBOrder::getTableName() . '.id_currency');
-        self::joinCombinationByCartProducts($sql);
 
         return $sql;
     }

@@ -248,4 +248,50 @@ class SRBProduct extends LibProduct implements PSElementInterface
             al.id_lang = ' . Configuration::get('PS_LANG_DEFAULT')
         );
     }
+
+    public function getAttributes()
+    {
+        return self::getAttributesOfProduct($this->getDBId());
+    }
+
+    // Returns all attributes the product can have
+    static public function getAttributesOfProduct($productId)
+    {
+        return Db::getInstance()->executeS(self::findAttributesOfProductQuery($productId));
+    }
+
+    static public function findAttributesOfProductQuery($productId)
+    {
+        $sql = self::getBaseQuery();
+        self::joinLang($sql);
+        self::joinCombinationByProduct($sql);
+        $sql->select('al.name as attribute_name, pa.ean13 as attribute_ean13, pac.id_product_attribute');
+        $sql->where(self::getTableIdentifier() . ' = ' . $productId);
+
+        return $sql;
+    }
+
+    public function getPreciseCombinationInOrder($orderId, $productAttributeId)
+    {
+        return self::getPreciseCombinationOfProductInOrder($this->getDBId(), $orderId, $productAttributeId);
+    }
+
+    // Get all the attributes of the product commanded in the order in a precise combination
+    static public function getPreciseCombinationOfProductInOrder($productId, $orderId, $productAttributeId)
+    {
+        return Db::getInstance()->executeS(self::findPreciseCombinationOfProductInOrderQuery($productId, $orderId, $productAttributeId));
+    }
+
+    static public function findPreciseCombinationOfProductInOrderQuery($productId, $orderId, $productAttributeId)
+    {
+        $sql = self::findAttributesOfProductQuery($productId);
+        $sql->innerJoin('cart_product', 'cp', self::getTableIdentifier() . ' = cp.' . self::getIdColumnName());
+        $sql->innerJoin('cart', 'ca', 'cp.id_cart = ca.id_cart');
+        $sql->innerJoin('orders', SRBOrder::getTableName(), 'ca.id_cart = ' . SRBOrder::getTableName() . '.id_cart');
+        $sql->where(SRBOrder::getTableIdentifier() . ' = ' . $orderId);
+        $sql->where('cp.id_product_attribute = pa.id_product_attribute');
+        $sql->where('cp.id_product_attribute = ' . $productAttributeId);
+
+        return $sql;
+    }
 }
