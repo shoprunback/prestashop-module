@@ -275,6 +275,11 @@ trait PSElementTrait
         $sql->where(SRBOrder::getTableName() . '.reference LIKE "%' . $orderNumber . '%"');
     }
 
+    static public function getByMapper($idItemSRB)
+    {
+        return static::getById(ElementMapper::getByIdItemSRBAndItemType($idItemSRB, static::getObjectTypeForMapping())->id_item);
+    }
+
     public function mapApiCall()
     {
         $identifier = static::getIdColumnName();
