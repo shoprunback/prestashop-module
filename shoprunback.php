@@ -56,7 +56,7 @@ class ShopRunBack extends Module
         // Mandatory parameters
         $this->name = 'shoprunback';
         $this->author = 'ShopRunBack';
-        $this->version = '1.0.14';
+        $this->version = '1.0.15';
         $this->ps_versions_compliancy = array('min' => '1.6.0.9');
         $this->tab = 'administration';
         $this->tabs = [
@@ -274,6 +274,7 @@ class ShopRunBack extends Module
     {
         if (\Shoprunback\RestClient::getClient()->getToken()) {
             $productId = (version_compare(_PS_VERSION_, '1.7', '>')) ? $params['product']->id : $params['id_product'];
+
             // In 1.7 the productAdd hook doesn't exist, so it's productUpdate that must manage the adding
             try {
                 $product = SRBProduct::getById($productId);
