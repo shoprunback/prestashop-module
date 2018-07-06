@@ -68,7 +68,11 @@ class ShopRunBackWebhookModuleFrontController extends ModuleFrontController
             try {
                 $product = SRBProduct::getByMapper($id);
             } catch (Exception $e) {
-                SRBLogger::addLog('Can\'t find product ' . $id, SRBLogger::ERROR, $type);
+                SRBLogger::addLog('Can\'t find product ' . $id . ' in mapping table. Resynchronizing product', SRBLogger::ERROR, $type);
+
+                $product = SRBProduct::getNotSyncById($webhook->data->reference);
+                $product->sync();
+
                 return self::returnHeaderHTTP(200);
             }
 

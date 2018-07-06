@@ -277,7 +277,6 @@ trait PSElementTrait
 
     static public function getByMapper($idItemSRB)
     {
-        SRBLogger::addLog(json_encode(ElementMapper::getByIdItemSRBAndItemType($idItemSRB, static::getObjectTypeForMapping())));
         return static::getById(ElementMapper::getByIdItemSRBAndItemType($idItemSRB, static::getObjectTypeForMapping())->id_item);
     }
 
