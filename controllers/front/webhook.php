@@ -20,17 +20,16 @@ class ShopRunBackWebhookModuleFrontController extends ModuleFrontController
         $webhook = file_get_contents("php://input");
         $webhook = json_decode($webhook);
 
-        $type = isset($webhook->event) ? explode('.', $webhook->event)[0] : '';
+        if (!isset($webhook->event)) {
+            SRBLogger::addLog('WEBHOOK FAILED: TYPE IS MISSING!', SRBLogger::FATAL);
+            return self::returnHeaderHTTP(200);
+        }
+
+        $event = explode('.', $webhook->event);
+
+        $type = $event[0];
         $id = isset($webhook->data->id) ? $webhook->data->id : '';
 
-        if (!$type && !$id) {
-            SRBLogger::addLog('WEBHOOK FAILED: NO TYPE AND NO ID! ' . json_encode($webhook), SRBLogger::FATAL);
-            return self::returnHeaderHTTP(200);
-        }
-        if (!$type) {
-            SRBLogger::addLog('WEBHOOK FAILED: TYPE IS MISSING! id: ' . $id, SRBLogger::FATAL);
-            return self::returnHeaderHTTP(200);
-        }
         if (!$id) {
             SRBLogger::addLog('WEBHOOK FAILED: ID IS MISSING! type: ' . $type, SRBLogger::FATAL);
             return self::returnHeaderHTTP(200);
@@ -40,19 +39,11 @@ class ShopRunBackWebhookModuleFrontController extends ModuleFrontController
             SRBLogger::addLog('WEBHOOK IS SHIPBACK. id: ' . $id, SRBLogger::INFO, $type);
             try {
                 $shipback = SRBShipback::getById($id);
-                $state = isset($webhook->data->state) ? $webhook->data->state : '';
                 $mode = isset($webhook->data->mode) ? $webhook->data->mode : '';
+                $state = $event[1];
 
-                if (!$mode && !$state) {
-                    SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: NO MODE AND NO STATE!', SRBLogger::FATAL, $type);
-                    return self::returnHeaderHTTP(200);
-                }
                 if (!$mode) {
                     SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: MODE IS MISSING! state: ' . $state, SRBLogger::FATAL, $type);
-                    return self::returnHeaderHTTP(200);
-                }
-                if (!$state) {
-                    SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: STATE IS MISSING! mode: ' . $mode, SRBLogger::FATAL, $type);
                     return self::returnHeaderHTTP(200);
                 }
 
