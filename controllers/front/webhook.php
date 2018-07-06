@@ -37,22 +37,22 @@ class ShopRunBackWebhookModuleFrontController extends ModuleFrontController
         }
 
         if ($type == 'shipback') {
-            SRBLogger::addLog('WEBHOOK IS SHIPBACK. id: ' . $id, SRBLogger::INFO, $type, $id);
+            SRBLogger::addLog('WEBHOOK IS SHIPBACK. id: ' . $id, SRBLogger::INFO, $type);
             try {
                 $shipback = SRBShipback::getById($id);
                 $state = isset($webhook->data->state) ? $webhook->data->state : '';
                 $mode = isset($webhook->data->mode) ? $webhook->data->mode : '';
 
                 if (!$mode && !$state) {
-                    SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: NO MODE AND NO STATE!', SRBLogger::FATAL, $type, $id);
+                    SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: NO MODE AND NO STATE!', SRBLogger::FATAL, $type);
                     return self::returnHeaderHTTP(200);
                 }
                 if (!$mode) {
-                    SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: MODE IS MISSING! state: ' . $state, SRBLogger::FATAL, $type, $id);
+                    SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: MODE IS MISSING! state: ' . $state, SRBLogger::FATAL, $type);
                     return self::returnHeaderHTTP(200);
                 }
                 if (!$state) {
-                    SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: STATE IS MISSING! mode: ' . $mode, SRBLogger::FATAL, $type, $id);
+                    SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: STATE IS MISSING! mode: ' . $mode, SRBLogger::FATAL, $type);
                     return self::returnHeaderHTTP(200);
                 }
 
@@ -60,15 +60,48 @@ class ShopRunBackWebhookModuleFrontController extends ModuleFrontController
                 $shipback->mode = $mode;
                 $shipback->updateOnPS();
             } catch (ShipbackException $e) {
-                SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: ' . $e, SRBLogger::FATAL, $type, $id);
+                SRBLogger::addLog('WEBHOOK SHIPBACK FAILED: ' . $e, SRBLogger::FATAL, $type);
+                return self::returnHeaderHTTP(200);
+            }
+        } elseif ($type == 'product') {
+            // We check if the data is correct between PS and SRB
+            try {
+                $product = SRBProduct::getByMapper($id);
+            } catch (Exception $e) {
+                SRBLogger::addLog('Can\'t find product ' . $id, SRBLogger::ERROR, $type);
+                return self::returnHeaderHTTP(200);
+            }
+
+            $errors = [];
+
+            if ($webhook->data->reference != $product->getDBId()) {
+                $errors['reference'] = $webhook->data->reference . ' != ' . $id;
+            }
+
+            if ($webhook->data->label != $product->label) {
+                $errors['label'] = $webhook->data->label . ' != ' . $product->label;
+            }
+
+            if ($webhook->data->ean != $product->ean) {
+                $errors['ean'] = $webhook->data->ean . ' != ' . $product->ean;
+            }
+
+            if (count($errors) > 0) {
+                $errorsString = '';
+                foreach ($errors as $key => $error) {
+                    $errorsString .= $key . ': ' . $error . ', ';
+                }
+                $errorsString = trim($errorsString, ', ');
+
+                SRBLogger::addLog('PRODUCT DOESN\'T HAVE CORRECT INFORMATIONS: ' . $errorsString, SRBLogger::ERROR, $type);
                 return self::returnHeaderHTTP(200);
             }
         } else {
-            SRBLogger::addLog('WEBHOOK TYPE UNKNOWN: ' . $type, SRBLogger::ERROR, $type, $id);
+            SRBLogger::addLog('WEBHOOK TYPE UNKNOWN: ' . $type, SRBLogger::ERROR, $type);
             return self::returnHeaderHTTP(200);
         }
 
-        SRBLogger::addLog('WEBHOOK WORKED', SRBLogger::INFO, $type, $id);
+        SRBLogger::addLog('WEBHOOK WORKED', SRBLogger::INFO, $type);
         return self::returnHeaderHTTP(200);
     }
 
