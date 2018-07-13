@@ -8,7 +8,7 @@ function toggleModal() {
   }
 }
 
-function createShopRunBackReturn(createReturnLink) {
+function createShopRunBackReturn(createReturnLink, loadingMessage) {
   $.ajax({
     url: createReturnLink,
     method: 'POST',
