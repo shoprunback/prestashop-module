@@ -1,7 +1,3 @@
-<script type="text/javascript">
-    var loadingMessage = "<h1>{l s='front.order.detail.loading' mod='shoprunback'}</h1>";
-</script>
-
 <section class="box" id="order-detail">
     <h1 id="request">
         {if !$shipback}
@@ -22,7 +18,13 @@
                     {l s='front.order.detail.modal.cancel' mod='shoprunback'}
                 </span>
 
-                <span onclick="createShopRunBackReturn('{$createReturnLink nofilter}')" class="external-link form-control-submit btn btn-primary">
+                <span
+                    onclick="createShopRunBackReturn(
+                        '{$createReturnLink nofilter}',
+                        &quot;<h1>{l s='front.order.detail.loading' mod='shoprunback'}</h1>&quot;
+                    )"
+                    class="external-link form-control-submit btn btn-primary"
+                >
                     {l s='front.order.detail.modal.validate' mod='shoprunback'}
                 </span>
             </div>
