@@ -32,3 +32,12 @@ In order to use the module, you need an account on the ShopRunBack dashboard (yo
 To configure it, go to the configuration page. You can go there by 2 ways:
 - Go to Modules & Services -> Installed modules, search for "ShopRunBack", and click on "Configure"
 - Click on the ShopRunBack tab on the left menu, and then go to "Configuration"
+
+### How to contribute ?
+
+In order to contribute to this module, please follow these steps in this order :
+- Use the command 'git clone [repository_url] shoprunback' in the modules directory of your PrestaShop installation
+- Run 'composer install'
+- Then if you are working with Linux, run 'sudo chmod -R 777 shoprunback'
+
+Please make sure to follow the [PrestaShop Guidelines](https://devdocs.prestashop.com/1.7/modules/) 
