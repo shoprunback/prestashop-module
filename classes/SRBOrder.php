@@ -77,11 +77,11 @@ class SRBOrder extends LibOrder implements PSElementInterface
 
     static public function getComponentsForShipbacks($sql)
     {
-        $sql->select(SRBShipback::getTableName() . '.' . SRBShipback::getIdColumnName() . ', ' . SRBShipback::getTableName() . '.state');
+        $sql->select(pSQL(SRBShipback::getTableName()) . '.' . pSQL(SRBShipback::getIdColumnName()) . ', ' . pSQL(SRBShipback::getTableName()) . '.state');
         $sql->leftJoin( // We use leftJoin because orders may not have a return associated
             SRBShipback::SHIPBACK_TABLE_NAME_NO_PREFIX,
-            SRBShipback::getTableName(),
-            SRBShipback::getTableName() . '.id_order = ' . self::getTableIdentifier()
+            pSQL(SRBShipback::getTableName()),
+            pSQL(SRBShipback::getTableName()) . '.id_order = ' . pSQL(self::getTableIdentifier())
         );
         return $sql;
     }
@@ -123,7 +123,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
 
     static public function addComponentsToQuery($sql)
     {
-        $sql->select(self::getTableName() . '.*, c.id_customer, c.firstname, c.lastname, c.email, a.id_address, a.address1, a.address2, a.postcode, a.city, a.phone, s.name as stateName, co.*');
+        $sql->select(pSQL(self::getTableName()) . '.*, c.id_customer, c.firstname, c.lastname, c.email, a.id_address, a.address1, a.address2, a.postcode, a.city, a.phone, s.name as stateName, co.*');
         static::joinCustomer($sql);
         $sql->innerJoin('address', 'a', 'c.id_customer = a.id_customer');
         $sql->innerJoin('country', 'co', 'a.id_country = co.id_country');
@@ -137,7 +137,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
     {
         $sql = static::getBaseQuery();
         $sql = self::getComponentsToFindOrderState($sql);
-        $sql->where('oh.id_order = ' . $this->ps['id_order']);
+        $sql->where('oh.id_order = ' . pSQL($this->ps['id_order']));
         $sql->select('os.shipped');
 
         return Db::getInstance()->getRow($sql)['shipped'];
@@ -152,7 +152,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
         $sql->leftJoin(
             'order_history',
             'oh',
-            'oh.id_order = ' . self::getTableIdentifier() . ' AND oh.id_order_history IN (
+            'oh.id_order = ' . pSQL(self::getTableIdentifier()) . ' AND oh.id_order_history IN (
                 SELECT MAX(oh.id_order_history)
                 FROM ' . _DB_PREFIX_ . 'order_history oh
                 GROUP BY id_order
@@ -177,8 +177,8 @@ class SRBOrder extends LibOrder implements PSElementInterface
 
     static public function getLikeOrderNumber($orderNumber, $onlySyncElements = false, $limit = 0, $offset = 0, $withNestedElements = true)
     {
-        $sql = self::findLikeOrderNumberQuery($orderNumber, $limit, $offset, $onlySyncElements);
-        $sql->groupBy(static::getTableIdentifier());
+        $sql = self::findLikeOrderNumberQuery($orderNumber, $limit, $offset, $onlySyncElements); //@TODO : investigate this function
+        $sql->groupBy(pSQL(static::getTableIdentifier()));
         return self::convertPSArrayToElements(Db::getInstance()->executeS($sql), $withNestedElements);
     }
 
@@ -198,8 +198,8 @@ class SRBOrder extends LibOrder implements PSElementInterface
 
     static public function getLikeCustomer($customer, $onlySyncElements = false, $limit = 0, $offset = 0, $withNestedElements = true)
     {
-        $sql = self::findLikeCustomerQuery($customer, $limit, $offset, $onlySyncElements);
-        $sql->groupBy(static::getTableIdentifier());
+        $sql = self::findLikeCustomerQuery($customer, $limit, $offset, $onlySyncElements); //@TODO : investigate this function
+        $sql->groupBy(pSQL(static::getTableIdentifier()));
         return self::convertPSArrayToElements(Db::getInstance()->executeS($sql), $withNestedElements);
     }
 

@@ -70,9 +70,9 @@ class SRBShipback extends LibShipback implements PSElementInterface
     static public function findAllQuery($limit = 0, $offset = 0)
     {
         $sql = static::getBaseQuery();
-        $sql->select(self::getTableName() . '.*, ' . SRBOrder::getTableName() . '.*');
-        $sql->innerJoin('orders', SRBOrder::getTableName(), self::getTableName() . '.id_order = ' . SRBOrder::getTableName() . '.' . SRBOrder::getIdColumnName());
-        $sql->groupBy(static::getTableIdentifier());
+        $sql->select(pSQL(self::getTableName()) . '.*, ' . pSQL(SRBOrder::getTableName()) . '.*');
+        $sql->innerJoin('orders', pSQL(SRBOrder::getTableName()), pSQL(self::getTableName()) . '.id_order = ' . pSQL(SRBOrder::getTableName()) . '.' . pSQL(SRBOrder::getIdColumnName()));
+        $sql->groupBy(pSQL(static::getTableIdentifier()));
         $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
@@ -88,7 +88,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
     {
         $sql = self::findAllQuery();
         $sql->innerJoin('order_detail', 'od', 'ord.id_order_detail = od.id_order_detail');
-        $sql->where(self::getTableIdentifier() . ' = ' . pSQL($this->id));
+        $sql->where(pSQL(self::getTableIdentifier()) . ' = ' . pSQL($this->id));
         $sql->groupBy('ord.id_order_detail');
 
         return Db::getInstance()->executeS($sql);
@@ -159,12 +159,12 @@ class SRBShipback extends LibShipback implements PSElementInterface
     public function insertOnPS()
     {
         $shipbackToInsert = [
-            'id_srb_shipback' => $this->id,
-            'id_order' => $this->ps['id_order'],
-            'state' => $this->state,
-            'mode' => $this->mode,
-            'created_at' => Util::convertDateFormatForDB($this->created_at),
-            'public_url' => $this->public_url
+            'id_srb_shipback' => pSQL($this->id),
+            'id_order' => pSQL($this->ps['id_order']),
+            'state' => pSQL($this->state),
+            'mode' => pSQL($this->mode),
+            'created_at' => pSQL(Util::convertDateFormatForDB($this->created_at)),
+            'public_url' => pSQL($this->public_url)
         ];
 
         $sql = Db::getInstance();
@@ -178,14 +178,14 @@ class SRBShipback extends LibShipback implements PSElementInterface
     public function updateOnPS()
     {
         $shipbackToUpdate = [
-            'state' => $this->state,
-            'mode' => $this->mode,
-            'created_at' => $this->created_at,
-            'public_url' => $this->public_url,
+            'state' => pSQL($this->state),
+            'mode' => pSQL($this->mode),
+            'created_at' => pSQL($this->created_at),
+            'public_url' => pSQL($this->public_url),
         ];
 
         $sql = Db::getInstance();
-        $result = $sql->update(self::SHIPBACK_TABLE_NAME_NO_PREFIX, $shipbackToUpdate, self::getIdColumnName() . ' = "' . pSQL($this->id) . '"');
+        $result = $sql->update(self::SHIPBACK_TABLE_NAME_NO_PREFIX, $shipbackToUpdate, pSQL(self::getIdColumnName()) . ' = "' . pSQL($this->id) . '"');
 
         SRBLogger::addLog(self::getObjectTypeForMapping() . ' "' . $this->getReference() . '" updated', SRBLogger::INFO, self::getObjectTypeForMapping(), $this->getDBId());
 
@@ -255,7 +255,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
     static public function findLikeOrderIdByCreateDateQuery($orderReference, $limit = 0, $offset = 0)
     {
         $sql = self::findAllByCreateDateQuery($limit, $offset);
-        $sql->where(SRBOrder::getTableName() . '.reference LIKE "%' . pSQL($orderReference) . '%"');
+        $sql->where(pSQL(SRBOrder::getTableName()) . '.reference LIKE "%' . pSQL($orderReference) . '%"');
         $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
@@ -274,7 +274,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
     {
         $sql = self::findAllQuery();
         $sql = SRBOrder::addComponentsToQuery($sql);
-        $sql->where(self::getTableName() . '.id_order = ' . pSQL($orderId));
+        $sql->where(pSQL(self::getTableName()) . '.id_order = ' . pSQL($orderId));
         $sql->orderBy('created_at', 'DESC');
         $shipbackFromDB = Db::getInstance()->getRow($sql);
 
@@ -309,6 +309,6 @@ class SRBShipback extends LibShipback implements PSElementInterface
 
     static public function truncateTable()
     {
-        Db::getInstance()->execute('TRUNCATE TABLE ' . self::getShipbackTableName());
+        Db::getInstance()->execute('TRUNCATE TABLE ' . pSQL(self::getShipbackTableName()));
     }
 }

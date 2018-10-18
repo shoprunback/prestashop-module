@@ -66,7 +66,7 @@ class SRBAddress extends LibAddress implements PSInterface
 
     static protected function findByOrderIdQuery($orderId)
     {
-        return self::findAllQuery()->innerJoin('orders', SRBOrder::getTableName(), SRBOrder::getTableName() . '.id_address_delivery = ' . self::getTableName() . '.id_address')->where(SRBOrder::getTableName() . '.id_order = ' . pSQL($orderId));
+        return self::findAllQuery()->innerJoin('orders', pSQL(SRBOrder::getTableName()), pSQL(SRBOrder::getTableName()) . '.id_address_delivery = ' . pSQL(self::getTableName()) . '.id_address')->where(pSQL(SRBOrder::getTableName()) . '.id_order = ' . pSQL($orderId));
     }
 
     static public function findAllQuery($limit = 0, $offset = 0)

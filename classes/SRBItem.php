@@ -28,14 +28,14 @@ class SRBItem extends LibItem
     static public function createItemsFromOrderId($orderId)
     {
         $sql = self::findProductsForItems();
-        $sql->where(SRBOrder::getTableIdentifier() . ' = "' . pSQL($orderId) . '"');
+        $sql->where(pSQL(SRBOrder::getTableIdentifier()) . ' = "' . pSQL($orderId) . '"');
         return self::generateItemsWithProducts(Db::getInstance()->executeS($sql));
     }
 
     static public function createItemsFromOrderDetail($orderDetailId)
     {
         $sql = self::findProductsForItems();
-        $sql->innerJoin('order_detail', 'od', 'od.id_order = ' . SRBOrder::getTableName() . '.id_order');
+        $sql->innerJoin('order_detail', 'od', 'od.id_order = ' . pSQL(SRBOrder::getTableName()) . '.id_order');
         $sql->where('od.id_order_detail = ' . pSQL($orderDetailId));
         return self::generateItemsWithProducts(Db::getInstance()->executeS($sql));
     }
