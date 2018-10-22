@@ -25,7 +25,7 @@ $(document).ready(function() {
     e.preventDefault();
 
     var data = {
-      'action': 'sync',
+      'actionSRB': 'sync',
       'className': getSRBObjectName($(this).data('type')),
       'params': parseInt($(this).parent().parent().data('id'))
     };
@@ -41,7 +41,7 @@ $(document).ready(function() {
     e.preventDefault();
 
     var data = {
-      'action': 'syncAll',
+      'actionSRB': 'syncAll',
       'className': getSRBObjectName($(this).data('type')),
       'params': ''
     };
