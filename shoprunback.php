@@ -87,6 +87,12 @@ class ShopRunBack extends Module
             $type = Tools::getValue('messageType');
             $this->context->controller->{$type}[] = $this->l($message);
         }
+
+        $this->controller_name = array('AdminShoprunback');
+        $this->front_controller =  array(
+            'index.php?controller=' . $this->controller_name[0] . '&token=' . Tools::getAdminTokenLite($this->controller_name[0]),
+        );
+
     }
 
     private function installTab($controllerClassName, $tabConf)
@@ -379,4 +385,5 @@ class ShopRunBack extends Module
             $this->context->controller->addJs($this->SRBModulePath . '/views/js/admin/tab-1.7.js');
         }
     }
+
 }
