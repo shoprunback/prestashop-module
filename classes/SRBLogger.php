@@ -24,12 +24,12 @@ class SRBLogger
     static public function getLogs($limit = 100, $offset = 0)
     {
         $sql = new DbQuery();
-        $sql->select(self::getPSLogTableName() . '.*, e.firstname, e.lastname, e.email');
-        $sql->from('log', self::getPSLogTableName());
-        $sql->innerJoin('employee', 'e', self::getPSLogTableName() . '.id_employee = e.id_employee');
-        $sql->where(self::getPSLogTableName() . '.message LIKE "[ShopRunBack] %"');
+        $sql->select(pSQL(self::getPSLogTableName()) . '.*, e.firstname, e.lastname, e.email');
+        $sql->from('log', pSQL(self::getPSLogTableName()));
+        $sql->innerJoin('employee', 'e', pSQL(self::getPSLogTableName()) . '.id_employee = e.id_employee');
+        $sql->where(pSQL(self::getPSLogTableName()) . '.message LIKE "[ShopRunBack] %"');
         $sql->limit($limit, $offset);
-        $sql->orderBy(self::getPSLogTableName() . '.id_log DESC');
+        $sql->orderBy(pSQL(self::getPSLogTableName()) . '.id_log DESC');
 
         return Db::getInstance()->executeS($sql);
     }

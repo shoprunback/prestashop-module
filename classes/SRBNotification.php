@@ -54,8 +54,8 @@ class SRBNotification
 
     static public function allUnread($limit = 10, $offset = 0)
     {
-        $sql = self::findAllQuery($limit, $offset);
-        $sql->where(self::getTableName() . '.read = 0');
+        $sql = self::findAllQuery((int) $limit, (int) $offset);
+        $sql->where(pSQL(self::getTableName()) . '.read = 0');
 
         return self::generateNotificationsFromArrayOfResult(Db::getInstance()->executeS($sql));
     }
@@ -63,7 +63,7 @@ class SRBNotification
     static public function get($id)
     {
         $sql = self::findQuery();
-        $sql->where(self::getTableIdentifier() . ' = ' . $id);
+        $sql->where(pSQL(self::getTableIdentifier()) . ' = ' . pSQL($id)); // @TODO : check if we need (int) or pSQL()
 
         return new self(Db::getInstance()->executeS($sql));
     }
@@ -71,8 +71,8 @@ class SRBNotification
     static private function findQuery()
     {
         $sql = new DbQuery();
-        $sql->select(self::getTableName() . '.*');
-        $sql->from(self::NOTIFICATION_TABLE_NAME_NO_PREFIX, self::getTableName());
+        $sql->select(pSQL(self::getTableName()) . '.*');
+        $sql->from(self::NOTIFICATION_TABLE_NAME_NO_PREFIX, pSQL(self::getTableName()));
 
         return $sql;
     }
@@ -80,8 +80,8 @@ class SRBNotification
     static private function findAllQuery($limit = 10, $offset = 0)
     {
         $sql = self::findQuery();
-        $sql->limit($limit, $offset);
-        $sql->orderBy(self::getTableIdentifier() . ' DESC');
+        $sql->limit((int) $limit, (int) $offset);
+        $sql->orderBy(pSQL(self::getTableIdentifier()) . ' DESC');
 
         return $sql;
     }
@@ -108,11 +108,11 @@ class SRBNotification
 
         return Db::getInstance()->insert(self::NOTIFICATION_TABLE_NAME_NO_PREFIX, [
             'message'       => pSQL($this->message),
-            'severity'      => $this->severity,
+            'severity'      => pSQL($this->severity),
             'object_type'   => isset($this->objectType) ? pSQL($this->objectType) : null,
-            'object_id'     => isset($this->objectId) ? $this->objectId : 0,
-            'created_at'    => $currentDate,
-            'updated_at'    => $currentDate
+            'object_id'     => isset($this->objectId) ? pSQL($this->objectId) : 0,
+            'created_at'    => pSQL($currentDate),
+            'updated_at'    => pSQL($currentDate)
         ]);
     }
 
@@ -120,28 +120,28 @@ class SRBNotification
     {
         return Db::getInstance()->update(self::NOTIFICATION_TABLE_NAME_NO_PREFIX, [
             'message'       => pSQL($this->message),
-            'severity'      => $this->severity,
+            'severity'      => pSQL($this->severity),
             'object_type'   => isset($this->objectType) ? pSQL($this->objectType) : null,
-            'object_id'     => isset($this->objectId) ? $this->objectId : 0,
-            'read'          => $this->read,
+            'object_id'     => isset($this->objectId) ? pSQL($this->objectId): 0,
+            'read'          => pSQL($this->read),
             'updated_at'    => date('Y-m-d H:i:s')
-        ], self::getIdColumnName() . ' = ' . $this->id_srb_notification);
+        ], pSQL(self::getIdColumnName()) . ' = ' . pSQL($this->id_srb_notification));
     }
 
     public function delete()
     {
-        return Db::getInstance()->delete(self::NOTIFICATION_TABLE_NAME_NO_PREFIX, self::getTableIdentifier() . ' = ' . $this->id_srb_notification);
+        return Db::getInstance()->delete(self::NOTIFICATION_TABLE_NAME_NO_PREFIX, pSQL(self::getTableIdentifier()) . ' = ' . pSQL($this->id_srb_notification));
     }
 
     public static function markAsReadById($id)
     {
         return Db::getInstance()->update(self::NOTIFICATION_TABLE_NAME_NO_PREFIX , [
             'read' => true
-        ], self::getIdColumnName() . ' = ' . $id);
+        ], pSQL(self::getIdColumnName()) . ' = ' . pSQL($id));
     }
 
     static public function truncateTable()
     {
-        Db::getInstance()->execute('TRUNCATE TABLE ' . self::getNotificationFullTableName());
+        Db::getInstance()->execute('TRUNCATE TABLE ' . pSQL(self::getNotificationFullTableName()));
     }
 }

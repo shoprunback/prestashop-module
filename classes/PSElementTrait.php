@@ -86,9 +86,9 @@ trait PSElementTrait
         ElementMapper::addSelectAllToQuery($sql);
         $sql->{$joinType}(
             ElementMapper::MAPPER_TABLE_NAME_NO_PREFIX,
-            ElementMapper::getTableName(),
-            ElementMapper::getTableName() . '.id_item = ' . static::getTableIdentifier() . '
-                AND ' . ElementMapper::getTableName() . '.type = "' . static::getObjectTypeForMapping() . '"'
+            pSQL(ElementMapper::getTableName()),
+            pSQL(ElementMapper::getTableName()) . '.id_item = ' . pSQL(static::getTableIdentifier()) . '
+                AND ' . pSQL(ElementMapper::getTableName()) . '.type = "' . pSQL(static::getObjectTypeForMapping()) . '"'
         );
 
         return $sql;
@@ -105,8 +105,8 @@ trait PSElementTrait
     static protected function findAllWithMappingQuery($onlySyncElements = false, $limit = 0, $offset = 0)
     {
         $sql = self::getComponentsToFindAllWithMappingQuery($onlySyncElements);
-        $sql->groupBy(static::getTableIdentifier());
-        $sql->orderBy(ElementMapper::getTableName() . '.last_sent_at DESC');
+        $sql->groupBy(pSQL(static::getTableIdentifier()));
+        $sql->orderBy(pSQL(ElementMapper::getTableName()) . '.last_sent_at DESC');
         $sql = self::addLimitToQuery($sql, $limit, $offset);
 
         return $sql;
@@ -136,7 +136,7 @@ trait PSElementTrait
 
     static protected function addCountToQuery($sql)
     {
-        return $sql->select('COUNT(DISTINCT ' . static::getTableIdentifier() . ') as count');
+        return $sql->select('COUNT(DISTINCT ' . pSQL(static::getTableIdentifier()) . ') as count');
     }
 
     static protected function findOneQuery($id)
@@ -159,7 +159,7 @@ trait PSElementTrait
 
     static protected function addWhereId($sql, $id)
     {
-        $sql->where(self::getTableIdentifier() . ' = "' . pSQL($id) . '"');
+        $sql->where(pSQL(self::getTableIdentifier()) . ' = "' . pSQL($id) . '"');
         return $sql;
     }
 
@@ -202,7 +202,7 @@ trait PSElementTrait
     static protected function addLimitToQuery($sql, $limit = 0, $offset = 0)
     {
         if ($limit > 0) {
-            $sql->limit($limit, $offset);
+            $sql->limit((int) $limit, (int) $offset);
         }
 
         return $sql;
@@ -252,7 +252,7 @@ trait PSElementTrait
     static public function getBaseQuery()
     {
         $sql = new DbQuery();
-        $sql->from(static::getTableWithoutPrefix(), static::getTableName());
+        $sql->from(pSQL(static::getTableWithoutPrefix()), pSQL(static::getTableName()));
         return $sql;
     }
 

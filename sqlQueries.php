@@ -3,17 +3,17 @@
 function checkIfIndexExists() {
     return 'SELECT count(*)
         FROM information_schema.statistics
-        WHERE TABLE_NAME = "' . ElementMapper::getMapperTableName() . '"
-        AND INDEX_NAME = "' . ElementMapper::MAPPER_INDEX_NAME . '"
+        WHERE TABLE_NAME = "' . pSQL(ElementMapper::getMapperTableName()) . '"
+        AND INDEX_NAME = "' . pSQL(ElementMapper::MAPPER_INDEX_NAME) . '"
     ';
 }
 
 function createIndexQuery() {
-    return 'ALTER TABLE `' . ElementMapper::getMapperTableName() . '` ADD INDEX ' . ElementMapper::MAPPER_INDEX_NAME . ' (' . ElementMapper::MAPPER_INDEX_COLUMNS . ')';
+    return 'ALTER TABLE `' . pSQL(ElementMapper::getMapperTableName()) . '` ADD INDEX ' . pSQL(ElementMapper::MAPPER_INDEX_NAME) . ' (' . pSQL(ElementMapper::MAPPER_INDEX_COLUMNS) . ')';
 }
 
 function createTableQuery() {
-    return 'CREATE TABLE IF NOT EXISTS ' . ElementMapper::getMapperTableName() . '(
+    return 'CREATE TABLE IF NOT EXISTS ' . pSQL(ElementMapper::getMapperTableName()) . '(
         `id_srb_map` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
         `id_item_srb` VARCHAR(40) NOT NULL,
         `id_item` INT(11) NOT NULL,
@@ -23,7 +23,7 @@ function createTableQuery() {
 }
 
 function createNotificationTableQuery() {
-    return 'CREATE TABLE IF NOT EXISTS ' . SRBNotification::getNotificationFullTableName() . '(
+    return 'CREATE TABLE IF NOT EXISTS ' . pSQL(SRBNotification::getNotificationFullTableName()) . '(
         `id_srb_notification` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
         `message` VARCHAR(1000) NOT NULL,
         `severity` VARCHAR(20) NOT NULL,
@@ -36,7 +36,7 @@ function createNotificationTableQuery() {
 }
 
 function createReturnTableQuery() {
-    return 'CREATE TABLE IF NOT EXISTS ' . SRBShipback::getShipbackTableName() . '(
+    return 'CREATE TABLE IF NOT EXISTS ' . pSQL(SRBShipback::getShipbackTableName()) . '(
         `id_srb_shipback` VARCHAR(40) NOT NULL PRIMARY KEY,
         `id_order` INT(11) UNIQUE NOT NULL,
         `state` VARCHAR(40) NOT NULL,
@@ -47,15 +47,15 @@ function createReturnTableQuery() {
 }
 
 function dropTableQuery() {
-    return 'DROP TABLE ' . ElementMapper::getMapperTableName();
+    return 'DROP TABLE ' . pSQL(ElementMapper::getMapperTableName());
 }
 
 function dropNotificationTableQuery() {
-    return 'DROP TABLE ' . SRBNotification::getNotificationFullTableName();
+    return 'DROP TABLE ' . pSQL(SRBNotification::getNotificationFullTableName());
 }
 
 function dropReturnTableQuery() {
-    return 'DROP TABLE ' . SRBShipback::getShipbackTableName();
+    return 'DROP TABLE ' . pSQL(SRBShipback::getShipbackTableName());
 }
 
 function enableReturns() {

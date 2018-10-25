@@ -114,7 +114,7 @@ class SRBProduct extends LibProduct implements PSElementInterface
 
     static public function getOrderProducts($orderId)
     {
-        return self::convertPSArrayToElements(Db::getInstance()->executeS(self::findOrderProductsQuery($orderId)));
+        return self::convertPSArrayToElements(Db::getInstance()->executeS(self::findOrderProductsQuery(pSQL($orderId))));
     }
 
     public function getCoverPicture()
@@ -223,7 +223,7 @@ class SRBProduct extends LibProduct implements PSElementInterface
 
     static public function addWhereLikeLabelToQuery(&$sql, $label)
     {
-        $sql->where('pl.name LIKE "%' . $label . '%"');
+        $sql->where('pl.name LIKE "%' . pSQL($label) . '%"');
     }
 
     static public function findLikeLabelQuery($label, $limit = 0, $offset = 0, $onlySyncElements = false)
@@ -281,7 +281,7 @@ class SRBProduct extends LibProduct implements PSElementInterface
         self::joinLang($sql);
         self::joinCombinationByProduct($sql);
         $sql->select('al.name as attribute_name, pa.ean13 as attribute_ean13, pac.id_product_attribute');
-        $sql->where(self::getTableIdentifier() . ' = ' . $productId);
+        $sql->where(pSQL(self::getTableIdentifier()) . ' = ' . pSQL($productId));
 
         return $sql;
     }
@@ -300,12 +300,12 @@ class SRBProduct extends LibProduct implements PSElementInterface
     static public function findPreciseCombinationOfProductInOrderQuery($productId, $orderId, $productAttributeId)
     {
         $sql = self::findAttributesOfProductQuery($productId);
-        $sql->innerJoin('cart_product', 'cp', self::getTableIdentifier() . ' = cp.' . self::getIdColumnName());
+        $sql->innerJoin('cart_product', 'cp', pSQL(self::getTableIdentifier()) . ' = cp.' . pSQL(self::getIdColumnName()));
         $sql->innerJoin('cart', 'ca', 'cp.id_cart = ca.id_cart');
-        $sql->innerJoin('orders', SRBOrder::getTableName(), 'ca.id_cart = ' . SRBOrder::getTableName() . '.id_cart');
-        $sql->where(SRBOrder::getTableIdentifier() . ' = ' . $orderId);
+        $sql->innerJoin('orders', pSQL(SRBOrder::getTableName()), 'ca.id_cart = ' . pSQL(SRBOrder::getTableName()) . '.id_cart');
+        $sql->where(pSQL(SRBOrder::getTableIdentifier()) . ' = ' . pSQL($orderId));
         $sql->where('cp.id_product_attribute = pa.id_product_attribute');
-        $sql->where('cp.id_product_attribute = ' . $productAttributeId);
+        $sql->where('cp.id_product_attribute = ' . pSQL($productAttributeId));
 
         return $sql;
     }

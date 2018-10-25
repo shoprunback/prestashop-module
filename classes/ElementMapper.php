@@ -116,7 +116,7 @@ class ElementMapper
         if (is_string($idItem) && !is_numeric($idItem)) return static::getByIdItemSRBAndItemType($idItem, $type);
 
         $sql = self::findAllQuery();
-        $sql->where(self::getTableName() . '.id_item = ' . pSQL($idItem) . ' AND ' . self::getTableName() . '.type = "' . pSQL($type) . '"');
+        $sql->where(pSQL(self::getTableName()) . '.id_item = ' . pSQL($idItem) . ' AND ' . pSQL(self::getTableName()) . '.type = "' . pSQL($type) . '"');
         $result = Db::getInstance()->getRow($sql);
 
         return self::returnResult($result);
@@ -125,7 +125,7 @@ class ElementMapper
     static public function getByIdItemSRBAndItemType($idItemSrb, $type)
     {
         $sql = self::findAllQuery();
-        $sql->where(self::getTableName() . '.id_item_srb = "' . pSQL($idItemSrb) . '" AND ' . self::getTableName() . '.type = "' . pSQL($type) . '"');
+        $sql->where(pSQL(self::getTableName()) . '.id_item_srb = "' . pSQL($idItemSrb) . '" AND ' . pSQL(self::getTableName()) . '.type = "' . pSQL($type) . '"');
         $result = Db::getInstance()->getRow($sql);
 
         return self::returnResult($result);
@@ -149,11 +149,11 @@ class ElementMapper
     static public function addSelectAllToQuery(&$sql)
     {
         $sql->select(
-            self::getTableName() . '.id_srb_map, ' .
-            self::getTableName() . '.id_item_srb, ' .
-            self::getTableName() . '.id_item, ' .
-            self::getTableName() . '.type, ' .
-            self::getTableName() . '.last_sent_at'
+            pSQL(self::getTableName()) . '.id_srb_map, ' .
+            pSQL(self::getTableName()) . '.id_item_srb, ' .
+            pSQL(self::getTableName()) . '.id_item, ' .
+            pSQL(self::getTableName()) . '.type, ' .
+            pSQL(self::getTableName()) . '.last_sent_at'
         );
     }
 
@@ -202,13 +202,13 @@ class ElementMapper
     static public function findByTypeAndListOfIdsQuery($ids, $type)
     {
         $sql = static::findByTypeQuery($type);
-        $sql->where(self::getTableName() . '.id_item IN (' . implode(', ', $ids) . ')');
+        $sql->where(pSQL(self::getTableName()) . '.id_item IN (' . implode(', ', array_map('intval', $ids)) . ')');
 
         return $sql;
     }
 
     static public function truncateTable()
     {
-        Db::getInstance()->execute('TRUNCATE TABLE ' . self::getMapperTableName());
+        Db::getInstance()->execute('TRUNCATE TABLE ' . pSQL(self::getMapperTableName()));
     }
 }
