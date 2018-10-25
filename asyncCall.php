@@ -6,28 +6,28 @@ require_once(_PS_MODULE_DIR_ . '../init.php');
 require_once 'shoprunback.php';
 include_once 'classes/SRBLogger.php';
 
-$class = $_POST['className'] ? $_POST['className'] : 'ShopRunBack';
+$class = Tools::getIsset('className') ? Tools::getValue('className') : 'ShopRunBack';
 
-$action = $_POST['action'];
+$actionSRB = Tools::getValue('actionSRB');
 $result = '';
 
-if (isset($_POST['params'])) {
-    if ($action == 'sync') {
-        SRBLogger::addLog('AsyncCall sync ' . $class . ' ' . $_POST['params'], SRBLogger::INFO);
+if (Tools::getIsset('params')) {
+    if ($actionSRB == 'sync') {
+        SRBLogger::addLog('AsyncCall sync ' . $class . ' ' . Tools::getValue('params'), SRBLogger::INFO);
         try {
-            $element = $class::getNotSyncById($_POST['params']);
+            $element = $class::getNotSyncById(Tools::getValue('params'));
             $result = $element->sync(false);
         } catch (SRBException $e) {
             SRBLogger::addLog($e, SRBLogger::FATAL, $class);
         }
-    } elseif ($action == 'syncAll') {
+    } elseif ($actionSRB == 'syncAll') {
         $result = $class::syncAll();
     } else {
-        throw new SRBException('AsyncCall unknown action ' . $action . '. Param: ' . $_POST['params'], 3);
+        throw new SRBException('AsyncCall unknown action ' . $actionSRB . '. Param: ' . Tools::getValue('params'), 3);
     }
 } else {
-    SRBLogger::addLog('AsyncCall params is missing. Action: ' . $action . '. Class: ' . $class, SRBLogger::ERROR);
-    throw new SRBException('AsyncCall params is missing. Action: ' . $action);
+    SRBLogger::addLog('AsyncCall params is missing. Action: ' . $actionSRB . '. Class: ' . $class, SRBLogger::ERROR);
+    throw new SRBException('AsyncCall params is missing. Action: ' . $actionSRB);
 }
 
 if (! is_string($result)) {
