@@ -156,3 +156,5 @@
 #srb-manager .pagination ul li.active span {
   color: white;
 }
+
+.srb-information-text { font-size: 1.25em; }

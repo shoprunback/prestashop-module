@@ -51,7 +51,7 @@
                                     </a>
                                 </td>
                                 <td>{$element->created_at}</td>
-                                <td><a href="{$externalLink}{$element->getReference()}" target="_blank"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a></td>
+                                <td><a href="{$externalLink}{$element->getReference()}" target="_blank" title="{l s='See in ShopRunBack' mod='shoprunback'}"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a></td>
                             </tr>
                         {/foreach}
                     {else}

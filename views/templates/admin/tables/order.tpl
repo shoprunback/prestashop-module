@@ -72,7 +72,7 @@
                             </td>
                             <td>
                                 {if $element->id_item_srb}
-                                    <a href="{$externalLink}{$element->id_item_srb}" target="_blank"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a>
+                                    <a href="{$externalLink}{$element->id_item_srb}" target="_blank" title="{l s='See in ShopRunBack' mod='shoprunback'}"><i class="fa fa-external-link-square fa-lg" aria-hidden="true"></i></a>
                                 {/if}
                             </td>
                         </tr>

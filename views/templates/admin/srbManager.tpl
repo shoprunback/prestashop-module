@@ -3,7 +3,22 @@
     var elementType = '{$elementType}';
     var token = '{$srbtoken}';
     var loadingMessage = "{l s='manager.loading' mod='shoprunback'}";
+    var admin_module_ajax_url_shoprunback = '{$admin_module_ajax_url_shoprunback}';
 </script>
+
+<div id="srb-loader" class="hidden">
+    <div class="row text-center">
+        <div class="col-sm-12">
+            <i class="fa fa-spinner fa-spin fa-5x" aria-hidden="true"></i>
+        </div>
+        <div class="col-sm-12 srb-information-text">
+            <br>
+            {l s='manager.loading' mod='shoprunback'}
+        </div>
+    </div>
+
+
+</div>
 
 <div id="srb-manager">
     {if $srbtoken == ''}

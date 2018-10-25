@@ -139,9 +139,13 @@ class AdminShoprunbackController extends ModuleAdminController
             $this->addJs(_PS_MODULE_DIR_ . $this->module->name . '/views/js/admin/notification.js');
         }
 
-        $this->context->smarty->assign('srbtoken', RestClient::getClient()->getToken());
-        $this->context->smarty->assign('link', $link);
-        $this->context->smarty->assign('template', $template);
+        $this->context->smarty->assign(array(
+            'srbtoken'                          => RestClient::getClient()->getToken(),
+            'link'                              => $link,
+            'template'                          => $template,
+            'admin_module_ajax_url_shoprunback' => $this->module->front_controller[0]
+        ));
+
     }
 
     private function getElements($elementType = 'return')
@@ -270,10 +274,10 @@ class AdminShoprunbackController extends ModuleAdminController
         $this->context->smarty->assign('production', Configuration::get('production'));
     }
 
-    public function asyncCall()
+/*     public function asyncCall()
     {
         require_once($this->module->SRBModulePath . '/asyncCall.php');
-    }
+    } */
 
     public function markAsReadNotification()
     {
@@ -322,5 +326,37 @@ class AdminShoprunbackController extends ModuleAdminController
         $this->context->smarty->assign('syncProductsUrl', $this->tabUrl . '&syncAll&synchronize=product');
         $this->context->smarty->assign('syncOrdersUrl', $this->tabUrl . '&syncAll&synchronize=order');
         $this->addJs(_PS_MODULE_DIR_ . $this->module->name . '/views/js/admin/srbManager.js');
+    }
+
+    public function ajaxProcessSyncAll() {
+        $class = Tools::getIsset('className') ? Tools::getValue('className') : 'ShopRunBack';
+
+        $actionSRB = Tools::getValue('actionSRB');
+        $result = '';
+
+        if (Tools::getIsset('params')) {
+            if ($actionSRB == 'sync') {
+                SRBLogger::addLog('AsyncCall sync ' . $class . ' ' . Tools::getValue('params'), SRBLogger::INFO);
+                try {
+                    $element = $class::getNotSyncById(Tools::getValue('params'));
+                    $result = $element->sync(false);
+                } catch (SRBException $e) {
+                    SRBLogger::addLog($e, SRBLogger::FATAL, $class);
+                }
+            } elseif ($actionSRB == 'syncAll') {
+                $result = $class::syncAll();
+            } else {
+                throw new SRBException('AsyncCall unknown action ' . $actionSRB . '. Param: ' . Tools::getValue('params'), 3);
+            }
+        } else {
+            SRBLogger::addLog('AsyncCall params is missing. Action: ' . $actionSRB . '. Class: ' . $class, SRBLogger::ERROR);
+            throw new SRBException('AsyncCall params is missing. Action: ' . $actionSRB);
+        }
+
+        if (!is_string($result)) {
+            $result = json_encode($result);
+        }
+
+        die($result);
     }
 }
