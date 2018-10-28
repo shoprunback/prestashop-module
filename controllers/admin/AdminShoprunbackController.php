@@ -90,18 +90,21 @@ class AdminShoprunbackController extends ModuleAdminController
         $link = Context::getContext()->link;
         parent::initContent();
 
-        $elementType = (isset($_GET['elementType'])) ? $_GET['elementType'] : '';
+        $elementType = Tools::getIsset('elementType') ? Tools::getValue('elementType') : '';
         $message = '';
 
-        $this->context->smarty->assign('elementType', $elementType);
-        $this->context->smarty->assign('shoprunbackURL', $this->module->url);
-        $this->context->smarty->assign('shoprunbackURLProd', $this->module->urlProd);
-        $this->context->smarty->assign('srbManager', $this->tabUrl);
-        $this->context->smarty->assign('message', $message);
-        $this->context->smarty->assign('asyncCall', $this->tabUrl . '&action=asyncCall');
+        $this->context->smarty->assign(array(
+            'elementType'        => $elementType,
+            'shoprunbackURL'     => $this->module->url,
+            'shoprunbackURLProd' => $this->module->urlProd,
+            'srbManager'         => $this->tabUrl,
+            'message'            => $message,
+            'asyncCall'          => $this->tabUrl . '&action=asyncCall'
+        ));
+
         $this->setTemplate('../../../../modules/' . $this->module->name . '/views/templates/admin/layout.tpl');
 
-        if (isset($_GET['syncAll'])) {
+        if (Tools::getIsset('syncAll')) {
             $this->syncAll();
             return;
         }
