@@ -21,7 +21,7 @@ class AdminShoprunbackController extends ModuleAdminController
         $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/srbGlobal.css');
         $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin/header.css');
         $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin/override.css');
-        $this->addCSS('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
+        $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/vendor/font-awesome-4.7.0/css/font-awesome.min.css');
         $this->actionResult = false;
         $this->tabUrl = Context::getContext()->link->getAdminLink('AdminShoprunback');
 
