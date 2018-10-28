@@ -89,9 +89,13 @@ class ShopRunBack extends Module
         }
 
         $this->controller_name = array('AdminShoprunback');
-        $this->front_controller =  array(
-            'index.php?controller=' . $this->controller_name[0] . '&token=' . Tools::getAdminTokenLite($this->controller_name[0]),
-        );
+        
+        $current_context = Context::getContext();
+        if (isset($current_context->controller->controller_type) && $current_context->controller->controller_type == 'moduleadmin'){
+            $this->front_controller =  array(
+                'index.php?controller=' . $this->controller_name[0] . '&token=' . Tools::getAdminTokenLite($this->controller_name[0]),
+            );
+        }
 
     }
 
