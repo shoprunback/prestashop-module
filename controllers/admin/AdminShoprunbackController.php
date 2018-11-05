@@ -146,7 +146,7 @@ class AdminShoprunbackController extends ModuleAdminController
             'srbtoken'                          => RestClient::getClient()->getToken(),
             'link'                              => $link,
             'template'                          => $template,
-            'admin_module_ajax_url_shoprunback' => $this->module->front_controller[0]
+            'admin_module_ajax_url_shoprunback' => 'index.php?controller=AdminShoprunback&token=' . Tools::getAdminTokenLite('AdminShoprunback')
         ));
 
     }
