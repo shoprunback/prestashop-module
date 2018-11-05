@@ -100,7 +100,7 @@ class ShopRunBackWebhookModuleFrontController extends ModuleFrontController
         return self::returnHeaderHTTP(200);
     }
 
-    static private function returnHeaderHTTP($httpCode)
+    private static function returnHeaderHTTP($httpCode)
     {
         switch ($httpCode) {
             case 403:

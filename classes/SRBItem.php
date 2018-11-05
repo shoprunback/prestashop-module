@@ -25,14 +25,14 @@ class SRBItem extends LibItem
         }
     }
 
-    static public function createItemsFromOrderId($orderId)
+    public static function createItemsFromOrderId($orderId)
     {
         $sql = self::findProductsForItems();
         $sql->where(pSQL(SRBOrder::getTableIdentifier()) . ' = "' . pSQL($orderId) . '"');
         return self::generateItemsWithProducts(Db::getInstance()->executeS($sql));
     }
 
-    static public function createItemsFromOrderDetail($orderDetailId)
+    public static function createItemsFromOrderDetail($orderDetailId)
     {
         $sql = self::findProductsForItems();
         $sql->innerJoin('order_detail', 'od', 'od.id_order = ' . pSQL(SRBOrder::getTableName()) . '.id_order');
@@ -40,7 +40,7 @@ class SRBItem extends LibItem
         return self::generateItemsWithProducts(Db::getInstance()->executeS($sql));
     }
 
-    static private function findProductsForItems()
+    private static function findProductsForItems()
     {
         $sql = SRBProduct::getBaseQuery();
         SRBProduct::joinLang($sql);
@@ -54,13 +54,13 @@ class SRBItem extends LibItem
     }
 
     // To get the combination of the product in the cart
-    static public function joinCombinationByCartProducts(&$sql)
+    public static function joinCombinationByCartProducts(&$sql)
     {
         $sql->leftJoin('product_attribute', 'pa', 'pa.id_product_attribute = cp.id_product_attribute');
         SRBProduct::joinCombinationByProductAttribute($sql);
     }
 
-    static private function generateItemsWithProducts($products)
+    private static function generateItemsWithProducts($products)
     {
         $items = array();
         foreach ($products as $product) {

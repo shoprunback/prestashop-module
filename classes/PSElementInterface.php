@@ -5,8 +5,8 @@ include_once 'PSInterface.php';
 
 interface PSElementInterface extends PSInterface
 {
-    static function getDisplayNameAttribute();
-    static function getObjectTypeForMapping();
-    static function getPathForAPICall();
-    static function findAllQuery($limit = 0, $offset = 0);
+    public static function getDisplayNameAttribute();
+    public static function getObjectTypeForMapping();
+    public static function getPathForAPICall();
+    public static function findAllQuery($limit = 0, $offset = 0);
 }

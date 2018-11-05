@@ -17,27 +17,27 @@ class SRBNotification
         }
     }
 
-    static public function getNotificationFullTableName()
+    public static function getNotificationFullTableName()
     {
         return _DB_PREFIX_ . self::NOTIFICATION_TABLE_NAME_NO_PREFIX;
     }
 
-    static public function getTableName()
+    public static function getTableName()
     {
         return 'srbn';
     }
 
-    static public function getIdColumnName()
+    public static function getIdColumnName()
     {
         return 'id_srb_notification';
     }
 
-    static public function getTableIdentifier()
+    public static function getTableIdentifier()
     {
         return self::getTableName() . '.' . self::getIdColumnName();
     }
 
-    static private function generateNotificationsFromArrayOfResult($dbNotifications)
+    private static function generateNotificationsFromArrayOfResult($dbNotifications)
     {
         $notifications = array();
         foreach ($dbNotifications as $dbNotification) {
@@ -47,12 +47,12 @@ class SRBNotification
         return $notifications;
     }
 
-    static public function all($limit = 10, $offset = 0)
+    public static function all($limit = 10, $offset = 0)
     {
         return self::generateNotificationsFromArrayOfResult(Db::getInstance()->executeS(Db::getInstance()->executeS(self::findAllQuery($limit, $offset))));
     }
 
-    static public function allUnread($limit = 10, $offset = 0)
+    public static function allUnread($limit = 10, $offset = 0)
     {
         $sql = self::findAllQuery((int) $limit, (int) $offset);
         $sql->where(pSQL(self::getTableName()) . '.read = 0');
@@ -60,7 +60,7 @@ class SRBNotification
         return self::generateNotificationsFromArrayOfResult(Db::getInstance()->executeS($sql));
     }
 
-    static public function get($id)
+    public static function get($id)
     {
         $sql = self::findQuery();
         $sql->where(pSQL(self::getTableIdentifier()) . ' = ' . pSQL($id)); // @TODO : check if we need (int) or pSQL()
@@ -68,7 +68,7 @@ class SRBNotification
         return new self(Db::getInstance()->executeS($sql));
     }
 
-    static private function findQuery()
+    private static function findQuery()
     {
         $sql = new DbQuery();
         $sql->select(pSQL(self::getTableName()) . '.*');
@@ -77,7 +77,7 @@ class SRBNotification
         return $sql;
     }
 
-    static private function findAllQuery($limit = 10, $offset = 0)
+    private static function findAllQuery($limit = 10, $offset = 0)
     {
         $sql = self::findQuery();
         $sql->limit((int) $limit, (int) $offset);
@@ -135,12 +135,12 @@ class SRBNotification
 
     public static function markAsReadById($id)
     {
-        return Db::getInstance()->update(self::NOTIFICATION_TABLE_NAME_NO_PREFIX , array(
+        return Db::getInstance()->update(self::NOTIFICATION_TABLE_NAME_NO_PREFIX, array(
             'read' => true
         ), pSQL(self::getIdColumnName()) . ' = ' . pSQL($id));
     }
 
-    static public function truncateTable()
+    public static function truncateTable()
     {
         Db::getInstance()->execute('TRUNCATE TABLE ' . pSQL(self::getNotificationFullTableName()));
     }

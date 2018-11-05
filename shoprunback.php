@@ -5,8 +5,8 @@ if (! defined('_PS_VERSION_')) {
 
 include_once 'lib/shoprunback-php/init.php';
 
-define ('PRODUCTION_MODE', Configuration::get('production'));
-define ('DASHBOARD_PROD_URL', \Shoprunback\RestClient::getClient()->getProductionUrl());
+define('PRODUCTION_MODE', Configuration::get('production'));
+define('DASHBOARD_PROD_URL', \Shoprunback\RestClient::getClient()->getProductionUrl());
 
 \Shoprunback\RestClient::getClient()->setToken(Configuration::get('srbtoken'));
 
@@ -18,7 +18,7 @@ if (!PRODUCTION_MODE) {
     \Shoprunback\RestClient::getClient()->useSandboxEnvironment();
 }
 
-define ('DASHBOARD_URL', \Shoprunback\RestClient::getClient()->getApiBaseUrl());
+define('DASHBOARD_URL', \Shoprunback\RestClient::getClient()->getApiBaseUrl());
 
 include_once 'classes/ElementMapper.php';
 include_once 'classes/Util.php';
@@ -87,7 +87,6 @@ class ShopRunBack extends Module
             $type = Tools::getValue('messageType');
             $this->context->controller->{$type}[] = $this->l($message);
         }
-
     }
 
     private function installTab($controllerClassName, $tabConf)
@@ -235,7 +234,7 @@ class ShopRunBack extends Module
         Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminShoprunback') . '&elementType=config');
     }
 
-    public function hookNewOrder ($params)
+    public function hookNewOrder($params)
     {
         if (\Shoprunback\RestClient::getClient()->getToken()) {
             try {
@@ -301,8 +300,10 @@ class ShopRunBack extends Module
         if (\Shoprunback\RestClient::getClient()->getToken()) {
             try {
                 \Shoprunback\Elements\Product::delete(
-                    ElementMapper::getMappingIdIfExists($params['product']->id,
-                    SRBProduct::getObjectTypeForMapping())
+                    ElementMapper::getMappingIdIfExists(
+                        $params['product']->id,
+                    SRBProduct::getObjectTypeForMapping()
+                    )
                 );
             } catch (Exception $e) {
                 $notification = new SRBNotification();
@@ -372,7 +373,8 @@ class ShopRunBack extends Module
         $this->context->controller->addJs($this->_path . 'views/js/front/orderDetail.js');
     }
 
-    public function hookDisplayBackOfficeHeader() {
+    public function hookDisplayBackOfficeHeader()
+    {
         // Add icon to tab
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
             $this->context->controller->addJs($this->SRBModulePath . '/views/js/admin/tab-1.6.js');
@@ -380,5 +382,4 @@ class ShopRunBack extends Module
             $this->context->controller->addJs($this->SRBModulePath . '/views/js/admin/tab-1.7.js');
         }
     }
-
 }

@@ -30,32 +30,32 @@ class SRBBrand extends LibBrand implements PSElementInterface
         return 'm';
     }
 
-    static public function getIdColumnName()
+    public static function getIdColumnName()
     {
         return 'id_manufacturer';
     }
 
-    static public function getIdentifier()
+    public static function getIdentifier()
     {
         return 'reference';
     }
 
-    static public function getPreIdentifier()
+    public static function getPreIdentifier()
     {
         return 'name';
     }
 
-    static public function getDisplayNameAttribute()
+    public static function getDisplayNameAttribute()
     {
         return 'name';
     }
 
-    static public function getObjectTypeForMapping()
+    public static function getObjectTypeForMapping()
     {
         return 'brand';
     }
 
-    static public function getPathForAPICall()
+    public static function getPathForAPICall()
     {
         return 'brands';
     }
@@ -65,7 +65,7 @@ class SRBBrand extends LibBrand implements PSElementInterface
         return str_replace(' ', '-', $this->{self::getPreIdentifier()});
     }
 
-    static public function findAllQuery($limit = 0, $offset = 0)
+    public static function findAllQuery($limit = 0, $offset = 0)
     {
         $sql = static::getBaseQuery();
         $sql->select(self::getTableName() . '.*');

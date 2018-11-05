@@ -50,32 +50,32 @@ class SRBProduct extends LibProduct implements PSElementInterface
         return 'p';
     }
 
-    static public function getIdColumnName()
+    public static function getIdColumnName()
     {
         return 'id_product';
     }
 
-    static public function getIdentifier()
+    public static function getIdentifier()
     {
         return 'reference';
     }
 
-    static public function getPreIdentifier()
+    public static function getPreIdentifier()
     {
         return 'reference';
     }
 
-    static public function getDisplayNameAttribute()
+    public static function getDisplayNameAttribute()
     {
         return 'label';
     }
 
-    static public function getObjectTypeForMapping()
+    public static function getObjectTypeForMapping()
     {
         return 'product';
     }
 
-    static public function getPathForAPICall()
+    public static function getPathForAPICall()
     {
         return 'products';
     }
@@ -85,7 +85,7 @@ class SRBProduct extends LibProduct implements PSElementInterface
         return str_replace(' ', '-', ($this->ps[self::getPreIdentifier()] != '' ? $this->ps[self::getPreIdentifier()] : $this->label));
     }
 
-    static public function getBaseQuery()
+    public static function getBaseQuery()
     {
         $sql = self::trait_getBaseQuery();
 
@@ -96,7 +96,7 @@ class SRBProduct extends LibProduct implements PSElementInterface
         return $sql;
     }
 
-    static public function findAllQuery($limit = 0, $offset = 0)
+    public static function findAllQuery($limit = 0, $offset = 0)
     {
         $sql = static::getBaseQuery();
         $sql->select(self::getTableName() . '.*, pl.*');
@@ -107,12 +107,12 @@ class SRBProduct extends LibProduct implements PSElementInterface
     }
 
     // Own functions
-    static private function extractNameFromPSArray($psProductArrayName)
+    private static function extractNameFromPSArray($psProductArrayName)
     {
         return is_array($psProductArrayName) ? $psProductArrayName[1] : $psProductArrayName;
     }
 
-    static public function getOrderProducts($orderId)
+    public static function getOrderProducts($orderId)
     {
         return self::convertPSArrayToElements(Db::getInstance()->executeS(self::findOrderProductsQuery(pSQL($orderId))));
     }
@@ -176,13 +176,13 @@ class SRBProduct extends LibProduct implements PSElementInterface
         return $product->remove();
     }
 
-    static public function joinLang(&$sql)
+    public static function joinLang(&$sql)
     {
         $sql->innerJoin('product_lang', 'pl', self::getTableName() . '.id_product = pl.id_product');
         $sql->where('pl.id_lang = ' . Configuration::get('PS_LANG_DEFAULT'));
     }
 
-    static protected function findOrderProductsQuery($orderId)
+    protected static function findOrderProductsQuery($orderId)
     {
         $sql = static::getBaseQuery();
         $sql->select(self::getTableName() . '.*, pl.name, cu.iso_code');
@@ -196,19 +196,19 @@ class SRBProduct extends LibProduct implements PSElementInterface
         return $sql;
     }
 
-    static public function findAllByNameQuery($name)
+    public static function findAllByNameQuery($name)
     {
         $sql = static::findAllQuery();
         $sql->where('pl.name = "' . pSQL($name) . '"');
         return $sql;
     }
 
-    static public function getManyByName($name)
+    public static function getManyByName($name)
     {
         return self::convertPSArrayToElements(Db::getInstance()->executeS(self::findAllByNameQuery($name)));
     }
 
-    static public function getCountLikeLabel($label)
+    public static function getCountLikeLabel($label)
     {
         $sql = static::getBaseQuery();
         static::joinLang($sql);
@@ -216,17 +216,17 @@ class SRBProduct extends LibProduct implements PSElementInterface
         return self::getCountOfQuery($sql);
     }
 
-    static public function getLikeLabel($label, $onlySyncElements = false, $limit = 0, $offset = 0, $withNestedElements = true)
+    public static function getLikeLabel($label, $onlySyncElements = false, $limit = 0, $offset = 0, $withNestedElements = true)
     {
         return self::convertPSArrayToElements(Db::getInstance()->executeS(self::findLikeLabelQuery($label, $limit, $offset, $onlySyncElements)), $withNestedElements);
     }
 
-    static public function addWhereLikeLabelToQuery(&$sql, $label)
+    public static function addWhereLikeLabelToQuery(&$sql, $label)
     {
         $sql->where('pl.name LIKE "%' . pSQL($label) . '%"');
     }
 
-    static public function findLikeLabelQuery($label, $limit = 0, $offset = 0, $onlySyncElements = false)
+    public static function findLikeLabelQuery($label, $limit = 0, $offset = 0, $onlySyncElements = false)
     {
         $sql = self::findAllByMappingDateQuery($onlySyncElements, $limit, $offset);
         static::addWhereLikeLabelToQuery($sql, $label);
@@ -234,13 +234,13 @@ class SRBProduct extends LibProduct implements PSElementInterface
     }
 
     // To get all the combinations possible of the product
-    static public function joinCombinationByProduct(&$sql)
+    public static function joinCombinationByProduct(&$sql)
     {
         $sql->leftJoin('product_attribute', 'pa', 'pa.' . self::getIdColumnName() . ' = ' . self::getTableIdentifier());
         static::joinCombinationByProductAttribute($sql);
     }
 
-    static public function joinCombinationByProductAttribute(&$sql)
+    public static function joinCombinationByProductAttribute(&$sql)
     {
         $sql->leftJoin('product_attribute_combination', 'pac', 'pac.id_product_attribute = pa.id_product_attribute');
         $sql->leftJoin(
@@ -270,12 +270,12 @@ class SRBProduct extends LibProduct implements PSElementInterface
     }
 
     // Returns all attributes the product can have
-    static public function getAttributesOfProduct($productId)
+    public static function getAttributesOfProduct($productId)
     {
         return Db::getInstance()->executeS(self::findAttributesOfProductQuery($productId));
     }
 
-    static public function findAttributesOfProductQuery($productId)
+    public static function findAttributesOfProductQuery($productId)
     {
         $sql = self::getBaseQuery();
         self::joinLang($sql);
@@ -292,12 +292,12 @@ class SRBProduct extends LibProduct implements PSElementInterface
     }
 
     // Get all the attributes of the product commanded in the order in a precise combination
-    static public function getPreciseCombinationOfProductInOrder($productId, $orderId, $productAttributeId)
+    public static function getPreciseCombinationOfProductInOrder($productId, $orderId, $productAttributeId)
     {
         return Db::getInstance()->executeS(self::findPreciseCombinationOfProductInOrderQuery($productId, $orderId, $productAttributeId));
     }
 
-    static public function findPreciseCombinationOfProductInOrderQuery($productId, $orderId, $productAttributeId)
+    public static function findPreciseCombinationOfProductInOrderQuery($productId, $orderId, $productAttributeId)
     {
         $sql = self::findAttributesOfProductQuery($productId);
         $sql->innerJoin('cart_product', 'cp', pSQL(self::getTableIdentifier()) . ' = cp.' . pSQL(self::getIdColumnName()));

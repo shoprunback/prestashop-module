@@ -18,58 +18,58 @@ class SRBAddress extends LibAddress implements PSInterface
     }
 
     // Inherited functions
-    static public function getTableWithoutPrefix()
+    public static function getTableWithoutPrefix()
     {
         return 'address';
     }
 
-    static public function getTableName()
+    public static function getTableName()
     {
         return 'a';
     }
 
-    static public function getIdColumnName()
+    public static function getIdColumnName()
     {
         return 'id_address';
     }
 
-    static public function getIdentifier()
+    public static function getIdentifier()
     {
         return 'id';
     }
 
-    static public function getPreIdentifier()
+    public static function getPreIdentifier()
     {
         return 'id';
     }
 
     // Own functions
-    static public function getByCustomerId($customerId)
+    public static function getByCustomerId($customerId)
     {
         return self::convertPSArrayToElements(Db::getInstance()->executeS(self::findByCustomerIdQuery($customerId)));
     }
 
-    static public function getByOrderId($orderId)
+    public static function getByOrderId($orderId)
     {
         return self::convertPSArrayToElements(Db::getInstance()->getRow(self::findByOrderIdQuery($orderId)));
     }
 
-    static public function createFromOrder($psOrder)
+    public static function createFromOrder($psOrder)
     {
         return self::getNotSyncById($psOrder['id_address_delivery'], false);
     }
 
-    static protected function findByCustomerIdQuery($customerId)
+    protected static function findByCustomerIdQuery($customerId)
     {
         return self::findAllQuery()->where('id_customer = ' . pSQL($customerId));
     }
 
-    static protected function findByOrderIdQuery($orderId)
+    protected static function findByOrderIdQuery($orderId)
     {
         return self::findAllQuery()->innerJoin('orders', pSQL(SRBOrder::getTableName()), pSQL(SRBOrder::getTableName()) . '.id_address_delivery = ' . pSQL(self::getTableName()) . '.id_address')->where(pSQL(SRBOrder::getTableName()) . '.id_order = ' . pSQL($orderId));
     }
 
-    static public function findAllQuery($limit = 0, $offset = 0)
+    public static function findAllQuery($limit = 0, $offset = 0)
     {
         $sql = static::getBaseQuery();
         $sql->select(self::getTableName() . '.*, s.name as stateName, co.*');

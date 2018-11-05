@@ -36,37 +36,37 @@ class SRBOrder extends LibOrder implements PSElementInterface
         return 'o';
     }
 
-    static public function getIdColumnName()
+    public static function getIdColumnName()
     {
         return 'id_order';
     }
 
-    static public function getIdentifier()
+    public static function getIdentifier()
     {
         return 'order_number';
     }
 
-    static public function getPreIdentifier()
+    public static function getPreIdentifier()
     {
         return 'order_number';
     }
 
-    static public function getDisplayNameAttribute()
+    public static function getDisplayNameAttribute()
     {
         return 'order_number';
     }
 
-    static public function getObjectTypeForMapping()
+    public static function getObjectTypeForMapping()
     {
         return 'order';
     }
 
-    static public function getPathForAPICall()
+    public static function getPathForAPICall()
     {
         return 'orders';
     }
 
-    static public function findAllQuery($limit = 0, $offset = 0)
+    public static function findAllQuery($limit = 0, $offset = 0)
     {
         $sql = static::getBaseQuery();
         $sql = self::addComponentsToQuery($sql);
@@ -75,7 +75,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
         return $sql;
     }
 
-    static public function getComponentsForShipbacks($sql)
+    public static function getComponentsForShipbacks($sql)
     {
         $sql->select(pSQL(SRBShipback::getTableName()) . '.' . pSQL(SRBShipback::getIdColumnName()) . ', ' . pSQL(SRBShipback::getTableName()) . '.state');
         $sql->leftJoin( // We use leftJoin because orders may not have a return associated
@@ -86,7 +86,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
         return $sql;
     }
 
-    static public function getAllWithMapping($onlySyncElements = false, $limit = 0, $offset = 0, $withNestedElements = true)
+    public static function getAllWithMapping($onlySyncElements = false, $limit = 0, $offset = 0, $withNestedElements = true)
     {
         $sql = self::findAllWithMappingQuery($onlySyncElements, $limit, $offset);
         $sql = self::getComponentsForShipbacks($sql);
@@ -95,9 +95,9 @@ class SRBOrder extends LibOrder implements PSElementInterface
     }
 
     // Own functions
-    static private function extractOrderNumberFromPSArray($psOrderArrayName)
+    private static function extractOrderNumberFromPSArray($psOrderArrayName)
     {
-        if (isset($psOrderArrayName['reference'])){
+        if (isset($psOrderArrayName['reference'])) {
             return $psOrderArrayName['reference'];
         } elseif (isset($psOrderArrayName['id_order'])) {
             return $psOrderArrayName['id_order'];
@@ -116,12 +116,12 @@ class SRBOrder extends LibOrder implements PSElementInterface
         return $products;
     }
 
-    static public function createFromShipback($shipback, $withNestedElements = true)
+    public static function createFromShipback($shipback, $withNestedElements = true)
     {
         return new self($shipback, $withNestedElements);
     }
 
-    static public function addComponentsToQuery($sql)
+    public static function addComponentsToQuery($sql)
     {
         $sql->select(pSQL(self::getTableName()) . '.*, c.id_customer, c.firstname, c.lastname, c.email, a.id_address, a.address1, a.address2, a.postcode, a.city, a.phone, s.name as stateName, co.*');
         static::joinCustomer($sql);
@@ -144,7 +144,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
     }
 
     // Base query to get the order_state, available by passing through the order_history
-    static public function getComponentsToFindOrderState($sql)
+    public static function getComponentsToFindOrderState($sql)
     {
         // LeftJoin because the order may have no history
         // id_order_history is the primary key of order_history
@@ -168,42 +168,42 @@ class SRBOrder extends LibOrder implements PSElementInterface
         return $sql;
     }
 
-    static public function getCountLikeOrderNumber($orderNumber)
+    public static function getCountLikeOrderNumber($orderNumber)
     {
         $sql = static::getBaseQuery();
         static::addLikeOrderNumberToQuery($sql, $orderNumber);
         return self::getCountOfQuery($sql);
     }
 
-    static public function getLikeOrderNumber($orderNumber, $onlySyncElements = false, $limit = 0, $offset = 0, $withNestedElements = true)
+    public static function getLikeOrderNumber($orderNumber, $onlySyncElements = false, $limit = 0, $offset = 0, $withNestedElements = true)
     {
         $sql = self::findLikeOrderNumberQuery($orderNumber, $limit, $offset, $onlySyncElements); //@TODO : investigate this function
         $sql->groupBy(pSQL(static::getTableIdentifier()));
         return self::convertPSArrayToElements(Db::getInstance()->executeS($sql), $withNestedElements);
     }
 
-    static public function findAllByMappingDateQuery($onlySyncElements = false, $limit = 0, $offset = 0)
+    public static function findAllByMappingDateQuery($onlySyncElements = false, $limit = 0, $offset = 0)
     {
         $sql = self::trait_findAllByMappingDateQuery($onlySyncElements, $limit, $offset);
         $sql = self::getComponentsForShipbacks($sql);
         return $sql;
     }
 
-    static public function findLikeOrderNumberQuery($orderNumber, $limit = 0, $offset = 0, $onlySyncElements = false)
+    public static function findLikeOrderNumberQuery($orderNumber, $limit = 0, $offset = 0, $onlySyncElements = false)
     {
         $sql = self::findAllByMappingDateQuery($onlySyncElements, $limit, $offset);
         static::addLikeOrderNumberToQuery($sql, $orderNumber);
         return $sql;
     }
 
-    static public function getLikeCustomer($customer, $onlySyncElements = false, $limit = 0, $offset = 0, $withNestedElements = true)
+    public static function getLikeCustomer($customer, $onlySyncElements = false, $limit = 0, $offset = 0, $withNestedElements = true)
     {
         $sql = self::findLikeCustomerQuery($customer, $limit, $offset, $onlySyncElements); //@TODO : investigate this function
         $sql->groupBy(pSQL(static::getTableIdentifier()));
         return self::convertPSArrayToElements(Db::getInstance()->executeS($sql), $withNestedElements);
     }
 
-    static public function getCountLikeCustomer($customer)
+    public static function getCountLikeCustomer($customer)
     {
         $sql = static::getBaseQuery();
         static::joinCustomer($sql);
@@ -211,7 +211,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
         return self::getCountOfQuery($sql);
     }
 
-    static public function findLikeCustomerQuery($customer, $limit = 0, $offset = 0, $onlySyncElements = false)
+    public static function findLikeCustomerQuery($customer, $limit = 0, $offset = 0, $onlySyncElements = false)
     {
         $sql = self::findAllByMappingDateQuery($onlySyncElements, $limit, $offset);
         self::addLikeCustomerToQuery($sql, $customer);
