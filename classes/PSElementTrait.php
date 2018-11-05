@@ -7,7 +7,7 @@ trait PSElementTrait
     static protected function convertPSArrayToElements($PSArray, $withNestedElements = true, $retrieveMapping = false)
     {
         $class = get_called_class();
-        $elements = [];
+        $elements = array();
         foreach ($PSArray as $PSItem) {
             try {
                 $elements[] =  new $class($PSItem, $withNestedElements);
@@ -49,7 +49,7 @@ trait PSElementTrait
 
     static public function addMappingsToElements($elements)
     {
-        $ids = [];
+        $ids = array();
         foreach ($elements as $key => $element) {
             $ids[] = $element->getDBId();
         }
@@ -286,12 +286,12 @@ trait PSElementTrait
         $itemId = isset($this->$identifier) ? $this->$identifier : $this->getDBId();
 
         SRBLogger::addLog('Saving map for ' . static::getObjectTypeForMapping() . ' with ID ' . $itemId, SRBLogger::INFO, static::getObjectTypeForMapping());
-        $data = [
+        $data = array(
             'id_item' => $itemId,
             'id_item_srb' => $this->getMapId(),
             'type' => static::getObjectTypeForMapping(),
             'last_sent_at' => date('Y-m-d H:i:s'),
-        ];
+        );
         $map = new ElementMapper($data);
         $map->save();
     }
@@ -367,7 +367,7 @@ trait PSElementTrait
 
     public static function canHaveDuplicates()
     {
-        return in_array(static::getObjectTypeForMapping(), ['product', 'brand']);
+        return in_array(static::getObjectTypeForMapping(), array('product', 'brand'));
     }
 
     public function syncDuplicates($syncDuplicates = true)
@@ -385,7 +385,7 @@ trait PSElementTrait
             return $this->doSync();
         }
 
-        $result = [];
+        $result = array();
 
         for ($i = 0; $i < $countDuplicates; $i++) {
             $duplicates[$i]->reference = $duplicates[$i]->getDBId();

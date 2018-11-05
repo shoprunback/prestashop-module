@@ -42,7 +42,7 @@ class ElementMapper
 
     public function save()
     {
-        $mapArray = [];
+        $mapArray = array();
 
         foreach ($this as $key => $value) {
             $mapArray[$key] = $value;
@@ -103,7 +103,7 @@ class ElementMapper
     {
         $mappingsFromDB = Db::getInstance()->executeS(self::findByTypeQuery($type));
 
-        $mappings = [];
+        $mappings = array();
         foreach ($mappingsFromDB as $mapping) {
             $mappings[] = new self($mapping);
         }
@@ -133,7 +133,7 @@ class ElementMapper
 
     static private function generateMappers($mappingsFromDB)
     {
-        $mappings = [];
+        $mappings = array();
         foreach ($mappingsFromDB as $mapping) {
             $mappings[] = new self($mapping);
         }

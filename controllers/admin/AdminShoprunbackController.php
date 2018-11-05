@@ -109,7 +109,7 @@ class AdminShoprunbackController extends ModuleAdminController
             return;
         }
 
-        $elements = [];
+        $elements = array();
         $template = 'srbManager';
 
         if ($elementType == 'config') {
@@ -247,7 +247,7 @@ class AdminShoprunbackController extends ModuleAdminController
             $class::$function(false, self::ELEMENTS_BY_PAGE, $elementMin, false);
 
         if ($elementType == 'product') {
-            $noBrand = [];
+            $noBrand = array();
             foreach ($elements as $product) {
                 if (is_null($product->brand)) {
                     $noBrand[] = $product->getDBId();

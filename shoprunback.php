@@ -59,14 +59,14 @@ class ShopRunBack extends Module
         $this->version = '1.0.16';
         $this->ps_versions_compliancy = array('min' => '1.6.0.9');
         $this->tab = 'administration';
-        $this->tabs = [
-            'AdminShoprunback' => ['name' => 'ShopRunBack', 'parent' => 'SELL']
-        ];
+        $this->tabs = array(
+            'AdminShoprunback' => array('name' => 'ShopRunBack', 'parent' => 'SELL')
+        );
 
-        \Shoprunback\RestClient::getClient()->setCustomHeaders([
+        \Shoprunback\RestClient::getClient()->setCustomHeaders(array(
             'Prestashop-Version: ' . _PS_VERSION_,
             'Shoprunback-Module-Version: ' . $this->version
-        ]);
+        ));
 
         parent::__construct();
 
@@ -78,7 +78,7 @@ class ShopRunBack extends Module
         // Custom parameters
         $this->dirurl = 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']);
         $this->SRBModulePath = _PS_MODULE_DIR_ . $this->name;
-        $this->webhookUrl = $this->context->link->getModuleLink('shoprunback', 'webhook', []);
+        $this->webhookUrl = $this->context->link->getModuleLink('shoprunback', 'webhook', array());
         $this->url = DASHBOARD_URL;
         $this->urlProd = DASHBOARD_PROD_URL;
         $message = '';
@@ -201,7 +201,7 @@ class ShopRunBack extends Module
 
     private function installSQL()
     {
-        $queries = [];
+        $queries = array();
 
         $queries[] = createTableQuery();
 
@@ -220,7 +220,7 @@ class ShopRunBack extends Module
 
     private function uninstallSQL()
     {
-        $queries = [];
+        $queries = array();
 
         $queries[] = dropTableQuery();
         $queries[] = dropNotificationTableQuery();
@@ -346,7 +346,7 @@ class ShopRunBack extends Module
                 // To work everywhere, we must have something like 'shipback?orderId=ID', and not 'shipback&orderId=ID'
                 $this->context->smarty->assign(
                     'createReturnLink',
-                    str_replace('shipback', 'shipback?orderId=' . $order->getDBId() . '&action=asyncCreateShipback', $this->context->link->getModuleLink('shoprunback', 'shipback', []))
+                    str_replace('shipback', 'shipback?orderId=' . $order->getDBId() . '&action=asyncCreateShipback', $this->context->link->getModuleLink('shoprunback', 'shipback', array()))
                 );
                 $this->context->smarty->assign('srborder', $order);
 

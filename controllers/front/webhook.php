@@ -67,7 +67,7 @@ class ShopRunBackWebhookModuleFrontController extends ModuleFrontController
                 return self::returnHeaderHTTP(200);
             }
 
-            $errors = [];
+            $errors = array();
 
             if ($webhook->data->reference != $product->getDBId()) {
                 $errors['reference'] = $webhook->data->reference . ' != ' . $id;

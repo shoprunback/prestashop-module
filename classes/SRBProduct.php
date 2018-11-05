@@ -34,9 +34,9 @@ class SRBProduct extends LibProduct implements PSElementInterface
             parent::__construct();
         }
 
-        $this->metadata = [
+        $this->metadata = array(
             'ps_reference' => $psProduct['reference'],
-        ];
+        );
     }
 
     // Inherited functions
@@ -124,7 +124,7 @@ class SRBProduct extends LibProduct implements PSElementInterface
         $imagePath = $_SERVER['DOCUMENT_ROOT'] . _THEME_PROD_DIR_ . $image->getExistingImgPath() . '.jpg';
 
         if (file_exists($imagePath)) {
-            return [_PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->getExistingImgPath() . '.jpg', file_get_contents($imagePath)];
+            return array(_PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->getExistingImgPath() . '.jpg', file_get_contents($imagePath));
         }
 
         return false;

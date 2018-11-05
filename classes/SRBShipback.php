@@ -112,7 +112,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
         // If the order already has a shipback
         $retrievedOrder = \Shoprunback\Elements\Order::retrieve($order->order_number);
         if (!is_null($retrievedOrder->shipback)) {
-            $psReturn = [
+            $psReturn = array(
                 'id_srb_shipback' => $retrievedOrder->shipback->id,
                 'id_order' => $order->getDBId(),
                 'order' => $order,
@@ -120,14 +120,14 @@ class SRBShipback extends LibShipback implements PSElementInterface
                 'mode' => $retrievedOrder->shipback->mode,
                 'created_at' => $retrievedOrder->shipback->created_at,
                 'public_url' => $retrievedOrder->shipback->public_url
-            ];
+            );
             $srbShipback = new SRBShipback($psReturn);
             $srbShipback->insertOnPS();
 
             return $srbShipback;
         }
 
-        $psReturn = [
+        $psReturn = array(
             'id_srb_shipback' => 0,
             'id_order' => $orderId,
             'order' => $order,
@@ -135,7 +135,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
             'mode' => 'postal',
             'created_at' => date('Y-m-d H:i:s'),
             'public_url' => ''
-        ];
+        );
         $srbShipback = new self($psReturn);
 
         try {
@@ -158,14 +158,14 @@ class SRBShipback extends LibShipback implements PSElementInterface
 
     public function insertOnPS()
     {
-        $shipbackToInsert = [
+        $shipbackToInsert = array(
             'id_srb_shipback' => pSQL($this->id),
             'id_order' => pSQL($this->ps['id_order']),
             'state' => pSQL($this->state),
             'mode' => pSQL($this->mode),
             'created_at' => pSQL(Util::convertDateFormatForDB($this->created_at)),
             'public_url' => pSQL($this->public_url)
-        ];
+        );
 
         $sql = Db::getInstance();
         $sql->insert(self::SHIPBACK_TABLE_NAME_NO_PREFIX, $shipbackToInsert);
@@ -177,12 +177,12 @@ class SRBShipback extends LibShipback implements PSElementInterface
 
     public function updateOnPS()
     {
-        $shipbackToUpdate = [
+        $shipbackToUpdate = array(
             'state' => pSQL($this->state),
             'mode' => pSQL($this->mode),
             'created_at' => pSQL($this->created_at),
             'public_url' => pSQL($this->public_url),
-        ];
+        );
 
         $sql = Db::getInstance();
         $result = $sql->update(self::SHIPBACK_TABLE_NAME_NO_PREFIX, $shipbackToUpdate, pSQL(self::getIdColumnName()) . ' = "' . pSQL($this->id) . '"');
@@ -298,7 +298,7 @@ class SRBShipback extends LibShipback implements PSElementInterface
 
     static private function generateReturnsFromDBResult($shipbacksFromDB, $withNestedElements = true)
     {
-        $shipbacks = [];
+        $shipbacks = array();
         foreach ($shipbacksFromDB as $key => $shipback) {
             $shipback['order'] = SRBOrder::createFromShipback($shipback, $withNestedElements);
             $shipbacks[] = new self($shipback, $withNestedElements);

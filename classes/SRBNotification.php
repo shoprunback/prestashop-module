@@ -3,7 +3,7 @@ class SRBNotification
 {
     const NOTIFICATION_TABLE_NAME_NO_PREFIX = 'shoprunback_notification';
 
-    public function __construct($dbData = [])
+    public function __construct($dbData = array())
     {
         if (is_array($dbData) && !empty($dbData)) {
             $this->id_srb_notification = $dbData['id_srb_notification'] ? $dbData['id_srb_notification'] : 0;
@@ -39,7 +39,7 @@ class SRBNotification
 
     static private function generateNotificationsFromArrayOfResult($dbNotifications)
     {
-        $notifications = [];
+        $notifications = array();
         foreach ($dbNotifications as $dbNotification) {
             $notifications[] = new self($dbNotification);
         }
@@ -106,26 +106,26 @@ class SRBNotification
     {
         $currentDate = date('Y-m-d H:i:s');
 
-        return Db::getInstance()->insert(self::NOTIFICATION_TABLE_NAME_NO_PREFIX, [
+        return Db::getInstance()->insert(self::NOTIFICATION_TABLE_NAME_NO_PREFIX, array(
             'message'       => pSQL($this->message),
             'severity'      => pSQL($this->severity),
             'object_type'   => isset($this->objectType) ? pSQL($this->objectType) : null,
             'object_id'     => isset($this->objectId) ? pSQL($this->objectId) : 0,
             'created_at'    => pSQL($currentDate),
             'updated_at'    => pSQL($currentDate)
-        ]);
+        ));
     }
 
     private function update()
     {
-        return Db::getInstance()->update(self::NOTIFICATION_TABLE_NAME_NO_PREFIX, [
+        return Db::getInstance()->update(self::NOTIFICATION_TABLE_NAME_NO_PREFIX, array(
             'message'       => pSQL($this->message),
             'severity'      => pSQL($this->severity),
             'object_type'   => isset($this->objectType) ? pSQL($this->objectType) : null,
             'object_id'     => isset($this->objectId) ? pSQL($this->objectId): 0,
             'read'          => pSQL($this->read),
             'updated_at'    => date('Y-m-d H:i:s')
-        ], pSQL(self::getIdColumnName()) . ' = ' . pSQL($this->id_srb_notification));
+        ), pSQL(self::getIdColumnName()) . ' = ' . pSQL($this->id_srb_notification));
     }
 
     public function delete()
@@ -135,9 +135,9 @@ class SRBNotification
 
     public static function markAsReadById($id)
     {
-        return Db::getInstance()->update(self::NOTIFICATION_TABLE_NAME_NO_PREFIX , [
+        return Db::getInstance()->update(self::NOTIFICATION_TABLE_NAME_NO_PREFIX , array(
             'read' => true
-        ], pSQL(self::getIdColumnName()) . ' = ' . pSQL($id));
+        ), pSQL(self::getIdColumnName()) . ' = ' . pSQL($id));
     }
 
     static public function truncateTable()

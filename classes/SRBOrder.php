@@ -108,7 +108,7 @@ class SRBOrder extends LibOrder implements PSElementInterface
 
     public function getProducts()
     {
-        $products = [];
+        $products = array();
         foreach ($this->items as $item) {
             $products[] = $item->product;
         }

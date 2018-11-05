@@ -62,7 +62,7 @@ class SRBItem extends LibItem
 
     static private function generateItemsWithProducts($products)
     {
-        $items = [];
+        $items = array();
         foreach ($products as $product) {
             $item = new self($product);
             $quantity = $product['quantity'];
