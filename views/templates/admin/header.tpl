@@ -1,7 +1,7 @@
 <div id="srb-header">
     <div class="header row">
         <div class="col-md-4">
-            <a href="{$shoprunbackURL}" target="_blank"><img src="../modules/shoprunback/assets/img/logo.png" /></a>
+            <a href="{$shoprunbackURL}" target="_blank"><img src="../modules/shoprunback/views/img/logo.png" /></a>
         </div>
 
         <div class="col-md-5 col-md-offset-2 link-to-srb text-right">
