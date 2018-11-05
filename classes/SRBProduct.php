@@ -12,14 +12,14 @@ class SRBProduct extends LibProduct implements PSElementInterface
 
     public function __construct($psProduct)
     {
-        $this->ps = $psProduct;
-        $this->label = $this->extractNameFromPSArray($psProduct['name']);
-        $this->reference = $psProduct['id_product'];
-        $this->weight_grams = intval($psProduct['weight'] * 1000);
-        $this->width_mm = intval($psProduct['width'] * 10);
-        $this->height_mm = intval($psProduct['height'] * 10);
-        $this->length_mm = intval($psProduct['depth'] * 10);
-        $this->ean = $psProduct['ean13'];
+        $this->ps           = $psProduct;
+        $this->label        = $this->extractNameFromPSArray($psProduct['name']);
+        $this->reference    = $psProduct['id_product'];
+        $this->weight_grams = (int) $psProduct['weight'] * 1000;
+        $this->width_mm     = (int) $psProduct['width'] * 10;
+        $this->height_mm    = (int) $psProduct['height'] * 10;
+        $this->length_mm    = (int) $psProduct['depth'] * 10;
+        $this->ean          = $psProduct['ean13'];
 
         $this->addCoverPicture();
 

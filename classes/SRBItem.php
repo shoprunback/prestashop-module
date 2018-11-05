@@ -8,7 +8,7 @@ class SRBItem extends LibItem
 
     public function __construct($psProduct)
     {
-        $this->price_cents = intval($psProduct['price'] * 100);
+        $this->price_cents = (int) $psProduct['price'] * 100;
         $this->currency = $psProduct['iso_code'];
         $this->product = new SRBProduct($psProduct);
         $this->label = $this->product->label;
