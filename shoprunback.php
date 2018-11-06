@@ -1,4 +1,28 @@
 <?php
+/**
+ * 2007-2018 ShopRunBack
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to ShopRunBack
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade the ShopRunBack module to newer
+ * versions in the future.
+ *
+ * @author ShopRunBack <contact@shoprunback.com>
+ * @copyright 2007-2018 ShopRunBack
+ * @license http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * International Registered Trademark & Property of ShopRunBack
+ **/
+
 if (! defined('_PS_VERSION_')) {
     exit;
 }
@@ -83,7 +107,7 @@ class ShopRunBack extends Module
         $this->urlProd = DASHBOARD_PROD_URL;
         $message = '';
         if (Tools::getValue('message') && Tools::getValue('messageType')) {
-            $message = $_GET['message'];
+            $message = Tools::getValue('message');
             $type = Tools::getValue('messageType');
             $this->context->controller->{$type}[] = $this->l($message);
         }
@@ -302,7 +326,7 @@ class ShopRunBack extends Module
                 \Shoprunback\Elements\Product::delete(
                     ElementMapper::getMappingIdIfExists(
                         $params['product']->id,
-                    SRBProduct::getObjectTypeForMapping()
+                        SRBProduct::getObjectTypeForMapping()
                     )
                 );
             } catch (Exception $e) {
@@ -338,7 +362,7 @@ class ShopRunBack extends Module
     {
         if (\Shoprunback\RestClient::getClient()->getToken()) {
             try {
-                $order = SRBOrder::getNotSyncById($_GET['id_order']);
+                $order = SRBOrder::getNotSyncById(Tools::getValue('id_order'));
 
                 if (!$order->isShipped()) {
                     return false;
@@ -351,16 +375,16 @@ class ShopRunBack extends Module
                 );
                 $this->context->smarty->assign('srborder', $order);
 
-                $shipback = SRBShipback::getByOrderIdIfExists($_GET['id_order']);
+                $shipback = SRBShipback::getByOrderIdIfExists(Tools::getValue('id_order'));
                 $this->context->smarty->assign('shipback', $shipback);
 
                 return $this->display(__FILE__, 'orderDetail.tpl');
             } catch (OrderException $e) {
                 SRBLogger::addLog(
-                    'Error on OrderDetail: Order ' . $_GET['id_order'] . ' not found. It may not have been synchronized.',
+                    'Error on OrderDetail: Order ' . Tools::getValue('id_order') . ' not found. It may not have been synchronized.',
                     SRBLogger::ERROR,
                     SRBOrder::getObjectTypeForMapping(),
-                    $_GET['id_order']
+                    Tools::getValue('id_order')
                 );
             }
         }
