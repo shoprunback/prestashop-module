@@ -1,4 +1,27 @@
 <?php
+/**
+ * 2007-2018 ShopRunBack
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to ShopRunBack
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade the ShopRunBack module to newer
+ * versions in the future.
+ *
+ * @author ShopRunBack <contact@shoprunback.com>
+ * @copyright 2007-2018 ShopRunBack
+ * @license http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * International Registered Trademark & Property of ShopRunBack
+ **/
 
 use Shoprunback\Elements\Address as LibAddress;
 
@@ -18,58 +41,58 @@ class SRBAddress extends LibAddress implements PSInterface
     }
 
     // Inherited functions
-    static public function getTableWithoutPrefix()
+    public static function getTableWithoutPrefix()
     {
         return 'address';
     }
 
-    static public function getTableName()
+    public static function getTableName()
     {
         return 'a';
     }
 
-    static public function getIdColumnName()
+    public static function getIdColumnName()
     {
         return 'id_address';
     }
 
-    static public function getIdentifier()
+    public static function getIdentifier()
     {
         return 'id';
     }
 
-    static public function getPreIdentifier()
+    public static function getPreIdentifier()
     {
         return 'id';
     }
 
     // Own functions
-    static public function getByCustomerId($customerId)
+    public static function getByCustomerId($customerId)
     {
         return self::convertPSArrayToElements(Db::getInstance()->executeS(self::findByCustomerIdQuery($customerId)));
     }
 
-    static public function getByOrderId($orderId)
+    public static function getByOrderId($orderId)
     {
         return self::convertPSArrayToElements(Db::getInstance()->getRow(self::findByOrderIdQuery($orderId)));
     }
 
-    static public function createFromOrder($psOrder)
+    public static function createFromOrder($psOrder)
     {
         return self::getNotSyncById($psOrder['id_address_delivery'], false);
     }
 
-    static protected function findByCustomerIdQuery($customerId)
+    protected static function findByCustomerIdQuery($customerId)
     {
         return self::findAllQuery()->where('id_customer = ' . pSQL($customerId));
     }
 
-    static protected function findByOrderIdQuery($orderId)
+    protected static function findByOrderIdQuery($orderId)
     {
         return self::findAllQuery()->innerJoin('orders', pSQL(SRBOrder::getTableName()), pSQL(SRBOrder::getTableName()) . '.id_address_delivery = ' . pSQL(self::getTableName()) . '.id_address')->where(pSQL(SRBOrder::getTableName()) . '.id_order = ' . pSQL($orderId));
     }
 
-    static public function findAllQuery($limit = 0, $offset = 0)
+    public static function findAllQuery($limit = 0, $offset = 0)
     {
         $sql = static::getBaseQuery();
         $sql->select(self::getTableName() . '.*, s.name as stateName, co.*');

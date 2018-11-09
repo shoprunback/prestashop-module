@@ -1,12 +1,36 @@
 <?php
+/**
+ * 2007-2018 ShopRunBack
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to ShopRunBack
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade the ShopRunBack module to newer
+ * versions in the future.
+ *
+ * @author ShopRunBack <contact@shoprunback.com>
+ * @copyright 2007-2018 ShopRunBack
+ * @license http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * International Registered Trademark & Property of ShopRunBack
+ **/
+
 if (! defined('_PS_VERSION_')) {
     exit;
 }
 
 include_once 'lib/shoprunback-php/init.php';
 
-define ('PRODUCTION_MODE', Configuration::get('production'));
-define ('DASHBOARD_PROD_URL', \Shoprunback\RestClient::getClient()->getProductionUrl());
+define('PRODUCTION_MODE', Configuration::get('production'));
+define('DASHBOARD_PROD_URL', \Shoprunback\RestClient::getClient()->getProductionUrl());
 
 \Shoprunback\RestClient::getClient()->setToken(Configuration::get('srbtoken'));
 
@@ -18,7 +42,7 @@ if (!PRODUCTION_MODE) {
     \Shoprunback\RestClient::getClient()->useSandboxEnvironment();
 }
 
-define ('DASHBOARD_URL', \Shoprunback\RestClient::getClient()->getApiBaseUrl());
+define('DASHBOARD_URL', \Shoprunback\RestClient::getClient()->getApiBaseUrl());
 
 include_once 'classes/ElementMapper.php';
 include_once 'classes/Util.php';
@@ -59,14 +83,14 @@ class ShopRunBack extends Module
         $this->version = '1.0.16';
         $this->ps_versions_compliancy = array('min' => '1.6.0.9');
         $this->tab = 'administration';
-        $this->tabs = [
-            'AdminShoprunback' => ['name' => 'ShopRunBack', 'parent' => 'SELL']
-        ];
+        $this->tabs = array(
+            'AdminShoprunback' => array('name' => 'ShopRunBack', 'parent' => 'SELL')
+        );
 
-        \Shoprunback\RestClient::getClient()->setCustomHeaders([
+        \Shoprunback\RestClient::getClient()->setCustomHeaders(array(
             'Prestashop-Version: ' . _PS_VERSION_,
             'Shoprunback-Module-Version: ' . $this->version
-        ]);
+        ));
 
         parent::__construct();
 
@@ -78,16 +102,15 @@ class ShopRunBack extends Module
         // Custom parameters
         $this->dirurl = 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']);
         $this->SRBModulePath = _PS_MODULE_DIR_ . $this->name;
-        $this->webhookUrl = $this->context->link->getModuleLink('shoprunback', 'webhook', []);
+        $this->webhookUrl = $this->context->link->getModuleLink('shoprunback', 'webhook', array());
         $this->url = DASHBOARD_URL;
         $this->urlProd = DASHBOARD_PROD_URL;
         $message = '';
         if (Tools::getValue('message') && Tools::getValue('messageType')) {
-            $message = $_GET['message'];
+            $message = Tools::getValue('message');
             $type = Tools::getValue('messageType');
             $this->context->controller->{$type}[] = $this->l($message);
         }
-
     }
 
     private function installTab($controllerClassName, $tabConf)
@@ -201,7 +224,7 @@ class ShopRunBack extends Module
 
     private function installSQL()
     {
-        $queries = [];
+        $queries = array();
 
         $queries[] = createTableQuery();
 
@@ -220,7 +243,7 @@ class ShopRunBack extends Module
 
     private function uninstallSQL()
     {
-        $queries = [];
+        $queries = array();
 
         $queries[] = dropTableQuery();
         $queries[] = dropNotificationTableQuery();
@@ -235,7 +258,7 @@ class ShopRunBack extends Module
         Tools::redirectAdmin(Context::getContext()->link->getAdminLink('AdminShoprunback') . '&elementType=config');
     }
 
-    public function hookNewOrder ($params)
+    public function hookNewOrder($params)
     {
         if (\Shoprunback\RestClient::getClient()->getToken()) {
             try {
@@ -301,8 +324,10 @@ class ShopRunBack extends Module
         if (\Shoprunback\RestClient::getClient()->getToken()) {
             try {
                 \Shoprunback\Elements\Product::delete(
-                    ElementMapper::getMappingIdIfExists($params['product']->id,
-                    SRBProduct::getObjectTypeForMapping())
+                    ElementMapper::getMappingIdIfExists(
+                        $params['product']->id,
+                        SRBProduct::getObjectTypeForMapping()
+                    )
                 );
             } catch (Exception $e) {
                 $notification = new SRBNotification();
@@ -337,7 +362,7 @@ class ShopRunBack extends Module
     {
         if (\Shoprunback\RestClient::getClient()->getToken()) {
             try {
-                $order = SRBOrder::getNotSyncById($_GET['id_order']);
+                $order = SRBOrder::getNotSyncById(Tools::getValue('id_order'));
 
                 if (!$order->isShipped()) {
                     return false;
@@ -346,20 +371,20 @@ class ShopRunBack extends Module
                 // To work everywhere, we must have something like 'shipback?orderId=ID', and not 'shipback&orderId=ID'
                 $this->context->smarty->assign(
                     'createReturnLink',
-                    str_replace('shipback', 'shipback?orderId=' . $order->getDBId() . '&action=asyncCreateShipback', $this->context->link->getModuleLink('shoprunback', 'shipback', []))
+                    str_replace('shipback', 'shipback?orderId=' . $order->getDBId() . '&action=asyncCreateShipback', $this->context->link->getModuleLink('shoprunback', 'shipback', array()))
                 );
                 $this->context->smarty->assign('srborder', $order);
 
-                $shipback = SRBShipback::getByOrderIdIfExists($_GET['id_order']);
+                $shipback = SRBShipback::getByOrderIdIfExists(Tools::getValue('id_order'));
                 $this->context->smarty->assign('shipback', $shipback);
 
                 return $this->display(__FILE__, 'orderDetail.tpl');
             } catch (OrderException $e) {
                 SRBLogger::addLog(
-                    'Error on OrderDetail: Order ' . $_GET['id_order'] . ' not found. It may not have been synchronized.',
+                    'Error on OrderDetail: Order ' . Tools::getValue('id_order') . ' not found. It may not have been synchronized.',
                     SRBLogger::ERROR,
                     SRBOrder::getObjectTypeForMapping(),
-                    $_GET['id_order']
+                    Tools::getValue('id_order')
                 );
             }
         }
@@ -372,7 +397,8 @@ class ShopRunBack extends Module
         $this->context->controller->addJs($this->_path . 'views/js/front/orderDetail.js');
     }
 
-    public function hookDisplayBackOfficeHeader() {
+    public function hookDisplayBackOfficeHeader()
+    {
         // Add icon to tab
         if (version_compare(_PS_VERSION_, '1.7', '<')) {
             $this->context->controller->addJs($this->SRBModulePath . '/views/js/admin/tab-1.6.js');
@@ -380,5 +406,4 @@ class ShopRunBack extends Module
             $this->context->controller->addJs($this->SRBModulePath . '/views/js/admin/tab-1.7.js');
         }
     }
-
 }

@@ -1,4 +1,28 @@
 <?php
+/**
+ * 2007-2018 ShopRunBack
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to ShopRunBack
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade the ShopRunBack module to newer
+ * versions in the future.
+ *
+ * @author ShopRunBack <contact@shoprunback.com>
+ * @copyright 2007-2018 ShopRunBack
+ * @license http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * International Registered Trademark & Property of ShopRunBack
+ **/
+
 class ElementMapper
 {
     const MAPPER_TABLE_NAME_NO_PREFIX = 'shoprunback_mapper';
@@ -20,29 +44,29 @@ class ElementMapper
         $this->last_sent_at = Util::convertDateFormatForDB($psMap['last_sent_at']);
     }
 
-    static public function getMapperTableName()
+    public static function getMapperTableName()
     {
         return _DB_PREFIX_ . self::MAPPER_TABLE_NAME_NO_PREFIX;
     }
 
-    static public function getTableName()
+    public static function getTableName()
     {
         return 'srbm';
     }
 
-    static public function getIdColumnName()
+    public static function getIdColumnName()
     {
         return 'id_srb_map';
     }
 
-    static public function getTableIdentifier()
+    public static function getTableIdentifier()
     {
         return static::getTableName() . '.' . static::getIdColumnName();
     }
 
     public function save()
     {
-        $mapArray = [];
+        $mapArray = array();
 
         foreach ($this as $key => $value) {
             $mapArray[$key] = $value;
@@ -63,7 +87,7 @@ class ElementMapper
         if (isset($this->id_srb_map) && $this->id_srb_map != 0) {
             $result = $sql->update(ElementMapper::MAPPER_TABLE_NAME_NO_PREFIX, $mapArray, 'id_item_srb = "' . pSQL($this->id_item_srb) . '" && type = "' . pSQL($this->type) . '"');
             SRBLogger::addLog('Map of ' . ucfirst($this->type) . ' ' . $this->id_item . ' updated', SRBLogger::INFO, $this->type, $this->id_item);
-        } else if (self::getByIdItemAndItemType($this->id_item, $this->type)) {
+        } elseif (self::getByIdItemAndItemType($this->id_item, $this->type)) {
             $result = $sql->update(ElementMapper::MAPPER_TABLE_NAME_NO_PREFIX, $mapArray, 'id_item = "' . pSQL($this->id_item) . '" && type = "' . pSQL($this->type) . '"');
             SRBLogger::addLog('Map of ' . ucfirst($this->type) . ' ' . $this->id_item . ' updated', SRBLogger::INFO, $this->type, $this->id_item);
         } else {
@@ -74,12 +98,12 @@ class ElementMapper
         return $result;
     }
 
-    static private function returnResult($result)
+    private static function returnResult($result)
     {
         return $result ? new self($result) : false;
     }
 
-    static public function getMappingIdIfExists($itemId, $itemType)
+    public static function getMappingIdIfExists($itemId, $itemType)
     {
         $map = self::getByIdItemAndItemType($itemId, $itemType);
 
@@ -90,7 +114,7 @@ class ElementMapper
         return null;
     }
 
-    static public function getById($id)
+    public static function getById($id)
     {
         $sql = self::findAllQuery();
         $sql->where(self::getTableIdentifier() . ' = ' . pSQL($id));
@@ -99,11 +123,11 @@ class ElementMapper
         return self::returnResult($result);
     }
 
-    static public function getByType($type)
+    public static function getByType($type)
     {
         $mappingsFromDB = Db::getInstance()->executeS(self::findByTypeQuery($type));
 
-        $mappings = [];
+        $mappings = array();
         foreach ($mappingsFromDB as $mapping) {
             $mappings[] = new self($mapping);
         }
@@ -111,9 +135,11 @@ class ElementMapper
         return $mappings;
     }
 
-    static public function getByIdItemAndItemType($idItem, $type)
+    public static function getByIdItemAndItemType($idItem, $type)
     {
-        if (is_string($idItem) && !is_numeric($idItem)) return static::getByIdItemSRBAndItemType($idItem, $type);
+        if (is_string($idItem) && !is_numeric($idItem)) {
+            return static::getByIdItemSRBAndItemType($idItem, $type);
+        }
 
         $sql = self::findAllQuery();
         $sql->where(pSQL(self::getTableName()) . '.id_item = ' . pSQL($idItem) . ' AND ' . pSQL(self::getTableName()) . '.type = "' . pSQL($type) . '"');
@@ -122,7 +148,7 @@ class ElementMapper
         return self::returnResult($result);
     }
 
-    static public function getByIdItemSRBAndItemType($idItemSrb, $type)
+    public static function getByIdItemSRBAndItemType($idItemSrb, $type)
     {
         $sql = self::findAllQuery();
         $sql->where(pSQL(self::getTableName()) . '.id_item_srb = "' . pSQL($idItemSrb) . '" AND ' . pSQL(self::getTableName()) . '.type = "' . pSQL($type) . '"');
@@ -131,9 +157,9 @@ class ElementMapper
         return self::returnResult($result);
     }
 
-    static private function generateMappers($mappingsFromDB)
+    private static function generateMappers($mappingsFromDB)
     {
-        $mappings = [];
+        $mappings = array();
         foreach ($mappingsFromDB as $mapping) {
             $mappings[] = new self($mapping);
         }
@@ -141,12 +167,12 @@ class ElementMapper
         return $mappings;
     }
 
-    static public function getAll()
+    public static function getAll()
     {
         return self::generateMappers(Db::getInstance()->executeS(self::findAllQuery()));
     }
 
-    static public function addSelectAllToQuery(&$sql)
+    public static function addSelectAllToQuery(&$sql)
     {
         $sql->select(
             pSQL(self::getTableName()) . '.id_srb_map, ' .
@@ -157,7 +183,7 @@ class ElementMapper
         );
     }
 
-    static public function findAllQuery()
+    public static function findAllQuery()
     {
         $sql = new DbQuery();
         self::addSelectAllToQuery($sql);
@@ -166,7 +192,7 @@ class ElementMapper
         return $sql;
     }
 
-    static public function findByTypeQuery($type)
+    public static function findByTypeQuery($type)
     {
         $sql = self::findAllQuery();
         $sql->where(self::getTableName() . '.type = "' . $type . '"');
@@ -174,7 +200,7 @@ class ElementMapper
         return $sql;
     }
 
-    static public function findOnlyIdItemByTypeQuery($type)
+    public static function findOnlyIdItemByTypeQuery($type)
     {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.id_item');
@@ -184,7 +210,7 @@ class ElementMapper
         return $sql;
     }
 
-    static public function findOnlyLastSentByTypeQuery($type)
+    public static function findOnlyLastSentByTypeQuery($type)
     {
         $sql = new DbQuery();
         $sql->select(self::getTableName() . '.last_sent_at');
@@ -194,12 +220,12 @@ class ElementMapper
         return $sql;
     }
 
-    static public function getMappingsForIdsAndType($ids, $type)
+    public static function getMappingsForIdsAndType($ids, $type)
     {
         return self::generateMappers(Db::getInstance()->executeS(self::findByTypeAndListOfIdsQuery($ids, $type)));
     }
 
-    static public function findByTypeAndListOfIdsQuery($ids, $type)
+    public static function findByTypeAndListOfIdsQuery($ids, $type)
     {
         $sql = static::findByTypeQuery($type);
         $sql->where(pSQL(self::getTableName()) . '.id_item IN (' . implode(', ', array_map('intval', $ids)) . ')');
@@ -207,7 +233,7 @@ class ElementMapper
         return $sql;
     }
 
-    static public function truncateTable()
+    public static function truncateTable()
     {
         Db::getInstance()->execute('TRUNCATE TABLE ' . pSQL(self::getMapperTableName()));
     }

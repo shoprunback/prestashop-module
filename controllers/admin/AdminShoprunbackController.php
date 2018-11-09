@@ -1,4 +1,27 @@
 <?php
+/**
+ * 2007-2018 ShopRunBack
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to ShopRunBack
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade the ShopRunBack module to newer
+ * versions in the future.
+ *
+ * @author ShopRunBack <contact@shoprunback.com>
+ * @copyright 2007-2018 ShopRunBack
+ * @license http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * International Registered Trademark & Property of ShopRunBack
+ **/
 
 use Shoprunback\RestClient;
 use Shoprunback\Elements\Account;
@@ -17,7 +40,7 @@ class AdminShoprunbackController extends ModuleAdminController
     {
         parent::__construct();
         $this->bootstrap = true;
-        $this->token = isset($_GET['token']) ? $_GET['token'] : '';
+        $this->token = Tools::getIsset('token') ? Tools::getValue('token') : '';
         $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/srbGlobal.css');
         $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin/header.css');
         $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin/override.css');
@@ -25,8 +48,8 @@ class AdminShoprunbackController extends ModuleAdminController
         $this->actionResult = false;
         $this->tabUrl = Context::getContext()->link->getAdminLink('AdminShoprunback');
 
-        if ($_GET && isset($_GET['action'])) {
-            $function = $_GET['action'];
+        if (Tools::getIsset('action')) {
+            $function = Tools::getValue('action');
             $this->actionResult = $this->{$function}();
         }
     }
@@ -109,7 +132,7 @@ class AdminShoprunbackController extends ModuleAdminController
             return;
         }
 
-        $elements = [];
+        $elements = array();
         $template = 'srbManager';
 
         if ($elementType == 'config') {
@@ -148,7 +171,6 @@ class AdminShoprunbackController extends ModuleAdminController
             'template'                          => $template,
             'admin_module_ajax_url_shoprunback' => 'index.php?controller=AdminShoprunback&token=' . Tools::getAdminTokenLite('AdminShoprunback')
         ));
-
     }
 
     private function getElements($elementType = 'return')
@@ -157,16 +179,10 @@ class AdminShoprunbackController extends ModuleAdminController
         $countElements = 0;
         $searchCondition = false;
 
-        $currentPage = (isset($_GET['currentPage'])) ? $_GET['currentPage'] : 1;
+        $currentPage = (Tools::getIsset('currentPage')) ? Tools::getValue('currentPage') : 1;
         $class = 'SRBShipback';
         $function = 'getAllByCreateDate';
         $this->context->smarty->assign('actionUrl', Context::getContext()->link->getAdminLink('AdminShoprunback') . '&elementType=' . $elementType);
-
-        // If we have a filter, we set the value if the POST array so we can get it with the same function everywhere
-        // I had to do this because it seems we can't do a form with a method GET in the back-office...
-        if (isset($_GET['filter']) && !is_null($_GET['filter']) && isset($_GET['filterValue']) && !is_null($_GET['filterValue'])) {
-            $_POST[$_GET['filter']] = $_GET['filterValue'];
-        }
 
         $searchCustomer = 'customer';
         $this->context->smarty->assign('searchCustomerName', $searchCustomer);
@@ -247,7 +263,7 @@ class AdminShoprunbackController extends ModuleAdminController
             $class::$function(false, self::ELEMENTS_BY_PAGE, $elementMin, false);
 
         if ($elementType == 'product') {
-            $noBrand = [];
+            $noBrand = array();
             foreach ($elements as $product) {
                 if (is_null($product->brand)) {
                     $noBrand[] = $product->getDBId();
@@ -277,14 +293,9 @@ class AdminShoprunbackController extends ModuleAdminController
         $this->context->smarty->assign('production', Configuration::get('production'));
     }
 
-/*     public function asyncCall()
-    {
-        require_once($this->module->SRBModulePath . '/asyncCall.php');
-    } */
-
     public function markAsReadNotification()
     {
-        return SRBNotification::markAsReadById($_POST['id']);
+        return SRBNotification::markAsReadById(Tools::getValue('id'));
     }
 
     public function exportLogs()
@@ -299,9 +310,13 @@ class AdminShoprunbackController extends ModuleAdminController
             foreach ($logs as $log) {
                 $content .= '[' . $log['date_add'] . '] ' . "\n";
 
-                if (!empty($log['object_type'])) $content .= 'ObjectType: ' . $log['object_type'] . "\n";
+                if (!empty($log['object_type'])) {
+                    $content .= 'ObjectType: ' . $log['object_type'] . "\n";
+                }
 
-                if (!empty($log['object_id'])) $content .= 'ObjectID: ' . $log['object_id'] . "\n";
+                if (!empty($log['object_id'])) {
+                    $content .= 'ObjectID: ' . $log['object_id'] . "\n";
+                }
 
                 $content .= 'Employee: ' . $log['firstname'] . ' ' . $log['lastname'] . ' <' . $log['email'] . '>' . "\n";
                 $content .= 'Message: ' . $log['message'] . "\n\n";
@@ -331,7 +346,8 @@ class AdminShoprunbackController extends ModuleAdminController
         $this->addJs(_PS_MODULE_DIR_ . $this->module->name . '/views/js/admin/srbManager.js');
     }
 
-    public function ajaxProcessSyncAll() {
+    public function ajaxProcessSyncAll()
+    {
         $class = Tools::getIsset('className') ? Tools::getValue('className') : 'ShopRunBack';
 
         $actionSRB = Tools::getValue('actionSRB');
