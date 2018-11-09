@@ -21,7 +21,7 @@ class AdminShoprunbackController extends ModuleAdminController
         $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/srbGlobal.css');
         $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin/header.css');
         $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/admin/override.css');
-        $this->addCSS('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
+        $this->addCSS(_PS_MODULE_DIR_ . $this->module->name . '/views/css/vendor/font-awesome-4.7.0/css/font-awesome.min.css');
         $this->actionResult = false;
         $this->tabUrl = Context::getContext()->link->getAdminLink('AdminShoprunback');
 
@@ -90,18 +90,21 @@ class AdminShoprunbackController extends ModuleAdminController
         $link = Context::getContext()->link;
         parent::initContent();
 
-        $elementType = (isset($_GET['elementType'])) ? $_GET['elementType'] : '';
+        $elementType = Tools::getIsset('elementType') ? Tools::getValue('elementType') : '';
         $message = '';
 
-        $this->context->smarty->assign('elementType', $elementType);
-        $this->context->smarty->assign('shoprunbackURL', $this->module->url);
-        $this->context->smarty->assign('shoprunbackURLProd', $this->module->urlProd);
-        $this->context->smarty->assign('srbManager', $this->tabUrl);
-        $this->context->smarty->assign('message', $message);
-        $this->context->smarty->assign('asyncCall', $this->tabUrl . '&action=asyncCall');
+        $this->context->smarty->assign(array(
+            'elementType'        => $elementType,
+            'shoprunbackURL'     => $this->module->url,
+            'shoprunbackURLProd' => $this->module->urlProd,
+            'srbManager'         => $this->tabUrl,
+            'message'            => $message,
+            'asyncCall'          => $this->tabUrl . '&action=asyncCall'
+        ));
+
         $this->setTemplate('../../../../modules/' . $this->module->name . '/views/templates/admin/layout.tpl');
 
-        if (isset($_GET['syncAll'])) {
+        if (Tools::getIsset('syncAll')) {
             $this->syncAll();
             return;
         }
@@ -143,7 +146,7 @@ class AdminShoprunbackController extends ModuleAdminController
             'srbtoken'                          => RestClient::getClient()->getToken(),
             'link'                              => $link,
             'template'                          => $template,
-            'admin_module_ajax_url_shoprunback' => $this->module->front_controller[0]
+            'admin_module_ajax_url_shoprunback' => 'index.php?controller=AdminShoprunback&token=' . Tools::getAdminTokenLite('AdminShoprunback')
         ));
 
     }

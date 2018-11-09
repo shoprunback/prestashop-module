@@ -88,11 +88,6 @@ class ShopRunBack extends Module
             $this->context->controller->{$type}[] = $this->l($message);
         }
 
-        $this->controller_name = array('AdminShoprunback');
-        $this->front_controller =  array(
-            'index.php?controller=' . $this->controller_name[0] . '&token=' . Tools::getAdminTokenLite($this->controller_name[0]),
-        );
-
     }
 
     private function installTab($controllerClassName, $tabConf)

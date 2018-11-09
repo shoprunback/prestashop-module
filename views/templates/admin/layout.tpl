@@ -2,14 +2,19 @@
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
     {include file='./header.tpl'}
 
-    {if $message}
-        <div class="alert alert-{$messageType}">
-            {if $message == AdminShoprunbackController::SUCCESS_CONFIG}
-                {l s="success.config" mod='shoprunback'}
-            {elseif $message == AdminShoprunbackController::ERROR_NO_TOKEN}
-                {l s="error.no_token" mod='shoprunback'}
+    {if isset($messageType)}
+        <div class="col-sm-12">
+            {if $messageType == 'success'}
+                <div class="alert alert-success">
+                    {l s="Form saved with success" mod='shoprunback'}
+                </div>
+            {else}
+                <div class="alert alert-danger">
+                    {l s="There was an error saving your configuration, please check your token" mod='shoprunback'}
+                </div>
             {/if}
         </div>
+
     {/if}
 
     {if isset($notifications)}
