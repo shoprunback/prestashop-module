@@ -34,12 +34,12 @@ define('DASHBOARD_PROD_URL', \Shoprunback\RestClient::getClient()->getProduction
 
 \Shoprunback\RestClient::getClient()->setToken(Configuration::get('srbtoken'));
 
-// We set the production environment by default
-\Shoprunback\RestClient::getClient()->useProductionEnvironment();
-
 // Then we check which environment we are on and switch to Sandbox if needed
 if (!PRODUCTION_MODE) {
     \Shoprunback\RestClient::getClient()->useSandboxEnvironment();
+} else {
+    // We set the production environment by default
+    \Shoprunback\RestClient::getClient()->useProductionEnvironment();
 }
 
 define('DASHBOARD_URL', \Shoprunback\RestClient::getClient()->getApiBaseUrl());
@@ -171,6 +171,7 @@ class ShopRunBack extends Module
             return false;
         }
 
+        Configuration::updateValue('SRB_ENABLE_RETURN_BTN', 0);
         Configuration::updateValue('production', false);
 
         \Shoprunback\RestClient::getClient()->setToken('');
@@ -360,6 +361,10 @@ class ShopRunBack extends Module
 
     public function hookDisplayOrderDetail($params)
     {
+        if (Configuration::get('SRB_ENABLE_RETURN_BTN') === false || Configuration::get('SRB_ENABLE_RETURN_BTN') == 0) {
+            return false;
+        }
+
         if (\Shoprunback\RestClient::getClient()->getToken()) {
             try {
                 $order = SRBOrder::getNotSyncById(Tools::getValue('id_order'));

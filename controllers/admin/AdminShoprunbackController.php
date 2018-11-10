@@ -122,7 +122,7 @@ class AdminShoprunbackController extends ModuleAdminController
             'shoprunbackURLProd' => $this->module->urlProd,
             'srbManager'         => $this->tabUrl,
             'message'            => $message,
-            'asyncCall'          => $this->tabUrl . '&action=asyncCall'
+            'asyncCall'          => $this->tabUrl . '&action=asyncCall',
         ));
 
         $this->setTemplate('../../../../modules/' . $this->module->name . '/views/templates/admin/layout.tpl');
@@ -134,6 +134,11 @@ class AdminShoprunbackController extends ModuleAdminController
 
         $elements = array();
         $template = 'srbManager';
+
+    
+        if (Tools::getIsset('enable_return_btn')) {
+            $this->_handleReturnBtn(Tools::getValue('enable_return_btn'));
+        }
 
         if ($elementType == 'config') {
             if (Tools::getValue('srbtoken')) {
@@ -169,8 +174,18 @@ class AdminShoprunbackController extends ModuleAdminController
             'srbtoken'                          => RestClient::getClient()->getToken(),
             'link'                              => $link,
             'template'                          => $template,
-            'admin_module_ajax_url_shoprunback' => 'index.php?controller=AdminShoprunback&token=' . Tools::getAdminTokenLite('AdminShoprunback')
+            'admin_module_ajax_url_shoprunback' => 'index.php?controller=AdminShoprunback&token=' . Tools::getAdminTokenLite('AdminShoprunback'),
+            'enable_return_btn' => (Configuration::get('SRB_ENABLE_RETURN_BTN') !== false) ? Configuration::get('SRB_ENABLE_RETURN_BTN') : '0'
         ));
+    }
+
+    private function _handleReturnBtn($status) {
+        if ($status == 1) {
+            //$company = Company::getOwn(); // check the enable attribute
+            Configuration::updateValue('SRB_ENABLE_RETURN_BTN', $status);
+        } else {
+            Configuration::updateValue('SRB_ENABLE_RETURN_BTN', $status);
+        }
     }
 
     private function getElements($elementType = 'return')

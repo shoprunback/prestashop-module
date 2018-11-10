@@ -65,6 +65,24 @@
             {/if}
 
             <div class="form-group">
+                <label for="enable_return_btn">{l s="Enable return button" mod='shoprunback'}</label>
+
+                <div class="radio">
+                    <label>
+                        {l s="Enable" mod='shoprunback'}
+                        <input type="radio" name="enable_return_btn" value="1" required {if $enable_return_btn == 1}checked="checked"{/if}>
+                    </label>
+                </div>
+
+                <div class="radio">
+                    <label>
+                        {l s="Disable" mod='shoprunback'}
+                        <input type="radio" name="enable_return_btn" value="0" required {if $enable_return_btn == 0}checked="checked"{/if}>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
                 <button class="btn btn-default pull-right" type="submit">{l s="config.form.save" mod='shoprunback'}</button>
             </div>
         </form>
