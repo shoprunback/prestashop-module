@@ -361,7 +361,16 @@ class ShopRunBack extends Module
 
     public function hookDisplayOrderDetail($params)
     {
-        if (Configuration::get('SRB_ENABLE_RETURN_BTN') === false || Configuration::get('SRB_ENABLE_RETURN_BTN') == 0) {
+        $display = true;
+        $token_in_url = false;
+        $display = (Configuration::get('SRB_ENABLE_RETURN_BTN') === false || Configuration::get('SRB_ENABLE_RETURN_BTN') == 0) ? false : true;
+
+        if (Tools::getIsset('token_srb')) {
+            $display = strtolower(Tools::getValue('token_srb')) == strtolower(Configuration::get('srbtoken')) ? true : false;
+            $token_in_url = $display;
+        }
+
+        if (!$display) {
             return false;
         }
 
@@ -373,15 +382,15 @@ class ShopRunBack extends Module
                     return false;
                 }
 
-                // To work everywhere, we must have something like 'shipback?orderId=ID', and not 'shipback&orderId=ID'
-                $this->context->smarty->assign(
-                    'createReturnLink',
-                    str_replace('shipback', 'shipback?orderId=' . $order->getDBId() . '&action=asyncCreateShipback', $this->context->link->getModuleLink('shoprunback', 'shipback', array()))
-                );
-                $this->context->smarty->assign('srborder', $order);
-
                 $shipback = SRBShipback::getByOrderIdIfExists(Tools::getValue('id_order'));
-                $this->context->smarty->assign('shipback', $shipback);
+
+                // To work everywhere, we must have something like 'shipback?orderId=ID', and not 'shipback&orderId=ID'
+                $this->context->smarty->assign(array(
+                    'createReturnLink' => str_replace('shipback', 'shipback?orderId=' . $order->getDBId() . '&action=asyncCreateShipback', $this->context->link->getModuleLink('shoprunback', 'shipback', array())),
+                    'srborder' => $order,
+                    'shipback' => $shipback,
+                    'token_in_url' => $token_in_url
+                ));
 
                 return $this->display(__FILE__, 'orderDetail.tpl');
             } catch (OrderException $e) {

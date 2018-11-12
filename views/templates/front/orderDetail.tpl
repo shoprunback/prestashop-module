@@ -23,6 +23,11 @@
  *}
  
  <section class="box" id="order-detail">
+
+    {if isset($token_in_url) && $token_in_url === true}
+        <u>{l s='Please be aware that the return part will only be displayed for you and not for your customers.' mod='shoprunback'}</u>
+    {/if}
+
     <h1 id="request">
         {if !$shipback}
             {l s='front.order.detail.title' mod='shoprunback'}<br>

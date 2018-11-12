@@ -83,6 +83,11 @@
             </div>
 
             <div class="form-group">
+                <p>{l s='If you wish to display the return part anyway, please add the &token_srb=[Your SRB Token] to the order detail URL.' mod='shoprunback'}</p>
+                <p>{l s='Please be aware that the return part will only be displayed for you and not for your customers.' mod='shoprunback'}</p>
+            </div>
+
+            <div class="form-group">
                 <button class="btn btn-default pull-right" type="submit">{l s="config.form.save" mod='shoprunback'}</button>
             </div>
         </form>
