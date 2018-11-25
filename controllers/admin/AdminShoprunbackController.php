@@ -137,7 +137,9 @@ class AdminShoprunbackController extends ModuleAdminController
 
     
         if (Tools::getIsset('enable_return_btn')) {
-            $this->_handleReturnBtn(Tools::getValue('enable_return_btn'));
+            if ($this->_handleReturnBtn(Tools::getValue('enable_return_btn')) === false) {
+                $this->context->smarty->assign('enable_return_btn_msg', false);
+            }
         }
 
         if ($elementType == 'config') {
@@ -181,11 +183,19 @@ class AdminShoprunbackController extends ModuleAdminController
 
     private function _handleReturnBtn($status) {
         if ($status == 1) {
-            //$company = Company::getOwn(); // check the enable attribute
-            Configuration::updateValue('SRB_ENABLE_RETURN_BTN', $status);
+            $company = Company::getOwn(); // check the enabled attribute
+
+            if (isset($company->enabled) && $company->enabled === true) {
+                Configuration::updateValue('SRB_ENABLE_RETURN_BTN', $status);
+            } else {
+                return false;
+            }
+            
         } else {
             Configuration::updateValue('SRB_ENABLE_RETURN_BTN', $status);
         }
+
+        return true;
     }
 
     private function getElements($elementType = 'return')

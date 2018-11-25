@@ -28,17 +28,26 @@
 
     {if isset($messageType)}
         <div class="col-sm-12">
+            {* if we add another case, use a cleaner way to handle the error messages *}
             {if $messageType == 'success'}
                 <div class="alert alert-success">
                     {l s="Form saved with success" mod='shoprunback'}
                 </div>
-            {else}
+            {else if $messageType == 'danger'}
                 <div class="alert alert-danger">
                     {l s="There was an error saving your configuration, please check your token" mod='shoprunback'}
                 </div>
             {/if}
         </div>
 
+    {/if}
+
+    {if isset($enable_return_btn_msg) && $enable_return_btn_msg === false}
+        <div class="col-sm-12">
+            <div class="alert alert-warning">
+                {l s="You can not edit the return button field yet." mod='shoprunback'}
+            </div>
+        </div>
     {/if}
 
     {if isset($notifications)}
