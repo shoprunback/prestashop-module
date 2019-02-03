@@ -337,6 +337,11 @@ trait PSElementTrait
 
     public static function syncNestedElement($element)
     {
+        // if the element is already synced, we dont do it again
+        if (method_exists($element, 'getIdColumnName') && $element->getMapId()) {
+            return $element;
+        }
+
         if ($element instanceof PSElementInterface) {
             $element->sync();
         } elseif (method_exists($element, 'syncNestedElements')) {
