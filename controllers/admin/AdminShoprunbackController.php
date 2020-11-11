@@ -56,6 +56,12 @@ class AdminShoprunbackController extends ModuleAdminController
 
     private function handleConfig()
     {
+        if(Tools::getValue('production') == "1"){
+            RestClient::getClient()->useProductionEnvironment();
+        }else{
+            RestClient::getClient()->useSandboxEnvironment();
+        }
+
         $srbtoken = Tools::getValue('srbtoken');
 
         if ($srbtoken == '') {
@@ -65,7 +71,13 @@ class AdminShoprunbackController extends ModuleAdminController
         $oldSrbToken = RestClient::getClient()->getToken();
 
         RestClient::getClient()->setToken($srbtoken);
-        $user = Account::getOwn();
+        
+        try {
+            $user = Account::getOwn();
+        } catch (\Throwable $th) {
+            $user= null;
+        }
+        
         if (!$user) {
             SRBLogger::addLog('Invalid API token: ' . $srbtoken, SRBLogger::WARNING, 'configuration');
             RestClient::getClient()->setToken($oldSrbToken);
