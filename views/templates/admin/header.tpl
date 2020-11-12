@@ -38,15 +38,6 @@
             <li class="{if $elementType eq 'return'}active{/if}">
                 <a href="{$srbManager}&elementType=return">{l s='return.my_returns' mod='shoprunback'}</a>
             </li>
-            <li class="{if $elementType eq 'brand'}active{/if}">
-                <a href="{$srbManager}&elementType=brand">{l s='brand.my_brands' mod='shoprunback'}</a>
-            </li>
-            <li class="{if $elementType eq 'product'}active{/if}">
-                <a href="{$srbManager}&elementType=product">{l s="product.my_products" mod='shoprunback'}</a>
-            </li>
-            <li class="{if $elementType eq 'order'}active{/if}">
-                <a href="{$srbManager}&elementType=order">{l s="order.my_orders" mod='shoprunback'}</a>
-            </li>
             <li class="{if $elementType eq 'config'}active{/if}">
                 <a href="{$srbManager}&elementType=config">{l s="config" mod='shoprunback'}</a>
             </li>
