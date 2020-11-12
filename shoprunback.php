@@ -159,14 +159,10 @@ class ShopRunBack extends Module
         }
 
         if (! parent::install()
-            // || ! $this->registerHook('actionProductAdd')
-            // || ! $this->registerHook('actionProductDelete')
-            // || ! $this->registerHook('actionProductUpdate')
             || ! $this->registerHook('actionOrderStatusPostUpdate')
             || ! $this->registerHook('displayBackOfficeHeader')
             || ! $this->registerHook('displayHeader')
             || ! $this->registerHook('displayOrderDetail')
-            // || ! $this->registerHook('newOrder')
         ) {
             return false;
         }
@@ -192,14 +188,11 @@ class ShopRunBack extends Module
         }
 
         if (! parent::uninstall()
-            // || ! $this->unregisterHook('actionProductAdd')
-            // || ! $this->unregisterHook('actionProductDelete')
-            // || ! $this->unregisterHook('actionProductUpdate')
             || ! $this->unregisterHook('actionOrderStatusPostUpdate')
             || ! $this->unregisterHook('displayBackOfficeHeader')
             || ! $this->unregisterHook('displayHeader')
             || ! $this->unregisterHook('displayOrderDetail')
-            // || ! $this->unregisterHook('newOrder')
+            
         ) {
             return false;
         }
